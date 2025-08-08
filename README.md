@@ -1,0 +1,2 @@
+# CRM-Project
+A scalable, automation-driven CRM platform designed to help businesses capture, nurture, and convert leads while centralizing multi-channel communication, tracking sales pipelines, managing campaigns, and enhancing team productivity through role-based access, analytics, and real-time insights
