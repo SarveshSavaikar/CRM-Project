@@ -24,6 +24,9 @@ import {
   TasksCreatePage,
   TasksEditPage,
   TasksListPage,
+  LeadsListIndex,
+  GeoInsightsPage,               // Existing GeoInsights page
+  CampaignAnalyticsDashboard,    // <-- Import new Campaigns page
 } from "@/routes";
 
 import "@refinedev/antd/dist/reset.css";
@@ -81,15 +84,27 @@ const App = () => {
                     <Route path="edit/:id" element={<CompanyEditPage />} />
                   </Route>
 
+                  {/* Leads route */}
+                  <Route path="/leads">
+                    <Route index element={<LeadsListIndex />} />
+                  </Route>
+
+                  {/* GeoInsights route */}
+                  <Route path="/geo-insights">
+                    <Route index element={<GeoInsightsPage />} />
+                  </Route>
+
+                  {/* NEW Campaigns route */}
+                  <Route path="/campaigns">
+                    <Route index element={<CampaignAnalyticsDashboard />} />
+                  </Route>
+
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
 
                 <Route
                   element={
-                    <Authenticated
-                      key="authenticated-auth"
-                      fallback={<Outlet />}
-                    >
+                    <Authenticated key="authenticated-auth" fallback={<Outlet />}>
                       <NavigateToResource resource="dashboard" />
                     </Authenticated>
                   }
