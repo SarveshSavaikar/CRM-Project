@@ -192,6 +192,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
             boxShadow: "0 1px 8px #dde3f1",
             padding: 22,
             marginBottom: 24,
+             minHeight: 390,
           }}
         >
           <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 14 }}>
@@ -239,7 +240,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
                   />
                   <text
                     x={x + 7}
-                    y={250} // moved below more
+                    y={270}  // Pushed down to prevent overlap
                     fontSize="10"
                     fill="#7f8a9c"
                     textAnchor="middle"
@@ -250,12 +251,12 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
               );
             })}
             {/* Legend below bars */}
-            <rect x={100} y={245} width={16} height={10} fill="#3871f9" />
-            <text x={120} y={254} fontSize={12} fill="#22274a">
+            <rect x={100} y={290} width={16} height={10} fill="#3871f9" />
+            <text x={120} y={300} fontSize={12} fill="#22274a">
               Campaign Cost
             </text>
-            <rect x={250} y={245} width={16} height={10} fill="#69d277" />
-            <text x={270} y={254} fontSize={12} fill="#22274a">
+            <rect x={250} y={290} width={16} height={10} fill="#69d277" />
+            <text x={270} y={300} fontSize={12} fill="#22274a">
               Campaign Revenue
             </text>
           </svg>

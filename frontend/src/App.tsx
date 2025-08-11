@@ -1,5 +1,4 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-
 import { RefineThemes, useNotificationProvider } from "@refinedev/antd";
 import { Authenticated, ErrorComponent, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
@@ -9,12 +8,13 @@ import routerProvider, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-
 import { App as AntdApp, ConfigProvider } from "antd";
 
 import { Layout } from "@/components";
 import { resources } from "@/config/resources";
 import { authProvider, dataProvider, liveProvider } from "@/providers";
+
+// Make sure AdminSettingsPage is exported in src/routes/index.ts!
 import {
   CompanyCreatePage,
   CompanyEditPage,
@@ -25,8 +25,9 @@ import {
   TasksEditPage,
   TasksListPage,
   LeadsListIndex,
-  GeoInsightsPage,               // Existing GeoInsights page
-  CampaignAnalyticsDashboard,    // <-- Import new Campaigns page
+  GeoInsightsPage,
+  CampaignAnalyticsDashboard,
+  AdminSettingsPage, // <-- This must be valid and re-exported from the barrel!
 } from "@/routes";
 
 import "@refinedev/antd/dist/reset.css";
@@ -52,6 +53,7 @@ const App = () => {
               }}
             >
               <Routes>
+                {/* Protected Layout */}
                 <Route
                   element={
                     <Authenticated
@@ -66,6 +68,7 @@ const App = () => {
                 >
                   <Route index element={<DashboardPage />} />
 
+                  {/* Tasks */}
                   <Route
                     path="/tasks"
                     element={
@@ -78,30 +81,39 @@ const App = () => {
                     <Route path="edit/:id" element={<TasksEditPage />} />
                   </Route>
 
+                  {/* Companies */}
                   <Route path="/companies">
                     <Route index element={<CompanyListPage />} />
                     <Route path="new" element={<CompanyCreatePage />} />
                     <Route path="edit/:id" element={<CompanyEditPage />} />
                   </Route>
 
-                  {/* Leads route */}
+                  {/* Leads */}
                   <Route path="/leads">
                     <Route index element={<LeadsListIndex />} />
                   </Route>
 
-                  {/* GeoInsights route */}
+                  {/* GeoInsights */}
                   <Route path="/geo-insights">
                     <Route index element={<GeoInsightsPage />} />
                   </Route>
 
-                  {/* NEW Campaigns route */}
+                  {/* Campaigns */}
                   <Route path="/campaigns">
                     <Route index element={<CampaignAnalyticsDashboard />} />
                   </Route>
 
+                  {/* ------ Admin Settings (NEW) ------ */}
+                  <Route path="/admin">
+                    <Route index element={<AdminSettingsPage />} />
+                  </Route>
+                  {/* --------------------------------- */}
+
+                  {/* 404 Fallback */}
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
 
+                {/* Auth route (login) */}
                 <Route
                   element={
                     <Authenticated key="authenticated-auth" fallback={<Outlet />}>

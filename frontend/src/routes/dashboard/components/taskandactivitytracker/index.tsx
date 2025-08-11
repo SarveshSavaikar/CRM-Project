@@ -1,6 +1,12 @@
 import React from "react";
 import { Card, List, Space, Typography, Tag } from "antd";
-import { ClockCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import {
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  PhoneOutlined,
+  CalendarOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
 
 type Activity = {
   icon: React.ReactNode;
@@ -18,17 +24,17 @@ type Completed = {
 
 const activities: Activity[] = [
   {
-    icon: <span role="img" aria-label="phone">📞</span>,
+    icon: <PhoneOutlined style={{ color: "#1677ff" }} />,
     text: "Follow up with Acme Corp",
     time: "10:00 AM",
   },
   {
-    icon: <span role="img" aria-label="calendar">📅</span>,
+    icon: <CalendarOutlined style={{ color: "#52c41a" }} />,
     text: "Project X kickoff with Dev Team",
     time: "02:00 PM",
   },
   {
-    icon: <span role="img" aria-label="mail">📧</span>,
+    icon: <MailOutlined style={{ color: "#faad14" }} />,
     text: "Send proposal to Beta Ltd",
     time: "04:00 PM",
   },

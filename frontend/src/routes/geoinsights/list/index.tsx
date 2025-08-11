@@ -1,16 +1,30 @@
 import React, { useState } from "react";
+import {
+  ComposableMap,
+  ZoomableGroup,
+  Geographies,
+  Geography,
+  Marker,
+} from "react-simple-maps";
 
-// Export constants for reuse if needed
-export const timeOptions: string[] = ["Last 30 days", "Last 7 days", "This Month", "Last Month"];
-export const regionOptions: string[] = ["North America", "Europe", "Asia", "South America", "Africa"];
+// Filter options
+const timeOptions: string[] = ["Last 30 days", "Last 7 days", "This Month", "Last Month"];
+const regionOptions: string[] = ["North America", "Europe", "Asia", "South America", "Africa"];
 
-// Dummy map marker positions (relative to container)
-export const markers: { left: string; top: string }[] = [
-  { left: "28%", top: "32%" }, // North America
-  { left: "76.5%", top: "30%" }, // East Asia/Russia
-  { left: "53.5%", top: "43%" }, // Middle East
-  { left: "37%", top: "78%" }, // South America
-  { left: "61%", top: "54%" }, // Sub-Saharan Africa
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
+
+// Map marker data
+type MarkerType = {
+  name: string;
+  coordinates: [number, number];
+  count: number;
+};
+const markers: MarkerType[] = [
+  { name: "North America", coordinates: [-98, 39], count: 3 },
+  { name: "East Asia/Russia", coordinates: [105, 55], count: 2 },
+  { name: "Middle East", coordinates: [45, 25], count: 1 },
+  { name: "South America", coordinates: [-60, -15], count: 1 },
+  { name: "Sub-Saharan Africa", coordinates: [20, 0], count: 1 },
 ];
 
 export function GeoInsightsPage(): JSX.Element {
@@ -22,16 +36,16 @@ export function GeoInsightsPage(): JSX.Element {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        background: "#f5f5f8",
+        background: "#f5f6fb",
         padding: "32px 36px",
       }}
     >
-      {/* Header and filters */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 36 }}>
-        <h1 style={{ fontWeight: 700, fontSize: 27, margin: 0, letterSpacing: 0, flex: 1 }}>
+      {/* Header and filter bar */}
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
+        <h1 style={{ fontWeight: 700, fontSize: 27, margin: 0, flex: 1, letterSpacing: 0 }}>
           Geo Insights
         </h1>
-        {/* Time filter */}
+
         <div
           style={{
             display: "flex",
@@ -80,7 +94,6 @@ export function GeoInsightsPage(): JSX.Element {
             </svg>
           </span>
         </div>
-        {/* Region filter */}
         <div
           style={{
             display: "flex",
@@ -145,9 +158,7 @@ export function GeoInsightsPage(): JSX.Element {
             justifyContent: "center",
           }}
         >
-          <div
-            style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}
-          >
+          <div style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}>
             {/* Person icon */}
             <svg width="17" height="16" viewBox="0 0 24 24" style={{ marginRight: 7 }}>
               <circle cx="12" cy="8" r="4.5" fill="#1467fa" />
@@ -173,9 +184,7 @@ export function GeoInsightsPage(): JSX.Element {
             justifyContent: "center",
           }}
         >
-          <div
-            style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}
-          >
+          <div style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}>
             {/* Conversion icon */}
             <svg width="17" height="16" viewBox="0 0 18 18" style={{ marginRight: 7 }}>
               <circle cx="9" cy="9" r="8" fill="#e4f0fc" />
@@ -201,9 +210,7 @@ export function GeoInsightsPage(): JSX.Element {
             justifyContent: "center",
           }}
         >
-          <div
-            style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}
-          >
+          <div style={{ display: "flex", alignItems: "center", color: "#7c819a", fontSize: 14, marginBottom: 5 }}>
             {/* Globe icon */}
             <svg width="17" height="16" viewBox="0 0 20 20" style={{ marginRight: 7 }}>
               <circle cx="10" cy="10" r="8" fill="#edf2ff" />
@@ -219,56 +226,82 @@ export function GeoInsightsPage(): JSX.Element {
         </div>
       </div>
 
-      {/* Map Section */}
+      {/* MAP CARD */}
       <div
         style={{
           background: "#fff",
           borderRadius: 14,
-          boxShadow: "0 1px 8px #dde3f1",
+          boxShadow: "0 1px 8px #dde6f0",
           padding: 24,
           minHeight: 360,
           position: "relative",
         }}
       >
-        <div style={{ fontWeight: 700, fontSize: 18, color: "#22274a", marginBottom: 18 }}>
+        <h2
+          style={{
+            fontWeight: 700,
+            fontSize: 18,
+            color: "#222",
+            marginBottom: 18,
+          }}
+        >
           Lead Distribution Map
-        </div>
-        <div style={{ position: "relative", height: "100%" }}>
-          {/* Replace with your map image path */}
-          <img
-            src="/path/to/your/map-image.png"
-            alt="Map"
-            style={{ width: "100%", height: "100%", borderRadius: 8, objectFit: "contain" }}
-          />
-          {markers.map((marker, index) => (
-            <div
-              key={index}
-              title={`Marker ${index + 1}`}
-              style={{
-                position: "absolute",
-                top: marker.top,
-                left: marker.left,
-                width: 26,
-                height: 26,
-                backgroundColor: "#1467fa",
-                border: "3px solid white",
-                borderRadius: "50%",
-                boxShadow: "0 0 12px rgba(20,103,250,0.5)",
-                transform: "translate(-50%, -50%)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 10,
-              }}
-            >
-              <svg width={14} height={14} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx={9} cy={9} r={7} fill="white" />
-                <circle cx={9} cy={9} r={4} fill="#1467fa" />
-              </svg>
-            </div>
-          ))}
-        </div>
+        </h2>
+        <ComposableMap
+          projectionConfig={{ scale: 130 }}
+          width={800}
+          height={400}
+          style={{ width: "100%", height: "400px", background: "#f7fafb" }}
+        >
+          <ZoomableGroup zoom={1} minZoom={1} maxZoom={6}>
+            <Geographies geography={geoUrl}>
+              {({ geographies }: { geographies: any[] }) =>
+                geographies.map((geo: any) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    style={{
+                      default: { fill: "#dbf0f7", outline: "none" },
+                      hover: { fill: "#a9d7e8", outline: "none" },
+                      pressed: { fill: "#7ec6e8", outline: "none" },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+            {markers.map(({ name, coordinates, count }, i) => (
+              <Marker key={i} coordinates={coordinates}>
+                <circle
+                  r={count > 1 ? 20 : 8}
+                  fill="#1491f2"
+                  stroke="#fff"
+                  strokeWidth={2}
+                  style={{
+                    filter: "drop-shadow(0 0 6px rgba(20, 145, 242, 0.7))",
+                    cursor: "pointer",
+                  }}
+                >
+                  <title>{`${name}: ${count} Leads`}</title>
+                </circle>
+                {count > 1 && (
+                  <text
+                    textAnchor="middle"
+                    y={5}
+                    style={{
+                      fill: "#fff",
+                      fontWeight: 700,
+                      fontSize: 16,
+                      pointerEvents: "none",
+                      userSelect: "none",
+                    }}
+                  >
+                    {count}
+                  </text>
+                )}
+              </Marker>
+            ))}
+          </ZoomableGroup>
+        </ComposableMap>
       </div>
     </div>
   );
