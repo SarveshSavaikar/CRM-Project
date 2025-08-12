@@ -1,0 +1,89 @@
+server/
+│
+├── app/
+│   ├── _init_.py
+│   ├── main.py                  # App entry point
+│   ├── core/                    # Core configs & utilities
+│   │   ├── config.py             # Environment variables
+│   │   ├── security.py           # JWT token creation/validation
+│   │   ├── dependencies.py       # Common dependencies (auth checks)
+│   │   ├── logger.py             # Logging config
+│   │   └── utils.py              # Helper functions
+│   │
+│   ├── database/
+│   │   ├── _init_.py
+│   │   ├── connection.py         # DB connection setup
+│   │   └── models/               # All database models
+│   │       ├── user.py
+│   │       ├── team.py
+│   │       ├── lead.py
+│   │       ├── deal.py
+│   │       ├── task.py
+│   │       ├── campaign.py
+│   │       ├── customer.py
+│   │       └── settings.py
+│   │
+│   ├── schemas/                  # Pydantic models (request/response DTOs)
+│   │   ├── auth.py
+│   │   ├── user.py
+│   │   ├── team.py
+│   │   ├── lead.py
+│   │   ├── deal.py
+│   │   ├── task.py
+│   │   ├── campaign.py
+│   │   ├── customer.py
+│   │   ├── geo.py
+│   │   ├── analytics.py
+│   │   ├── file.py
+│   │   └── settings.py
+│   │
+│   ├── services/                 # Business logic layer
+│   │   ├── auth_service.py
+│   │   ├── user_service.py
+│   │   ├── team_service.py
+│   │   ├── lead_service.py
+│   │   ├── deal_service.py
+│   │   ├── task_service.py
+│   │   ├── campaign_service.py
+│   │   ├── customer_service.py
+│   │   ├── geo_service.py
+│   │   ├── analytics_service.py
+│   │   ├── file_service.py
+│   │   └── settings_service.py
+│   │
+│   ├── api/                      # API route definitions
+│   │   ├── _init_.py
+│   │   ├── auth.py               # Authentication & Authorization
+│   │   ├── users.py              # User & Team Management
+│   │   ├── leads.py              # Leads Management
+│   │   ├── deals.py              # Deals / Opportunities
+│   │   ├── tasks.py              # Tasks & Activities
+│   │   ├── campaigns.py          # Marketing Campaigns
+│   │   ├── customers.py          # Customer Management
+│   │   ├── geo.py                # Geo Insights
+│   │   ├── analytics.py          # Dashboard & Analytics
+│   │   ├── files.py              # File Uploads
+│   │   └── settings.py           # System Settings
+│   │
+│   ├── middlewares/              # Request/response middlewares
+│   │   ├── auth_middleware.py
+│   │   └── logging_middleware.py
+│   │
+│   ├── tests/                    # Unit & integration tests
+│   │   ├── test_auth.py
+│   │   ├── test_users.py
+│   │   ├── test_leads.py
+│   │   ├── test_deals.py
+│   │   ├── test_tasks.py
+│   │   ├── test_campaigns.py
+│   │   ├── test_customers.py
+│   │   ├── test_geo.py
+│   │   ├── test_analytics.py
+│   │   └── test_files.py
+│   │
+│   └── migrations/               # Database migration files
+│
+├── requirements.txt              # Python dependencies
+├── .env                          # Environment variables
+├── .gitignore
+└── README.md
