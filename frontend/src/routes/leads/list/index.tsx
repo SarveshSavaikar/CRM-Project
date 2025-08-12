@@ -304,144 +304,6 @@ export function LeadsListIndex() {
         </div>
       </div>
 
-      {/* --- Clean horizontal filter/action bar --- */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          background: "#fff",
-          borderRadius: 10,
-          boxShadow: "0 1px 6px #f0f1f3",
-          padding: "14px 18px",
-          marginTop: 20,
-          marginBottom: 0,
-          flexWrap: "wrap",
-        }}
-      >
-        {/* All main filters and sort: always in one row, left-aligned */}
-        <input
-          placeholder="Filter leads..."
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            borderRadius: 6,
-            border: '1px solid #dbe4f3',
-            fontSize: 15,
-            width: 165,
-            background: "#f9fbfd"
-          }}
-        />
-        <select
-          value={source}
-          onChange={e => setSource(e.target.value)}
-          style={{
-            padding: "8px 12px",
-            border: "1px solid #dbe4f3",
-            borderRadius: 6,
-            background: "#f9fbfd",
-            fontSize: 15,
-            color: "#636b91",
-            width: 120,
-            minWidth: 80,
-          }}
-        >
-          {sources.map(opt =>
-            <option key={opt} value={opt}>{opt === "All" ? "Source" : opt}</option>
-          )}
-        </select>
-        <select
-          value={status}
-          onChange={e => setStatus(e.target.value)}
-          style={{
-            padding: "8px 12px",
-            border: "1px solid #dbe4f3",
-            borderRadius: 6,
-            background: "#f9fbfd",
-            fontSize: 15,
-            color: "#636b91",
-            width: 120,
-            minWidth: 80,
-          }}
-        >
-          {statuses.map(opt =>
-            <option key={opt} value={opt}>{opt === "All" ? "Status" : opt}</option>
-          )}
-        </select>
-        <select
-          value={assigned}
-          onChange={e => setAssigned(e.target.value)}
-          style={{
-            padding: "8px 12px",
-            border: "1px solid #dbe4f3",
-            borderRadius: 6,
-            background: "#f9fbfd",
-            fontSize: 15,
-            color: "#636b91",
-            width: 120,
-            minWidth: 80,
-          }}
-        >
-          {assignees.map(opt =>
-            <option key={opt} value={opt}>{opt === "All" ? "Assigned To" : opt}</option>
-          )}
-        </select>
-        <select
-          value={sortBy}
-          onChange={e => setSortBy(e.target.value)}
-          style={{
-            padding: "8px 12px",
-            border: "1px solid #dbe4f3",
-            borderRadius: 6,
-            background: "#f9fbfd",
-            fontSize: 15,
-            color: "#636b91",
-            width: 90,
-            minWidth: 60,
-          }}
-        >
-          {sortOptions.map(opt => <option key={opt} value={opt}>{opt === "None" ? "Sort" : opt}</option>)}
-        </select>
-
-        {/* Spacer pushes actions all the way right */}
-        <div style={{ flex: 1 }} />
-
-        {/* Actions: right-aligned in same row */}
-        <button
-          style={{
-            borderRadius: 4,
-            padding: '8px 16px',
-            background: '#1467fa',
-            color: '#fff',
-            border: 'none',
-            fontWeight: 500,
-            fontSize: 15,
-            marginRight: 8,
-            cursor: "pointer",
-            whiteSpace: "nowrap"
-          }}
-        >
-          Add New Lead
-        </button>
-        <button
-          style={{
-            borderRadius: 4,
-            padding: '8px 16px',
-            background: '#f7fafd',
-            color: '#5167ad',
-            border: '1px solid #dbe4f3',
-            fontWeight: 500,
-            fontSize: 15,
-            cursor: "pointer",
-            whiteSpace: "nowrap"
-          }}
-        >
-          Export
-        </button>
-      </div>
-
-      {/* Table or Kanban display */}
       {isListView ? (
         <div
           style={{
@@ -453,13 +315,141 @@ export function LeadsListIndex() {
             overflowX: 'auto',
           }}
         >
+          {/* Unified Header and Filter/Action Bar */}
           <div
             style={{
-              padding: '20px 18px',
-              borderBottom: '1px solid #f2f3f7',
+              padding: "16px 18px",
             }}
           >
-            <div style={{ fontWeight: 600, fontSize: 18 }}>Leads Overview</div>
+            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 12 }}>Leads Overview</div>
+            
+            {/* Filter and Action Buttons */}
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <input
+                placeholder="Filter leads..."
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  border: '1px solid #dbe4f3',
+                  fontSize: 15,
+                  width: 165,
+                  background: "#ffffff"
+                }}
+              />
+              <select
+                value={source}
+                onChange={e => setSource(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #dbe4f3",
+                  borderRadius: 6,
+                  background: "#ffffff",
+                  fontSize: 15,
+                  color: "#636b91",
+                  width: 120,
+                  minWidth: 80,
+                }}
+              >
+                {sources.map(opt =>
+                  <option key={opt} value={opt}>{opt === "All" ? "Source" : opt}</option>
+                )}
+              </select>
+              <select
+                value={status}
+                onChange={e => setStatus(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #dbe4f3",
+                  borderRadius: 6,
+                  background: "#ffffff",
+                  fontSize: 15,
+                  color: "#636b91",
+                  width: 120,
+                  minWidth: 80,
+                }}
+              >
+                {statuses.map(opt =>
+                  <option key={opt} value={opt}>{opt === "All" ? "Status" : opt}</option>
+                )}
+              </select>
+              <select
+                value={assigned}
+                onChange={e => setAssigned(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #dbe4f3",
+                  borderRadius: 6,
+                  background: "#ffffff",
+                  fontSize: 15,
+                  color: "#636b91",
+                  width: 120,
+                  minWidth: 80,
+                }}
+              >
+                {assignees.map(opt =>
+                  <option key={opt} value={opt}>{opt === "All" ? "Assigned To" : opt}</option>
+                )}
+              </select>
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #dbe4f3",
+                  borderRadius: 6,
+                  background: "#ffffff",
+                  fontSize: 15,
+                  color: "#636b91",
+                  width: 90,
+                  minWidth: 60,
+                }}
+              >
+                {sortOptions.map(opt => <option key={opt} value={opt}>{opt === "None" ? "Sort" : opt}</option>)}
+              </select>
+
+              <div style={{ flex: 1 }} />
+
+              <button
+                style={{
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                  background: '#1467fa',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 500,
+                  fontSize: 15,
+                  marginRight: 8,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                Add New Lead
+              </button>
+              <button
+                style={{
+                  borderRadius: 4,
+                  padding: '8px 16px',
+                  background: '#f7fafd',
+                  color: '#5167ad',
+                  border: '1px solid #dbe4f3',
+                  fontWeight: 500,
+                  fontSize: 15,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                Export
+              </button>
+            </div>
           </div>
           <table
             style={{
