@@ -52,6 +52,7 @@ async def create_user(db: Database, user_data: UserCreate):
             email=user_data.email
         )
         .returning(User)
+
     )
 
     try:

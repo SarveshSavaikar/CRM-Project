@@ -1,18 +1,61 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from app.database.connection import get_db
-from app.schemas.auth import SignUp, LogIn, AuthResponse
-from app.services import auth_service
+# app/api/auth.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from app.schemas.auth import Token, UserCreate, UserResponse
+from app.services.auth_service import authenticate_user, create_user, create_access_token
+from app.core.dependencies import get_current_user, require_roles
+from datetime import timedelta
+# from app.core.config import settings
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post("/signup", response_model=AuthResponse)
-def create_user(user: SignUp, db: Session = Depends(get_db)):
-    return auth_service.sign_up(user)
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 1 hour token validity
 
-@router.post("/login", response_model=AuthResponse)
-def create_user(user: LogIn, db: Session = Depends(get_db)):
-    return auth_service.log_in(user)
+# ------------------------
+# LOGIN
+# ------------------------
+@router.post("/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password"
+        )
 
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(user["id"])},
+        expires_delta=access_token_expires
+    )
+    return {"access_token": access_token}
+
+
+# ------------------------
+# SIGNUP (Admin only)
+# ------------------------
+@router.post("/signup", response_model=Token)
+async def signup(user: UserCreate):
+    new_user = await create_user(user)
+    access_token = create_access_token(data={"sub": str(new_user["id"])})
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+# ------------------------
+# CURRENT USER
+# ------------------------
+@router.get("/me", response_model=UserResponse)
+async def get_me(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+
+# ------------------------
+# ADMIN TEST ROUTE
+# ------------------------
+@router.get("/admin-dashboard")
+async def admin_dashboard(_: dict = Depends(require_roles("admin"))):
+    return {"message": "Welcome, Admin! Only admins can see this."}
 
 
