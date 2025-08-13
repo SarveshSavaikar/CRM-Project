@@ -6,8 +6,11 @@ from app.database.models import User
 
 # Get all users
 async def get_all_users(db: Database):
+    print("executing get_all_users()")
     query = select(User)
-    return await db.fetch_all(query)
+    data = await db.fetch_all(query)
+    print(f"type: {type(data)}")
+    return data
 
 # Get user by ID
 async def get_user_by_id(db: Database, user_id: int):

@@ -1,6 +1,6 @@
 # app/database/models/user.py
 import sqlalchemy
-from sqlalchemy import ForeignKey, Table, Column, Integer, String, MetaData
+from sqlalchemy import Date, Float, ForeignKey, Table, Column, Integer, String, MetaData, Text
 
 metadata = MetaData()
 
