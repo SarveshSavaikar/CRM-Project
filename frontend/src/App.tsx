@@ -1,5 +1,4 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-
 import { RefineThemes, useNotificationProvider } from "@refinedev/antd";
 import { Authenticated, ErrorComponent, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
@@ -9,12 +8,13 @@ import routerProvider, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-
 import { App as AntdApp, ConfigProvider } from "antd";
 
 import { Layout } from "@/components";
 import { resources } from "@/config/resources";
 import { authProvider, dataProvider, liveProvider } from "@/providers";
+
+// Make sure AdminSettingsPage is exported in src/routes/index.ts!
 import {
   CompanyCreatePage,
   CompanyEditPage,
@@ -24,6 +24,7 @@ import {
   TasksCreatePage,
   TasksEditPage,
   TasksListPage,
+  LeadsListIndex,
 } from "@/routes";
 
 import "@refinedev/antd/dist/reset.css";
@@ -49,6 +50,7 @@ const App = () => {
               }}
             >
               <Routes>
+                {/* Protected Layout */}
                 <Route
                   element={
                     <Authenticated
@@ -63,6 +65,7 @@ const App = () => {
                 >
                   <Route index element={<DashboardPage />} />
 
+                  {/* Tasks */}
                   <Route
                     path="/tasks"
                     element={
@@ -75,21 +78,26 @@ const App = () => {
                     <Route path="edit/:id" element={<TasksEditPage />} />
                   </Route>
 
+                  {/* Companies */}
                   <Route path="/companies">
                     <Route index element={<CompanyListPage />} />
                     <Route path="new" element={<CompanyCreatePage />} />
                     <Route path="edit/:id" element={<CompanyEditPage />} />
                   </Route>
 
+                  {/* Leads */}
+                  <Route path="/leads">
+                    <Route index element={<LeadsListIndex />} />
+                  </Route>
+
+                  {/* 404 Fallback */}
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
 
+                {/* Auth route (login) */}
                 <Route
                   element={
-                    <Authenticated
-                      key="authenticated-auth"
-                      fallback={<Outlet />}
-                    >
+                    <Authenticated key="authenticated-auth" fallback={<Outlet />}>
                       <NavigateToResource resource="dashboard" />
                     </Authenticated>
                   }
