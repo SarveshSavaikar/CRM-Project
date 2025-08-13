@@ -4,7 +4,8 @@
 # import json
 from fastapi import FastAPI # type: ignore
 from app.api import users, auth
-
+from app.api import test_db
+from app.database.connection import database
 
 app = FastAPI(
     title="CRM-API",
@@ -12,5 +13,17 @@ app = FastAPI(
     description="API server for CRM Application"
 )
 
+# Startup event → connect to DB
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+# Shutdown event → disconnect from DB
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+
+
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(test_db.router, prefix="/debug", tags=["Debug"])
