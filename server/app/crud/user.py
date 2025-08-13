@@ -8,6 +8,9 @@ import datetime
 def get_all_users(db: Session):
     return db.query(User).all()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
+    
 def create_user(db: Session, user_data: UserCreate):
     # Convert UserCreate to SQLAlchemy User model instance
     new_user = User(
