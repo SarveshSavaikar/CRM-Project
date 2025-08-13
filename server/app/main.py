@@ -3,7 +3,7 @@
 # from server_utils import User, UserPydantic
 # import json
 from fastapi import FastAPI # type: ignore
-from app.api import users
+from app.api import users, auth
 
 
 app = FastAPI(
@@ -13,3 +13,4 @@ app = FastAPI(
 )
 
 app.include_router(users.router)
+app.include_router(auth.router)

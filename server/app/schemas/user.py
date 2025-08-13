@@ -3,16 +3,19 @@ from datetime import datetime
 from pydantic import BaseModel, Field, EmailStr
 
 class UserBase(BaseModel):
-    # user_id: str = Field(..., max_length=12)
     name: str = Field(..., max_length=100)
     role: str = Field(default="Unassigned", max_length=20)
-    department: int = Field(default=0)
-    status: str = Field(default="Idle", max_length=10)
-    email: Optional[EmailStr] = None
+    email: EmailStr
+    team_id: Optional[int] = None
     # phone: Optional[str] = Field(None, max_length=20)
+    # user_id: str = Field(..., max_length=12)
+    # department: int = Field(default=0)
+    # status: str = Field(default="Idle", max_length=10)
 
 class UserCreate(UserBase):
     pass
+    
+        
 
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
@@ -25,11 +28,11 @@ class UserUpdate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     name: str
-    email: str
+    email: EmailStr
     
     class Config:
         orm_mode = True
-    
+
 
 class UserInDB(UserBase):
     id: int
