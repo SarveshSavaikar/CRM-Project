@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { DndContext, useSensors, useSensor, MouseSensor, TouchSensor, useDroppable, useDraggable, DragEndEvent } from "@dnd-kit/core";
 
+
 // Dummy Leads Data
 const initialLeads = [
   {
@@ -83,6 +84,7 @@ export function Pill({ color, label }: { color: string; label: string }) {
     <span
       style={{
         background: color,
+
         color: "#fff",
         borderRadius: 14,
         fontSize: 13,
@@ -91,6 +93,7 @@ export function Pill({ color, label }: { color: string; label: string }) {
         marginLeft: 4,
         lineHeight: 1.4,
         display: "inline-block",
+
       }}
     >
       {label}
@@ -98,14 +101,17 @@ export function Pill({ color, label }: { color: string; label: string }) {
   );
 }
 
+
 export const boxStyle = {
   borderRadius: 8,
   padding: 16,
   background: "#fff",
   boxShadow: "0 1px 6px 0 #f0f1f3",
+
   minWidth: 185,
   flex: 1,
 };
+
 
 // Filtering and sorting logic (same as before)
 const filterLead = (
@@ -118,6 +124,7 @@ const filterLead = (
     stage: string;
     notes: string;
   },
+
   filter: string,
   source: string,
   status: string,
@@ -139,12 +146,14 @@ const filterLead = (
   return match;
 };
 
+
 const sources = ["All", ...Array.from(new Set(initialLeads.map((l) => l.source)))];
 const statuses = ["All", ...Array.from(new Set(initialLeads.map((l) => l.status.label)))];
 const assignees = ["All", ...Array.from(new Set(initialLeads.map((l) => l.assignedTo)))];
 const sortOptions = ["None", "Name (A-Z)", "Name (Z-A)", "Stage (A-Z)", "Stage (Z-A)"];
 
 const sortLeads = (leads: typeof initialLeads, sortBy: string): typeof initialLeads => {
+
   const leadsCopy = [...leads];
   switch (sortBy) {
     case "Name (A-Z)":
@@ -159,6 +168,7 @@ const sortLeads = (leads: typeof initialLeads, sortBy: string): typeof initialLe
       return leadsCopy;
   }
 };
+
 
 // Kanban Board Styles
 const kanbanColumnStyle = {
@@ -265,6 +275,7 @@ const KanbanCard = ({ lead }: { lead: typeof initialLeads[number] }) => {
 
 // --------------------------- MAIN COMPONENT ---------------------------
 
+
 export function LeadsListIndex() {
   const [filter, setFilter] = useState("");
   const [isListView, setIsListView] = useState(true);
@@ -272,6 +283,7 @@ export function LeadsListIndex() {
   const [status, setStatus] = useState("All");
   const [assigned, setAssigned] = useState("All");
   const [sortBy, setSortBy] = useState("None");
+
   const [leads, setLeads] = useState(initialLeads);
   const [showAddLeadForm, setShowAddLeadForm] = useState(false);
   const [newLeadData, setNewLeadData] = useState({
@@ -429,6 +441,7 @@ export function LeadsListIndex() {
     transition: "background 0.2s, box-shadow 0.2s",
   };
 
+
   return (
     <div
       style={{
@@ -446,6 +459,7 @@ export function LeadsListIndex() {
           marginBottom: 0,
         }}
       >
+
         <h1
           style={{
             fontSize: 25,
@@ -461,7 +475,9 @@ export function LeadsListIndex() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "7px",
+
+              gap: '7px',
+
               borderRadius: 6,
               border: isListView ? "none" : "1px solid #dbe4f3",
               background: isListView ? "#1467fa" : "#fff",
@@ -486,6 +502,7 @@ export function LeadsListIndex() {
             style={{
               display: "flex",
               alignItems: "center",
+
               gap: "7px",
               borderRadius: 6,
               border: !isListView ? "none" : "1px solid #dbe4f3",
@@ -512,6 +529,7 @@ export function LeadsListIndex() {
           </button>
         </div>
       </div>
+
       <div style={{ display: "flex", gap: 24, margin: "30px 0 23px 0" }}>
         <div style={boxStyle}>
           <div style={{ color: "#888fac", fontSize: 13, marginBottom: 6 }}>Total Leads</div>
@@ -649,6 +667,7 @@ export function LeadsListIndex() {
         </div>
       )}
 
+
       {isListView ? (
         <div
           style={{
@@ -661,12 +680,14 @@ export function LeadsListIndex() {
           }}
         >
           {/* List View UI (omitted for brevity) */}
+
           <div
             style={{
               padding: "16px 18px",
             }}
           >
             <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 12 }}>Leads Overview</div>
+
             {/* Filter and Action Buttons */}
             <div
               style={{
@@ -679,6 +700,7 @@ export function LeadsListIndex() {
               <input
                 placeholder="Filter leads..."
                 value={filter}
+
                 onChange={(e) => setFilter(e.target.value)}
                 style={{
                   padding: "8px 12px",
@@ -687,11 +709,14 @@ export function LeadsListIndex() {
                   fontSize: 15,
                   width: 165,
                   background: "#ffffff",
+
                 }}
               />
               <select
                 value={source}
+
                 onChange={(e) => setSource(e.target.value)}
+
                 style={{
                   padding: "8px 12px",
                   border: "1px solid #dbe4f3",
@@ -703,6 +728,7 @@ export function LeadsListIndex() {
                   minWidth: 80,
                 }}
               >
+
                 {sources.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt === "All" ? "Source" : opt}
@@ -712,6 +738,7 @@ export function LeadsListIndex() {
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
+
                 style={{
                   padding: "8px 12px",
                   border: "1px solid #dbe4f3",
@@ -723,6 +750,7 @@ export function LeadsListIndex() {
                   minWidth: 80,
                 }}
               >
+
                 {statuses.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt === "All" ? "Status" : opt}
@@ -732,6 +760,7 @@ export function LeadsListIndex() {
               <select
                 value={assigned}
                 onChange={(e) => setAssigned(e.target.value)}
+
                 style={{
                   padding: "8px 12px",
                   border: "1px solid #dbe4f3",
@@ -743,6 +772,7 @@ export function LeadsListIndex() {
                   minWidth: 80,
                 }}
               >
+
                 {assignees.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt === "All" ? "Assigned To" : opt}
@@ -752,6 +782,7 @@ export function LeadsListIndex() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
+
                 style={{
                   padding: "8px 12px",
                   border: "1px solid #dbe4f3",
@@ -763,11 +794,13 @@ export function LeadsListIndex() {
                   minWidth: 60,
                 }}
               >
+
                 {sortOptions.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt === "None" ? "Sort" : opt}
                   </option>
                 ))}
+
               </select>
 
               <div style={{ flex: 1 }} />
@@ -775,23 +808,28 @@ export function LeadsListIndex() {
               <button
                 style={{
                   borderRadius: 4,
+
                   padding: "8px 16px",
                   background: "#1467fa",
                   color: "#fff",
                   border: "none",
+
                   fontWeight: 500,
                   fontSize: 15,
                   marginRight: 8,
                   cursor: "pointer",
+
                   whiteSpace: "nowrap",
                 }}
                 onClick={handleAddLead}
+
               >
                 Add New Lead
               </button>
               <button
                 style={{
                   borderRadius: 4,
+
                   padding: "8px 16px",
                   background: "#f7fafd",
                   color: "#5167ad",
@@ -800,6 +838,7 @@ export function LeadsListIndex() {
                   fontSize: 15,
                   cursor: "pointer",
                   whiteSpace: "nowrap",
+
                 }}
               >
                 Export
@@ -808,8 +847,10 @@ export function LeadsListIndex() {
           </div>
           <table
             style={{
+
               width: "100%",
               borderCollapse: "collapse",
+
               fontSize: 15,
             }}
           >
@@ -822,6 +863,7 @@ export function LeadsListIndex() {
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>ASSIGNED TO</th>
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>STAGE</th>
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>NOTES</th>
+
               </tr>
             </thead>
             <tbody>
@@ -837,6 +879,7 @@ export function LeadsListIndex() {
                     <td style={{ padding: "14px 8px" }}>{lead.assignedTo}</td>
                     <td style={{ padding: "14px 8px" }}>{lead.stage}</td>
                     <td style={{ padding: "14px 8px", maxWidth: 280 }}>{lead.notes}</td>
+
                   </tr>
                 ))
               ) : (
@@ -850,6 +893,7 @@ export function LeadsListIndex() {
           </table>
         </div>
       ) : (
+
         <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
           <div
             style={{
@@ -868,6 +912,7 @@ export function LeadsListIndex() {
             ))}
           </div>
         </DndContext>
+
       )}
     </div>
   );

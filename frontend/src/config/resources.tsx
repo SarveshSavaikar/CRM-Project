@@ -21,7 +21,6 @@ export const resources: IResourceItem[] = [
       icon: <DashboardOutlined />,
     },
   },
-
   {
     name: "tasks",
     list: "/tasks",
@@ -68,6 +67,7 @@ export const resources: IResourceItem[] = [
     },
   },
 
+
   // ✅ Added Customers before Geo Insights
   {
     name: "customers",
@@ -77,6 +77,7 @@ export const resources: IResourceItem[] = [
       icon: <ShopOutlined />, // using existing ShopOutlined icon, you can change if needed
     },
   },
+
 
   {
     name: "geo-insights",
