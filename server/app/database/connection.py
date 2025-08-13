@@ -22,9 +22,9 @@ from dotenv import load_dotenv
 
 load_dotenv()  # loads .env variables
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
-database = Database(DATABASE_URL)
+database = Database("postgresql://postgres:kerzWqBTnPLjqJqPAgJrBglHzCBKjpwp@switchyard.proxy.rlwy.net:21007/railway")
 
 def get_db():
     db = SessionLocal()

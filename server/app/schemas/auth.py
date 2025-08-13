@@ -13,11 +13,37 @@ class SignUp(BaseModel):
     def sign_up_to_create(self)->UserCreate:
         return UserCreate(name=self.name, email=self.email, role=self.role, team_id=self.team_id)
     
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        orm_mode = True
+
+class UserCreate(BaseModel):
+    name: Optional[str] = None
+    email: EmailStr
+    password: str
+    role: Optional[str] = "viewer"  # restrict on server side too
+
+class UserOut(BaseModel):
+    id: int
+    name: Optional[str]
+    email: EmailStr
+    role: str
+
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 class LogIn(BaseModel):
     email: EmailStr
     password: str
-
 # JWT signup response model
 class SignUpResponse(BaseModel):
     pass    
