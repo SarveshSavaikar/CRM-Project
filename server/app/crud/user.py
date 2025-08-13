@@ -7,9 +7,21 @@ import datetime
 def get_all_users(db: Session):
     return db.query(User).all()
 
+def get_user_by_id(db: Session, user_id: int):
+    return db.query(User).filter(User.id == user_id).first()
+
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
-    
+
+def get_user_by_role_team(db: Session, role: str, team_id: int):
+    return db.query(User).filter(User.team_id == team_id).filter(User.role == role).all()
+
+def get_user_by_team(db: Session, team_id: int):
+    return db.query(User).filter(User.team_id == team_id).all()
+
+def get_user_by_role(db: Session, role: str):
+    return db.query(User).filter(User.role == role).all()
+
 def create_user(db: Session, user_data: UserCreate):
     # Convert UserCreate to SQLAlchemy User model instance
     new_user = User(
