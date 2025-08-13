@@ -14,7 +14,6 @@ import { Layout } from "@/components";
 import { resources } from "@/config/resources";
 import { authProvider, dataProvider, liveProvider } from "@/providers";
 
-// Make sure AdminSettingsPage is exported in src/routes/index.ts!
 import {
   CompanyCreatePage,
   CompanyEditPage,
@@ -24,7 +23,14 @@ import {
   TasksCreatePage,
   TasksEditPage,
   TasksListPage,
+  TasksCalendarPage,
   LeadsListIndex,
+  GeoInsightsPage,
+  CampaignAnalyticsDashboard,
+  AdminSettingsPage,
+  AuditLog,
+  DealsPage,
+  CustomersPage,
 } from "@/routes";
 
 import "@refinedev/antd/dist/reset.css";
@@ -66,16 +72,12 @@ const App = () => {
                   <Route index element={<DashboardPage />} />
 
                   {/* Tasks */}
-                  <Route
-                    path="/tasks"
-                    element={
-                      <TasksListPage>
-                        <Outlet />
-                      </TasksListPage>
-                    }
-                  >
+
+                  <Route path="/tasks">
+                    <Route index element={<TasksListPage />} />
                     <Route path="new" element={<TasksCreatePage />} />
                     <Route path="edit/:id" element={<TasksEditPage />} />
+                    <Route path="calendar" element={<TasksCalendarPage />} />
                   </Route>
 
                   {/* Companies */}
@@ -89,6 +91,34 @@ const App = () => {
                   <Route path="/leads">
                     <Route index element={<LeadsListIndex />} />
                   </Route>
+
+
+                  {/* GeoInsights */}
+                  <Route path="/geo-insights">
+                    <Route index element={<GeoInsightsPage />} />
+                  </Route>
+
+                  {/* Campaigns */}
+                  <Route path="/campaigns">
+                    <Route index element={<CampaignAnalyticsDashboard />} />
+                  </Route>
+
+                  {/* Customers */}
+                  <Route path="/customers">
+                    <Route index element={<CustomersPage />} />
+                  </Route>
+
+                  {/* Deals */}
+                  <Route path="/deals">
+                    <Route index element={<DealsPage />} />
+                  </Route>
+
+                  {/* Admin Settings & Audit Log Custom Routes */}
+                  <Route path="/admin">
+                    <Route index element={<AdminSettingsPage />} />
+                    <Route path="auditlog" element={<AuditLog />} />
+                  </Route>
+                  
 
                   {/* 404 Fallback */}
                   <Route path="*" element={<ErrorComponent />} />

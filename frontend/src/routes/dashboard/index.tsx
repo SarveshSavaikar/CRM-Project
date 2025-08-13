@@ -1,5 +1,5 @@
+// src/routes/dashboard/index.tsx
 import { useCustom } from "@refinedev/core";
-
 import { Col, Row } from "antd";
 
 import type { DashboardTotalCountsQuery } from "@/graphql/types";
@@ -9,7 +9,11 @@ import {
   DashboardDealsChart,
   DashboardLatestActivities,
   DashboardTotalCountCard,
+  TaskActivityTracker,
+  Generate,           // ✅ combined donut + sales performance
+  CompaniesMapCard,   // ✅ interactive companies map
 } from "./components";
+
 import { DASHBOARD_TOTAL_COUNTS_QUERY } from "./queries";
 
 export const DashboardPage = () => {
@@ -21,6 +25,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="page-container">
+      {/* ===== Top Stats ===== */}
       <Row gutter={[32, 32]}>
         <Col xs={24} sm={24} xl={8}>
           <DashboardTotalCountCard
@@ -45,44 +50,44 @@ export const DashboardPage = () => {
         </Col>
       </Row>
 
-      <Row
-        gutter={[32, 32]}
-        style={{
-          marginTop: "32px",
-        }}
-      >
-        <Col
-          xs={24}
-          sm={24}
-          xl={8}
-          style={{
-            height: "460px",
-          }}
-        >
+      {/* ===== Calendar + Deals Chart ===== */}
+      <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
+        <Col xs={24} sm={24} xl={8} style={{ height: "460px" }}>
           <CalendarUpcomingEvents />
         </Col>
-        <Col
-          xs={24}
-          sm={24}
-          xl={16}
-          style={{
-            height: "460px",
-          }}
-        >
+        <Col xs={24} sm={24} xl={16} style={{ height: "460px" }}>
           <DashboardDealsChart />
         </Col>
       </Row>
 
-      <Row
-        gutter={[32, 32]}
-        style={{
-          marginTop: "32px",
-        }}
-      >
+      {/* ===== Latest Activities ===== */}
+      <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
         <Col xs={24}>
           <DashboardLatestActivities />
+        </Col>
+      </Row>
+
+      {/* ===== Task Activity Tracker ===== */}
+      <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
+        <Col xs={24}>
+          <TaskActivityTracker />
+        </Col>
+      </Row>
+
+      <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
+        <Col xs={24}>
+          <Generate />
+        </Col>
+      </Row>
+
+      {/* ===== Companies Map Module ===== */}
+      <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
+        <Col xs={24}>
+          <CompaniesMapCard />
         </Col>
       </Row>
     </div>
   );
 };
+
+export default DashboardPage;
