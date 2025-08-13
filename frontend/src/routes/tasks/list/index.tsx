@@ -13,7 +13,7 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import type { TaskUpdateInput } from "@/graphql/schema.types";
 import type { TasksQuery, TaskStagesQuery } from "@/graphql/types";
 
-import { KanbanAddCardButton } from "../components";
+import { KanbanAddCardButton, KanbanOpenCalendarButton } from "../components";
 import { KanbanBoard, KanbanBoardContainer } from "./kanban/board";
 import { ProjectCardMemo, ProjectCardSkeleton } from "./kanban/card";
 import { KanbanColumn, KanbanColumnSkeleton } from "./kanban/column";
@@ -140,6 +140,11 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
 
   return (
     <>
+      {/* ✅ Added calendar button above the board */}
+      <div style={{ display: "flex", gap: "8px", margin: "8px 16px" }}>
+        <KanbanOpenCalendarButton />
+      </div>
+
       <KanbanBoardContainer>
         <KanbanBoard onDragEnd={handleOnDragEnd}>
           <KanbanColumn
