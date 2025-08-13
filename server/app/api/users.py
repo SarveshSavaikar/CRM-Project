@@ -6,11 +6,7 @@ from app.services import user_service
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.post("/", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return user_service.create_user(user)
-
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/user-{user_id}", response_model=UserResponse)
 def get_user(user_id: str):
     return user_service.get_user(user_id)  # service function to be implemented
 
