@@ -9,8 +9,8 @@ class LeadBase(BaseModel):
     source: str = Field(..., max_length=100)
     status: str = Field(..., max_length=50)
     score: int = Field(default=0)
-    team_id: int = Field(default=0)
-    user_id: int = Field(default=0)
+    team_id: Optional[int] = None
+    user_id: Optional[int] = None
 
 class LeadCreate(LeadBase):
     pass
@@ -28,7 +28,7 @@ class LeadUpdate(BaseModel):
 class LeadResponse(LeadBase):
     pass
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LeadInDB(LeadBase):
