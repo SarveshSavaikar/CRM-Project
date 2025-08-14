@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Card, Modal, Radio, Row, Col, Spin, Button } from "antd"; // Added Button to imports
+import React, { useState } from "react";
+import { Card, Modal, Radio, Row, Col, Button } from "antd";
 import {
   Calendar,
   momentLocalizer,
@@ -7,35 +7,17 @@ import {
   type View,
 } from "react-big-calendar";
 import moment from "moment";
-import dayjs from "dayjs";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useList, useNavigation } from "@refinedev/core"; // Added useNavigation to imports
-import type { GetFieldsFromList } from "@refinedev/nestjs-query";
-import type { TasksQuery } from "@/graphql/types";
-import gql from "graphql-tag";
-import { CalendarOutlined } from "@ant-design/icons";
-
-// Define the GraphQL query to fetch only necessary fields
-const TASKS_QUERY = gql`
-  query Tasks {
-    tasks {
-      nodes {
-        id
-        title
-        dueDate
-      }
-    }
-  }
-`;
+import { useNavigation } from "@refinedev/core";
 
 const localizer = momentLocalizer(moment);
 
 type MyEvent = {
-  id: string; // Changed to string to match task id
+  id: string;
   title: string;
   start: Date;
   end: Date;
-  category: string;
+  category?: string;
 };
 
 // Custom toolbar component
@@ -78,41 +60,28 @@ const CustomToolbar = (
 };
 
 export const TasksCalendarPage: React.FC = () => {
-  const { push } = useNavigation(); // Get the navigation function
+  const { push } = useNavigation();
   const [view, setView] = useState<View>(Views.MONTH);
 
-  // Fetch all tasks using the new query
-  const { data: tasks, isLoading } = useList<GetFieldsFromList<TasksQuery>>({
-    resource: "tasks",
-    meta: {
-      gqlQuery: TASKS_QUERY,
+  // Static example events (no dueDate filtering)
+  const events: MyEvent[] = [
+    {
+      id: "1",
+      title: "Sample Event 1",
+      start: new Date(),
+      end: new Date(),
+      category: "General",
     },
-    pagination: {
-      mode: "off",
+    {
+      id: "2",
+      title: "Sample Event 2",
+      start: new Date(new Date().setDate(new Date().getDate() + 2)),
+      end: new Date(new Date().setDate(new Date().getDate() + 2)),
+      category: "General",
     },
-  });
+  ];
 
-  // Create calendar events from the fetched tasks
-  const events = useMemo(() => {
-    if (!tasks?.data) {
-      return [];
-    }
-
-    return tasks.data
-      .filter(task => task.dueDate)
-      .map(task => {
-        const dueDate = dayjs(task.dueDate as string).toDate();
-        return {
-          id: task.id,
-          title: task.title,
-          start: dueDate,
-          end: dueDate,
-          category: "Task",
-        };
-      });
-  }, [tasks]);
-
-  const eventStyleGetter = (event: MyEvent) => ({
+  const eventStyleGetter = () => ({
     style: {
       backgroundColor: "#377afd",
       borderRadius: "8px",
@@ -124,7 +93,7 @@ export const TasksCalendarPage: React.FC = () => {
   });
 
   return (
-    <Row style={{  minHeight: "100vh" }}>
+    <Row style={{ minHeight: "100vh" }}>
       <Col flex="auto" style={{ margin: 18 }}>
         <Card
           style={{
@@ -138,7 +107,6 @@ export const TasksCalendarPage: React.FC = () => {
           <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 10 }}>
             Tasks Calendar
           </div>
-          {/* Added the "View Tasks" button */}
           <Button
             type="primary"
             style={{ marginBottom: 16 }}
@@ -146,34 +114,27 @@ export const TasksCalendarPage: React.FC = () => {
           >
             View Tasks
           </Button>
-          {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 570 }}>
-              <Spin size="large" />
-            </div>
-          ) : (
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              views={["month", "week", "day", "agenda"]}
-              view={view}
-              onView={(newView) => setView(newView)}
-              style={{ height: 570, background: "#fff" }}
-              eventPropGetter={eventStyleGetter}
-              onSelectEvent={(ev: MyEvent) =>
-                Modal.info({
-                  title: ev.title,
-                  content: `Due: ${dayjs(ev.start).format("MMM D, YYYY")}`,
-                })
-              }
-              components={{
-                toolbar: (props) => (
-                  <CustomToolbar {...props} view={view} onView={setView} />
-                ),
-              }}
-            />
-          )}
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            views={["month", "week", "day", "agenda"]}
+            view={view}
+            onView={(newView) => setView(newView)}
+            style={{ height: 570, background: "#fff" }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={(ev: MyEvent) =>
+              Modal.info({
+                title: ev.title,
+              })
+            }
+            components={{
+              toolbar: (props) => (
+                <CustomToolbar {...props} view={view} onView={setView} />
+              ),
+            }}
+          />
         </Card>
       </Col>
     </Row>
