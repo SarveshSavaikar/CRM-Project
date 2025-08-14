@@ -2,24 +2,24 @@ from app.schemas.user import UserCreate  # Pydantic model
 from sqlalchemy import Table, Column, Integer, String, MetaData, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import user
+from app.database.models import User
 
 # Get all users
 async def get_all_users(db: Database):
     print("executing get_all_users()")
-    query = select(user)
+    query = select(User)
     data = await db.fetch_all(query)
     print(f"type: {type(data)}")
     return data
 
 # Get user by ID
 async def get_user_by_id(db: Database, user_id: int):
-    query = select(user).where(user.c.id == user_id)
+    query = select(User).where(User.c.id == user_id)
     return await db.fetch_one(query)
 
 # Get user by email
 async def get_user_by_email(db: Database, email: str):
-    query = select(user).where(user.c.email == email)
+    query = select(User).where(User.c.email == email)
     return await db.fetch_one(query)
 
 # Get users by role & team
@@ -44,14 +44,14 @@ async def get_user_by_role(db: Database, role: str):
 # Create user
 async def create_user(db: Database, user_data: UserCreate):
     query = (
-        insert(user)
+        insert(User)
         .values(
             name=user_data.name,
             role=user_data.role,
             status="Idle",
             email=user_data.email
         )
-        .returning(user)
+        .returning(User)
 
     )
 
@@ -63,9 +63,9 @@ async def create_user(db: Database, user_data: UserCreate):
 # Update user
 async def update_user(db: Database, user_id: int, update_data: dict):
     query = (
-        update(user)
-        .where(user.c.id == user_id)
+        update(User)
+        .where(User.c.id == user_id)
         .values(**update_data)
-        .returning(user)
+        .returning(User)
     )
     return await db.fetch_one(query)
