@@ -5,7 +5,7 @@ import { Col, Row } from "antd";
 import type { DashboardTotalCountsQuery } from "@/graphql/types";
 
 import {
-  CalendarUpcomingEvents,
+ InboxPreview,
   DashboardDealsChart,
   DashboardLatestActivities,
   DashboardTotalCountCard,
@@ -53,7 +53,7 @@ export const DashboardPage = () => {
       {/* ===== Calendar + Deals Chart ===== */}
       <Row gutter={[32, 32]} style={{ marginTop: "32px" }}>
         <Col xs={24} sm={24} xl={8} style={{ height: "460px" }}>
-          <CalendarUpcomingEvents />
+          <InboxPreview />
         </Col>
         <Col xs={24} sm={24} xl={16} style={{ height: "460px" }}>
           <DashboardDealsChart />
