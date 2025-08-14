@@ -1,8 +1,7 @@
 from app.crud import user
 from app.schemas.user import  UserCreate
-from app.schemas.auth import SignUp, LogIn, SignUpResponse, LogInResponse
+from app.schemas.auth import SignUp, LogIn, AuthResponse
 from sqlalchemy.orm import Session
-
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt

@@ -45,9 +45,6 @@ class LogIn(BaseModel):
     email: EmailStr
     password: str
 # JWT signup response model
-class SignUpResponse(BaseModel):
-    pass    
-
-# JWT login response model
-class LogInResponse(BaseModel):
-    pass
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
