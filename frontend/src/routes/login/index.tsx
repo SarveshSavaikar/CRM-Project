@@ -23,7 +23,7 @@ export const LoginPage = () => {
     >
       <Card style={{ width: 400, padding: 24 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <Title level={3}>Refine Project</Title>
+          <Title level={3}>CRM System</Title>
         </div>
         <Form
           name="login-form"
