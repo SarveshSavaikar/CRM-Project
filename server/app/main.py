@@ -3,7 +3,7 @@
 # from server_utils import User, UserPydantic
 # import json
 from fastapi import FastAPI # type: ignore
-from app.api import users, leads, auth, teams, campaigns
+from app.api import users, leads, auth, teams, campaigns, tasks
 from app.api import test_db
 from app.database.connection import database
 
@@ -30,3 +30,4 @@ app.include_router(users.router)
 app.include_router(leads.router)
 app.include_router(teams.router)
 app.include_router(campaigns.router)
+app.include_router(tasks.router)
