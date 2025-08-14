@@ -74,6 +74,7 @@ const App = () => {
                   <Route index element={<DashboardPage />} />
 
                   {/* Tasks */}
+
                   <Route path="/tasks">
                     <Route index element={<TasksListPage />} />
                     <Route path="new" element={<TasksCreatePage />} />
@@ -92,6 +93,7 @@ const App = () => {
                   <Route path="/leads">
                     <Route index element={<LeadsListIndex />} />
                   </Route>
+
 
                   {/* GeoInsights */}
                   <Route path="/geo-insights">
@@ -119,6 +121,7 @@ const App = () => {
                     <Route path="auditlog" element={<AuditLog />} />
                   </Route>
                   
+
                   {/* 404 Fallback */}
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>

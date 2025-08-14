@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DndContext, useSensors, useSensor, MouseSensor, TouchSensor, useDroppable, useDraggable, DragEndEvent } from "@dnd-kit/core";
 
-// --- UPDATED DUMMY LEADS DATA (NO MORE 'status') ---
+
 const initialLeads = [
   {
     id: "L001",
@@ -77,15 +77,20 @@ const initialLeads = [
   },
 ];
 
+
 // Reusable components and styles
 const boxStyle = {
+
   borderRadius: 8,
   padding: 16,
   background: "#fff",
   boxShadow: "0 1px 6px 0 #f0f1f3",
+
   minWidth: 185,
   flex: 1,
 };
+
+
 const kanbanColumnStyle = {
   minWidth: 300,
   maxWidth: 350,
@@ -238,12 +243,14 @@ const KanbanCard = ({ lead }: { lead: typeof initialLeads[number] }) => {
 };
 
 // --------------------------- MAIN COMPONENT ---------------------------
+
 export function LeadsListIndex() {
   const [filter, setFilter] = useState("");
   const [isListView, setIsListView] = useState(true); // <--- CHANGED FROM FALSE TO TRUE
   const [source, setSource] = useState("All");
   const [assigned, setAssigned] = useState("All");
   const [sortBy, setSortBy] = useState("None");
+
   const [leads, setLeads] = useState(initialLeads);
   const [showAddLeadForm, setShowAddLeadForm] = useState(false);
   const [newLeadData, setNewLeadData] = useState({
@@ -338,6 +345,7 @@ export function LeadsListIndex() {
     });
   };
 
+
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "#f4f6fb", minHeight: "100vh", padding: "28px" }}>
       {/* Header and Summary Boxes */}
@@ -349,9 +357,11 @@ export function LeadsListIndex() {
           </button>
           <button style={{ display: "flex", alignItems: "center", gap: "7px", borderRadius: 6, border: !isListView ? "none" : "1px solid #dbe4f3", background: !isListView ? "#1467fa" : "#fff", color: !isListView ? "#fff" : "#636b91", fontWeight: 500, fontSize: 15, padding: "8px 18px 8px 15px", cursor: "pointer", boxShadow: !isListView ? "0 1px 6px 0 #d0e3fc" : "none", transition: "background 0.15s, color 0.15s", }} onClick={() => setIsListView(false)}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="4" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /><rect x="9" y="5" width="4" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /><rect x="15" y="5" width="2" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /><rect x="3" y="11" width="4" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /><rect x="9" y="11" width="4" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /><rect x="15" y="11" width="2" height="4" rx="1" fill={!isListView ? "#fff" : "#a8b0c8"} /></svg> Kanban Board
+
           </button>
         </div>
       </div>
+
       <div style={{ display: "flex", gap: 24, margin: "30px 0 23px 0" }}>
         <div style={boxStyle}><div style={{ color: "#888fac", fontSize: 13, marginBottom: 6 }}>Total Leads</div><div style={{ fontWeight: 700, fontSize: 23 }}>{leads.length}</div><div style={{ color: "#0bab64", fontSize: 12, marginTop: 4 }}>+5% from last month</div></div>
         <div style={boxStyle}><div style={{ color: "#888fac", fontSize: 13, marginBottom: 6 }}>New Leads This Month</div><div style={{ fontWeight: 700, fontSize: 23 }}>{leads.filter(l => l.stage === "New").length}</div><div style={{ color: "#0bab64", fontSize: 12, marginTop: 4 }}>Increased by 12%</div></div>
@@ -379,6 +389,7 @@ export function LeadsListIndex() {
           </div>
         </div>
       )}
+
       
       {isListView ? (
         <div style={{ background: "#fff", borderRadius: 10, boxShadow: "0 1px 6px #f0f1f3", padding: 0, marginTop: 0, overflowX: "auto" }}>
@@ -394,6 +405,7 @@ export function LeadsListIndex() {
             </div>
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+
             <thead>
               <tr style={{ background: "#f8fafd", color: "#7b849a" }}>
                 <th style={{ textAlign: "left", padding: "13px 18px" }}>LEAD ID</th>
@@ -402,6 +414,7 @@ export function LeadsListIndex() {
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>ASSIGNED TO</th>
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>STAGE</th>
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>NOTES</th>
+
               </tr>
             </thead>
             <tbody>
@@ -414,6 +427,7 @@ export function LeadsListIndex() {
                     <td style={{ padding: "14px 8px" }}>{lead.assignedTo}</td>
                     <td style={{ padding: "14px 8px" }}>{lead.stage}</td>
                     <td style={{ padding: "14px 8px", maxWidth: 280 }}>{lead.notes}</td>
+
                   </tr>
                 ))
               ) : (
@@ -423,6 +437,7 @@ export function LeadsListIndex() {
           </table>
         </div>
       ) : (
+
         <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
           <div style={{ display: "flex", gap: "16px", overflowX: "auto", padding: "16px 0" }}>
             {stages.map((stage) => (
@@ -434,6 +449,7 @@ export function LeadsListIndex() {
             ))}
           </div>
         </DndContext>
+
       )}
     </div>
   );
