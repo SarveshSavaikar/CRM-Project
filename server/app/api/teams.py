@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-# from sqlalchemy.orm import Session
 from databases import Database
 from app.database.connection import get_db
 from app.schemas.lead import LeadCreate, LeadUpdate, LeadResponse

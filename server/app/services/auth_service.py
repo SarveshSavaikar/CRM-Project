@@ -11,23 +11,23 @@ from app.database.connection import database
 from app.core.config import settings
 # from app.core.config import settings
 from app.database.connection import get_db
-from app.database.models.user import User
+from app.database.models import User
 from sqlalchemy.orm import Session
 
-def sign_up(db: Session, user_sign_up: SignUp) -> SignUpResponse:
-    if user.get_user_by_email(db, user_sign_up.email):
-        raise ValueError("Email already registered")
-    else:
-        pass
+# def sign_up(db: Session, user_sign_up: SignUp) -> SignUpResponse:
+#     if user.get_user_by_email(db, user_sign_up.email):
+#         raise ValueError("Email already registered")
+#     else:
+#         pass  
     
-    """
-        Insert User auth here:
-        check for response validity then proceed or return error
+#     """
+#         Insert User auth here:
+#         check for response validity then proceed or return error
         
-    """
-    user_data = user_sign_up.sign_up_to_create()
+#     """
+#     user_data = user_sign_up.sign_up_to_create()
 
-    return user.create_user(db, user_data)
+#     return user.create_user(db, user_data)
 
 # ---------------- JWT ----------------
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
