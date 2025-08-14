@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.auth import Token, UserCreate, UserResponse
-from app.services.auth_service import authenticate_user, create_user, create_access_token
+from app.services.auth_service import authenticate_user, create_user, create_access_token , check_user
 from app.core.dependencies import get_current_user, require_roles
 from datetime import timedelta
 # from app.core.config import settings
@@ -14,22 +14,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 1 hour token validity
 # ------------------------
 # LOGIN
 # ------------------------
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Step 1: Authenticate user
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password"
-        )
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
-
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # Step 2: Create Access Token
     access_token = create_access_token(
-        data={"sub": str(user["id"])},
-        expires_delta=access_token_expires
+        data={"sub": user["email"], "role": user["role"]}
     )
-    return {"access_token": access_token}
+
+    # Step 3: Return token in standard format
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+    # return{
+    #     "ok":True
+    # }
 
 
 # ------------------------
@@ -37,11 +41,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # ------------------------
 @router.post("/signup", response_model=Token)
 async def signup(user: UserCreate):
-    new_user = await create_user(user)
-    access_token = create_access_token(data={"sub": str(new_user["id"])})
     
-    return {"access_token": access_token, "token_type": "bearer"}
-
+    if await check_user(user.email) is False:
+        new_user = await create_user(user)
+        access_token = create_access_token(data={"sub": str(new_user["id"])})
+        return {"access_token": access_token, "token_type": "bearer"}
+    else:
+        return{"status":"Failed","msg":"Already exists"}
 
 # ------------------------
 # CURRENT USER
