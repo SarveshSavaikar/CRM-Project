@@ -1,7 +1,6 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { RefineThemes, useNotificationProvider } from "@refinedev/antd";
 import { Authenticated, ErrorComponent, Refine } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import routerProvider, {
   CatchAllNavigate,
   DocumentTitleHandler,
@@ -31,6 +30,7 @@ import {
   AuditLog,
   DealsPage,
   CustomersPage,
+  RegisterPage,
 } from "@/routes";
 
 import "@refinedev/antd/dist/reset.css";
@@ -40,7 +40,7 @@ const App = () => {
     <BrowserRouter>
       <ConfigProvider theme={RefineThemes.Blue}>
         <AntdApp>
-          <DevtoolsProvider>
+
             <Refine
               routerProvider={routerProvider}
               dataProvider={dataProvider}
@@ -61,7 +61,9 @@ const App = () => {
                   element={
                     <Authenticated
                       key="authenticated-layout"
-                      fallback={<CatchAllNavigate to="/login" />}
+                      // 👈 CHANGE THIS LINE
+                      // When not authenticated, navigate to the register page.
+                      fallback={<CatchAllNavigate to="/register" />}
                     >
                       <Layout>
                         <Outlet />
@@ -121,7 +123,7 @@ const App = () => {
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
 
-                {/* Auth route (login) */}
+                {/* Auth route (login & register) */}
                 <Route
                   element={
                     <Authenticated key="authenticated-auth" fallback={<Outlet />}>
@@ -130,13 +132,12 @@ const App = () => {
                   }
                 >
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
                 </Route>
               </Routes>
               <UnsavedChangesNotifier />
               <DocumentTitleHandler />
             </Refine>
-            <DevtoolsPanel />
-          </DevtoolsProvider>
         </AntdApp>
       </ConfigProvider>
     </BrowserRouter>
