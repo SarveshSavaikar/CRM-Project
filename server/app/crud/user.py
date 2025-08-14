@@ -3,25 +3,26 @@ from app.schemas.user import UserCreate  # Pydantic model
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import User
+from app.database.models import user
 
 # Get all users
 async def get_all_users(db: Database):
     print("executing get_all_users()")
-    query = select(User)
+    query = select(user)
     data = await db.fetch_all(query)
     print(f"type: {type(data)}")
     return data
 
 # Get user by ID
 async def get_user_by_id(db: Database, user_id: int):
-    query = select(User).where(User.c.id == user_id)
+    query = select(user).where(user.c.id == user_id)
     return await db.fetch_one(query)
 
 # Get user by email
 async def get_user_by_email(db: Database, email: str):
-    query = select(User).where(User.c.email == email)
+    query = select(user).where(user.c.email == email)
     return await db.fetch_one(query)
+
 
 # Get users by filters
 async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
@@ -41,17 +42,18 @@ async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
     return [dict(row) for row in rows]
 
 
+
 # Create user
 async def create_user(db: Database, user_data: UserCreate):
     query = (
-        insert(User)
+        insert(user)
         .values(
             name=user_data.name,
             role=user_data.role,
             status="Idle",
             email=user_data.email
         )
-        .returning(User)
+        .returning(user)
 
     )
 
@@ -63,9 +65,9 @@ async def create_user(db: Database, user_data: UserCreate):
 # Update user
 async def update_user(db: Database, user_id: int, update_data: dict):
     query = (
-        update(User)
-        .where(User.c.id == user_id)
+        update(user)
+        .where(user.c.id == user_id)
         .values(**update_data)
-        .returning(User)
+        .returning(user)
     )
     return await db.fetch_one(query)

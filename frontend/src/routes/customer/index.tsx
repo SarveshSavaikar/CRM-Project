@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { Table, Card, Select, Row, Col } from "antd";
+import { Table, Card, Select, Row, Col, Input } from "antd";
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
 } from "recharts";
 
 const { Option } = Select;
+const { Search } = Input;
 
 // Extended sample customer data
 const customers = [
@@ -51,16 +52,34 @@ const retentionDataSample = {
   ],
 } as const;
 
-type QuarterKey = keyof typeof retentionDataSample; // "Q1" | "Q2" | "Q3" | "Q4"
+type QuarterKey = keyof typeof retentionDataSample;
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export const CustomersPage: React.FC = () => {
   const [selectedQuarter, setSelectedQuarter] = useState<QuarterKey>("Q1");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedStage, setSelectedStage] = useState<string | undefined>(undefined);
 
   const retentionData = useMemo(() => {
     return [...retentionDataSample[selectedQuarter]];
   }, [selectedQuarter]);
+
+  const filteredCustomers = useMemo(() => {
+    let filtered = customers;
+
+    if (searchQuery) {
+      filtered = filtered.filter(customer =>
+        customer.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedStage) {
+      filtered = filtered.filter(customer => customer.stage === selectedStage);
+    }
+
+    return filtered;
+  }, [searchQuery, selectedStage]);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -74,47 +93,82 @@ export const CustomersPage: React.FC = () => {
     { title: "Last Interaction", dataIndex: "lastInteraction", key: "lastInteraction" },
   ];
 
+  const stageOptions = [
+    "All",
+    ...new Set(customers.map(customer => customer.stage)),
+  ].map(stage => ({
+    label: stage,
+    value: stage === "All" ? undefined : stage,
+  }));
+
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ marginBottom: 24 }}>Customers</h1>
-
       {/* Customer List */}
-      <Card title="Customer List" style={{ marginBottom: 32 }}>
+      <Card
+        title="Customer List"
+        style={{ marginBottom: 24 }}
+        extra={
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Select
+              style={{ width: 150 }}
+              placeholder="Filter by Stage"
+              onChange={(value) => setSelectedStage(value)}
+              value={selectedStage}
+              allowClear
+            >
+              {stageOptions.map(option => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
+                </Option>
+              ))}
+            </Select>
+            <Search
+              placeholder="Search customers"
+              onSearch={setSearchQuery}
+              style={{ width: 200 }}
+              enterButton
+            />
+          </div>
+        }
+      >
         <Table
-          dataSource={customers}
+          dataSource={filteredCustomers}
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 5 }}
         />
       </Card>
 
-      <Row gutter={24}>
+      <Row gutter={[24, 24]}>
         {/* Lifecycle Distribution */}
-        <Col xs={24} md={12}>
-          <Card title="Lifecycle Distribution">
-            <PieChart width={350} height={280}>
-              <Pie
-                data={lifecycleData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                label
-              >
-                {lifecycleData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+        <Col xs={24} lg={12}>
+          <Card title="Lifecycle Distribution" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <PieChart width={400} height={300}>
+                <Pie
+                  data={lifecycleData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {lifecycleData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </div>
           </Card>
         </Col>
 
         {/* Retention vs Churn */}
-        <Col xs={24} md={12}>
+        <Col xs={24} lg={12}>
           <Card
             title="Retention vs Churn"
+            style={{ height: '100%' }}
             extra={
               <Select
                 value={selectedQuarter}
@@ -128,15 +182,17 @@ export const CustomersPage: React.FC = () => {
               </Select>
             }
           >
-            <BarChart width={350} height={300} data={retentionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="retention" fill="#0088FE" />
-              <Bar dataKey="churn" fill="#FF8042" />
-            </BarChart>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart width={400} height={300} data={retentionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="retention" fill="#0088FE" />
+                <Bar dataKey="churn" fill="#FF8042" />
+              </BarChart>
+            </div>
           </Card>
         </Col>
       </Row>

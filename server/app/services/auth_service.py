@@ -1,6 +1,6 @@
 from app.crud import user
 from app.schemas.user import  UserCreate
-from app.schemas.auth import SignUp, LogIn, AuthResponse
+from app.schemas.auth import SignUp, LogIn, AuthResponse , SignUpResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
@@ -13,6 +13,10 @@ from app.core.config import settings
 from app.database.connection import get_db
 from app.database.models import User
 from sqlalchemy.orm import Session
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # def sign_up(db: Session, user_sign_up: SignUp) -> SignUpResponse:
 #     if user.get_user_by_email(db, user_sign_up.email):
@@ -45,11 +49,14 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 # ---------------- Authentication ----------------
-def authenticate_user(db: Session, email: str, password: str):
-    user = db.query(User).filter(User.email == email).first()
+async def authenticate_user(email: str, password: str):
+    query = 'SELECT id, email, password_hash, role FROM "User" WHERE email = :email'
+    user = await database.fetch_one(query, {"email": email})
     if not user:
+        print("Usen not found")
         return None
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user["password_hash"]):
+        print("Incorrect Password")
         return None
     return user
 
@@ -65,3 +72,25 @@ async def create_user(user: UserCreate):
     }
     row = await database.fetch_one(query, values)
     return row 
+
+async def check_user(email: str):
+    query = 'SELECT id FROM "User" WHERE email = :email'
+    existing = await database.fetch_one(query, {"email": email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+        return True
+    return False
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
+        email = payload.get("sub")
+        role = payload.get("role")
+        if email is None or role is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return {"email": email, "role": role}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
