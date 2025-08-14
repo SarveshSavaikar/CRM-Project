@@ -3,29 +3,29 @@ from app.schemas.user import UserCreate  # Pydantic model
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import user
+from app.database.models import User
 
-# Get all users
-async def get_all_users(db: Database):
-    print("executing get_all_users()")
-    query = select(user)
+# Get all Users
+async def get_all_Users(db: Database):
+    print("executing get_all_Users()")
+    query = select(User)
     data = await db.fetch_all(query)
     print(f"type: {type(data)}")
     return data
 
-# Get user by ID
-async def get_user_by_id(db: Database, user_id: int):
-    query = select(user).where(user.c.id == user_id)
+# Get User by ID
+async def get_User_by_id(db: Database, User_id: int):
+    query = select(User).where(User.c.id == User_id)
     return await db.fetch_one(query)
 
-# Get user by email
-async def get_user_by_email(db: Database, email: str):
-    query = select(user).where(user.c.email == email)
+# Get User by email
+async def get_User_by_email(db: Database, email: str):
+    query = select(User).where(User.c.email == email)
     return await db.fetch_one(query)
 
 
-# Get users by filters
-async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+# Get Users by filters
+async def get_Users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     query = select(User)
     conditions = []
 
@@ -43,17 +43,17 @@ async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
 
 
 
-# Create user
-async def create_user(db: Database, user_data: UserCreate):
+# Create User
+async def create_User(db: Database, User_data: UserCreate):
     query = (
-        insert(user)
+        insert(User)
         .values(
-            name=user_data.name,
-            role=user_data.role,
+            name=User_data.name,
+            role=User_data.role,
             status="Idle",
-            email=user_data.email
+            email=User_data.email
         )
-        .returning(user)
+        .returning(User)
 
     )
 
@@ -62,12 +62,12 @@ async def create_user(db: Database, user_data: UserCreate):
     except IntegrityError as e:
         raise e
 
-# Update user
-async def update_user(db: Database, user_id: int, update_data: dict):
+# Update User
+async def update_User(db: Database, User_id: int, update_data: dict):
     query = (
-        update(user)
-        .where(user.c.id == user_id)
+        update(User)
+        .where(User.c.id == User_id)
         .values(**update_data)
-        .returning(user)
+        .returning(User)
     )
     return await db.fetch_one(query)

@@ -12,6 +12,16 @@ Team = Table(
     Column("description", Text, nullable=True)
 )
 
+Campaign = Table(
+    "Campaign",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name", String(100), nullable=False),
+    Column("description", Text, nullable=True),
+    Column("channel", String(50), nullable=False),
+    Column("start_date", Date, nullable=True),
+    Column("end_date", Date, nullable=True)
+)
 
 
 Lead = Table(
