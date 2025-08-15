@@ -1,14 +1,23 @@
 import { Form, Input, Button, Select, Typography, Card } from "antd";
-import { useLogin } from "@refinedev/core";
+import { useRegister } from "@refinedev/core";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-export const LoginPage = () => {
-  const { mutate: login } = useLogin();
+// Define a type for the form values
+interface RegisterFormValues {
+  email: string;
+  role: string;
+  password: string;
+  "confirm-password": string; // Note: The field name is a string literal
+}
 
-  const onFinish = (values: any) => {
-    login(values);
+export const RegisterPage = () => {
+  const { mutate: register } = useRegister();
+
+  // Explicitly type the 'values' parameter
+  const onFinish = (values: RegisterFormValues) => {
+    register(values);
   };
 
   return (
@@ -26,17 +35,19 @@ export const LoginPage = () => {
           <Title level={3}>CRM System</Title>
         </div>
         <Form
-          name="login-form"
+          name="register-form"
           layout="vertical"
           onFinish={onFinish}
           initialValues={{ remember: true }}
-          // requiredMark={false} is removed to keep the asterisk
         >
           {/* Email field */}
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: "Please input your Email!" }]}
+            rules={[
+              { required: true, message: "Please input your Email!" },
+              { type: "email", message: "The input is not a valid E-mail!" },
+            ]}
           >
             <Input size="large" />
           </Form.Item>
@@ -61,28 +72,47 @@ export const LoginPage = () => {
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Please input your Password!" }]}
+            rules={[
+              { required: true, message: "Please input your Password!" },
+              { min: 6, message: "Password must be at least 6 characters!" },
+            ]}
           >
             <Input.Password size="large" />
           </Form.Item>
 
-          {/* Forgot password link */}
-          <div style={{ textAlign: "right", marginBottom: 16 }}>
-            <a href="/forgot-password">Forgot password?</a>
-          </div>
+          {/* Confirm Password field */}
+          <Form.Item
+            label="Confirm Password"
+            name="confirm-password"
+            dependencies={['password']}
+            hasFeedback
+            rules={[
+              { required: true, message: "Please confirm your Password!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("The two passwords that you entered do not match!"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password size="large" />
+          </Form.Item>
 
-          {/* Sign In button */}
+          {/* Register button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" size="large" block>
-              Sign In
+              Sign Up
             </Button>
           </Form.Item>
         </Form>
 
-        {/* "Don't have an account?" link */}
+        {/* "Already have an account?" link */}
         <div style={{ textAlign: "center", marginTop: 24 }}>
           <Text type="secondary">
-            Don't have an account? <a href="/register">Sign up</a>
+            Already have an account? <a href="/login">Sign in</a>
           </Text>
         </div>
       </Card>

@@ -1,5 +1,6 @@
+from typing import Any
 from app.schemas.user import UserCreate  # Pydantic model
-from sqlalchemy import Table, Column, Integer, String, MetaData, select, insert, update
+from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import User
@@ -12,44 +13,46 @@ async def get_all_users(db: Database):
     print(f"type: {type(data)}")
     return data
 
-# Get user by ID
-async def get_user_by_id(db: Database, user_id: int):
-    query = select(User).where(User.c.id == user_id)
+
+# Get User by ID
+async def get_User_by_id(db: Database, User_id: int):
+    query = select(User).where(User.c.id == User_id)
     return await db.fetch_one(query)
 
-# Get user by email
-async def get_user_by_email(db: Database, email: str):
+# Get User by email
+async def get_User_by_email(db: Database, email: str):
     query = select(User).where(User.c.email == email)
     return await db.fetch_one(query)
 
-# Get users by role & team
-async def get_user_by_role_team(db: Database, role: str, team_id: int):
-    query = (
-        select(user)
-        .where(user.c.team_id == team_id)
-        .where(user.c.role == role)
-    )
-    return await db.fetch_all(query)
 
-# Get users by team
-async def get_user_by_team(db: Database, team_id: int):
-    query = select(user).where(user.c.team_id == team_id)
-    return await db.fetch_all(query)
+# Get Users by filters
+async def get_Users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    query = select(User)
+    conditions = []
 
-# Get users by role
-async def get_user_by_role(db: Database, role: str):
-    query = select(user).where(user.c.role == role)
-    return await db.fetch_all(query)
+    for attr, value in filters.items():
+        if value is None:
+            continue
+        elif hasattr(User.c, attr):
+            conditions.append(getattr(User.c, attr) == value)
 
-# Create user
-async def create_user(db: Database, user_data: UserCreate):
+    if conditions:
+        query = query.where(and_(*conditions))
+
+    rows = await db.fetch_all(query)
+    return [dict(row) for row in rows]
+
+
+
+# Create User
+async def create_User(db: Database, User_data: UserCreate):
     query = (
         insert(User)
         .values(
-            name=user_data.name,
-            role=user_data.role,
+            name=User_data.name,
+            role=User_data.role,
             status="Idle",
-            email=user_data.email
+            email=User_data.email
         )
         .returning(User)
 
@@ -60,11 +63,11 @@ async def create_user(db: Database, user_data: UserCreate):
     except IntegrityError as e:
         raise e
 
-# Update user
-async def update_user(db: Database, user_id: int, update_data: dict):
+# Update User
+async def update_User(db: Database, User_id: int, update_data: dict):
     query = (
         update(User)
-        .where(User.c.id == user_id)
+        .where(User.c.id == User_id)
         .values(**update_data)
         .returning(User)
     )

@@ -9,7 +9,7 @@ from datetime import date
 router = APIRouter(prefix="/leads", tags=["Leads"])
 
 @router.get("/", response_model=list[LeadResponse])
-def get_lead(
+async def get_lead(
     source: str = None,
     status: str = None, 
     min_score: float = None, 
@@ -20,17 +20,17 @@ def get_lead(
     before: bool = False, 
     db: Database = Depends(get_db)
 ):
-    return lead_service.get_lead(db, source, status, min_score, team_id, user_id, created, last_updated, before)
+    return await lead_service.get_leads(db, source, status, min_score, team_id, user_id, created, last_updated, before)
 
 
 @router.get("/lead-{lead_id}", response_model=LeadResponse)
-def get_lead(lead_id: int, db: Database = Depends(get_db)):
-    return lead_service.get_lead(db, lead_id)
+async def get_lead(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.get_lead(db, lead_id)
 
 
 @router.put("/{lead_id}", response_model=LeadResponse)
-def update_lead(lead_id: str, lead: LeadUpdate):    
-    return lead_service.update_lead(lead_id, lead)  # service function to be implemented
+async def update_lead(lead_id: str, lead: LeadUpdate):    
+    return await lead_service.update_lead(lead_id, lead)  # service function to be implemented
 
 
 # @router.delete("/{lead_id}")
