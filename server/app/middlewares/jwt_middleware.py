@@ -3,7 +3,7 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import jwt
+from jose import jwt
 
 SECRET_KEY = "awkef20392@" 
 ALGORITHM = "HS256"  
