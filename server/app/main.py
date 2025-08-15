@@ -6,6 +6,7 @@ from fastapi import FastAPI # type: ignore
 from app.api import users, leads, auth, teams, campaigns, tasks
 from app.api import test_db
 from app.database.connection import database
+from app.middlewares.jwt_middleware import JWTMiddleware
 
 app = FastAPI(
     title="CRM-API",
@@ -23,11 +24,15 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+app.add_middleware(JWTMiddleware)
+
 
 app.include_router(auth.router)
 app.include_router(test_db.router, prefix="/debug", tags=["Debug"])
 app.include_router(users.router)
 app.include_router(leads.router)
 app.include_router(teams.router)
+app.include_router(admin.router)
 app.include_router(campaigns.router)
 app.include_router(tasks.router)
+

@@ -14,9 +14,12 @@ from app.database.connection import get_db
 from app.database.models import User
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer ,HTTPAuthorizationCredentials
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+from datetime import datetime, timezone
+from fastapi import HTTPException
+
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # def sign_up(db: Session, user_sign_up: SignUp) -> SignUpResponse:
 #     if user.get_user_by_email(db, user_sign_up.email):
@@ -34,12 +37,27 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 #     return user.create_user(db, user_data)
 
 # ---------------- JWT ----------------
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.algorithm)
-    return encoded_jwt
+# def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+#     to_encode = data.copy()
+#     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
+#     to_encode.update({"exp": expire})
+#     encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.algorithm)
+#     return encoded_jwt
+
+def decode_access_token(token: str):
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
+        
+        # Optional: Check expiration manually
+        exp = payload.get("exp")
+        if exp and datetime.fromtimestamp(exp, tz=timezone.utc) < datetime.now(tz=timezone.utc):
+            raise HTTPException(status_code=401, detail="Token has expired")
+        
+        return payload  # e.g., {"sub": "email", "role": "admin"}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 # ---------------- Password hashing ----------------
 def verify_password(plain_password, hashed_password):
@@ -54,6 +72,8 @@ async def authenticate_user(email: str, password: str):
     user = await database.fetch_one(query, {"email": email})
     if not user:
         print("Usen not found")
+        print(email)
+        print(user)
         return None
     if not verify_password(password, user["password_hash"]):
         print("Incorrect Password")
@@ -80,17 +100,3 @@ async def check_user(email: str):
         raise HTTPException(status_code=400, detail="Email already registered")
         return True
     return False
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.algorithm])
-        email = payload.get("sub")
-        role = payload.get("role")
-        if email is None or role is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return {"email": email, "role": role}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")

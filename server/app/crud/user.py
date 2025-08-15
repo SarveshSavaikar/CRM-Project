@@ -5,13 +5,14 @@ from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import User
 
-# Get all Users
-async def get_all_Users(db: Database):
-    print("executing get_all_Users()")
+# Get all users
+async def get_all_users(db: Database):
+    print("executing get_all_users()")
     query = select(User)
     data = await db.fetch_all(query)
     print(f"type: {type(data)}")
     return data
+
 
 # Get User by ID
 async def get_User_by_id(db: Database, User_id: int):
