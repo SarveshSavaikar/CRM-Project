@@ -26,7 +26,9 @@ async def shutdown():
 
 app.add_middleware(JWTMiddleware)
 
-
+@app.get("/")
+async def root():
+    return {"message": "CRM API is running."}
 app.include_router(auth.router)
 app.include_router(test_db.router, prefix="/debug", tags=["Debug"])
 app.include_router(users.router)
