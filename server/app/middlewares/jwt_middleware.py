@@ -3,7 +3,7 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import jwt
+from jose import jwt
 
 SECRET_KEY = "awkef20392@" 
 ALGORITHM = "HS256"  
@@ -12,6 +12,8 @@ class JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # here i am skipping this path for the middleware currently 
         if (
+            request.url.path.startswith("/") or
+            request.url.path.startswith("/openapi.js") or
             request.url.path.startswith("/auth") or
     request.url.path.startswith("/docs") or
     request.url.path.startswith("/openapi.json") or
