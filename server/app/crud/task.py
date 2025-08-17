@@ -17,24 +17,19 @@ async def get_tasks(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
     for attr, value in filters.items():
         if value is None:
             continue
-
-        if attr == "before":
-            due_date = filters.get("due_date")
-            if due_date:
-                if value:  # before = True
-                    conditions.append(Task.c.due_date < due_date)
-                else:      # before = False
-                    conditions.append(Task.c.due_date > due_date)
-        # elif attr == "priority":
-        #     conditions.append(Task.c.priority >= value)
+        if attr == "due_date__lt":
+            print(value)
+            conditions.append(Task.c.due_date <= value)
+        elif attr == "due_date__gt":
+            conditions.append(Task.c.due_date >= value)
         elif hasattr(Task.c, attr):
             conditions.append(getattr(Task.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
-
     rows = await db.fetch_all(query)
     return [dict(row) for row in rows]
+    
 
 
 # Create task
@@ -67,6 +62,16 @@ async def update_task(db: Database, task_id: int, update_data: dict):
         .values(**update_data)
         .returning(Task)
     )
-    updated_task = await db.execute(update_query)
+    updated_task = await db.fetch_one(update_query)
 
     return updated_task
+
+async def delete_task(db: Database, task_id: int):
+    query = (
+        Task
+        .delete()
+        .where(Task.c.id == task_id)
+    )
+    
+    
+    return await db.execute(query)

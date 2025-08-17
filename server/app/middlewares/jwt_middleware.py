@@ -8,7 +8,7 @@ from jose import jwt
 SECRET_KEY = "awkef20392@" 
 ALGORITHM = "HS256"  
 
-class JWTMiddleware(BaseHTTPMiddleware):
+class   JWTMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # here i am skipping this path for the middleware currently 
         if (

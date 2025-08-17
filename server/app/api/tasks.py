@@ -30,10 +30,16 @@ async def get_task(task_id: int, db: Database = Depends(get_db)):
 
 
 @router.put("/{task_id}", response_model=TaskResponse)
-async def update_task(task_id: str, task: TaskUpdate):    
-    return await task_service.update_task(task_id, task)  # service function to be implemented
+async def update_task(task_id: int, task: TaskUpdate, db: Database = Depends(get_db)):    
+    return await task_service.update_task(db, task_id, task)  # service function to be implemented
 
+@router.put("/{task_id}", response_model=TaskResponse)
+async def update_task(task_id: int, task: TaskUpdate, db: Database = Depends(get_db)):    
+    return await task_service.update_task(db, task_id, task)  # service function to be implemented
 
+@router.delete("/{task_id}")
+async def delete_task(task_id: int, db: Database = Depends(get_db)):
+    return await task_service.delete_task(db, task_id)
 
 # @router.delete("/{task_id}")
 # def delete_task(task_id: str):
