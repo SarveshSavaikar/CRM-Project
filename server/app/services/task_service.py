@@ -17,14 +17,10 @@ async def get_tasks(
     priority: Optional[float] = None,
     user_id: Optional[int] = None,
     opportunity_id: Optional[int] = None,
-    before: Optional[bool] = None
+    before: Optional[bool] = True
 ):
     filters = {}
 
-    if due_date is not None:
-        due_date = datetime.combine(due_date, time.max)
-        print(due_date)
-        filters["due_date"] = due_date
     if status is not None:
         filters["status"] = status
     if priority is not None:
@@ -34,9 +30,9 @@ async def get_tasks(
     if opportunity_id is not None:
         filters["opportunity_id"] = opportunity_id
     if before is True and due_date is not None:
-        filters["due_date__lt"] = due_date
+        filters["due_date__lt"] = datetime.combine(due_date, time.max)
     elif before is False and due_date is not None:
-        filters["due_date__gt"] = due_date
+        filters["due_date__gt"] = datetime.combine(due_date, time.max)
 
     return await task.get_tasks(db, **filters)
 
@@ -45,12 +41,12 @@ async def update_task(db: Database, task_id: str, taskObj: TaskUpdate):
     if result is None:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    db_data = dict(result)
-
     update_data = taskObj.model_dump(exclude_unset=True)
     
-    task.update_task(db, update_data)
+    return await task.update_task(db, task_id, update_data)
     
 async def create_task(db: Database, taskObj: TaskCreate):
     return await task.create_task(db, taskObj)
-    
+
+async def delete_task(db: Database, task_id: int):
+    return await task.delete_task(db, task_id)
