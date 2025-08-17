@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ThemedLayoutV2, ThemedTitleV2 } from "@refinedev/antd";
+import { ThemedLayoutV2 } from "@refinedev/antd";
 
 import { Header } from "./header";
 
@@ -9,9 +9,8 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
     <>
       <ThemedLayoutV2
         Header={Header}
-        Title={(titleProps) => {
-          return <ThemedTitleV2 {...titleProps} text="Refine" />;
-        }}
+        // This change removes the logo and text from the sidebar.
+        Title={() => null}
       >
         {children}
       </ThemedLayoutV2>
