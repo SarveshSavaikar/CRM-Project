@@ -6,7 +6,12 @@ from databases import Database
 
 
 async def get_campaign(db: Database, campaign_id: int):
-    return await campaign.get_campaign_by_id(db, campaign_id)
+    result = await campaign.get_campaign_by_id(db, campaign_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    return result
 
 from typing import Optional
 from datetime import date

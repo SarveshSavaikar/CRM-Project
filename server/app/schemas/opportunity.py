@@ -11,8 +11,7 @@ class OpportunityBase(BaseModel):
 
 
 class OpportunityCreate(OpportunityBase):
-    created_at: Optional[datetime] = datetime.now()
-    pass
+    created_at: datetime = Field(default_factory=datetime.now)
     
         
 

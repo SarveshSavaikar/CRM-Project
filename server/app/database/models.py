@@ -1,6 +1,6 @@
 # app/database/models/user.py
 import sqlalchemy
-from sqlalchemy import Date, Float, ForeignKey, Table, Column, Integer, String, MetaData, Text, DateTime
+from sqlalchemy import Boolean, Date, Float, ForeignKey, Table, Column, Integer, String, MetaData, Text, DateTime
 
 metadata = MetaData()
 
@@ -89,8 +89,8 @@ Task = Table(
     Column("due_date", DateTime, nullable=False),
     Column("priority", String(50), nullable=False, default="Low"),
     Column("status", String(50), nullable=False, default="Pending"),
-    Column("user_id", Integer, ForeignKey(Lead.c.id)),
-    Column("opportunity_id", Integer, ForeignKey(PipelineStage.c.id))
+    Column("user_id", Integer, ForeignKey(User.c.id)),
+    Column("opportunity_id", Integer, ForeignKey(Opportunity.c.id))
 )
 
 Customer = Table(
@@ -105,4 +105,16 @@ Customer = Table(
     Column("created_at", DateTime, nullable=False),
     Column("updated_at", DateTime, nullable=False),
     Column("lead_id", Integer, ForeignKey(Lead.c.id))
+)
+
+Interaction = Table(
+    "Interaction",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("type", String(50), nullable=False),
+    Column("content", String, nullable=False),
+    Column("timestamp", DateTime, nullable=False),
+    Column("is_automated", Boolean, nullable=False, default=False),
+    Column("lead_id", Integer, ForeignKey(Lead.c.id)),
+    Column("customer_id", Integer, ForeignKey(Customer.c.id))
 )

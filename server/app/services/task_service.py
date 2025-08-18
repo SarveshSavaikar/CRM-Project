@@ -7,7 +7,12 @@ from typing import Optional
 from datetime import date
 
 async def get_task(db: Database, task_id: int):
-    return await task.get_task_by_id(db, task_id)
+    result = await task.get_task_by_id(db, task_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return result
 
 
 async def get_tasks(
