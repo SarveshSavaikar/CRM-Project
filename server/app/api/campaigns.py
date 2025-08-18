@@ -28,6 +28,3 @@ async def update_campaign(campaign_id: str, campaign: CampaignUpdate):
     return await campaign_service.update_campaign(campaign_id, campaign)  # service function to be implemented
 
 
-# @router.delete("/{campaign_id}")
-# def delete_campaign(campaign_id: str):
-#     return campaign_service.delete_campaign(campaign_id)  # service function to be implemented

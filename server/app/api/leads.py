@@ -28,11 +28,15 @@ async def get_lead(lead_id: int, db: Database = Depends(get_db)):
     return await lead_service.get_lead(db, lead_id)
 
 
-@router.put("/{lead_id}", response_model=LeadResponse)
-async def update_lead(lead_id: str, lead: LeadUpdate):    
-    return await lead_service.update_lead(lead_id, lead)  # service function to be implemented
+@router.post("/create-lead", response_model=LeadResponse)
+async def create_lead(lead: LeadCreate, db: Database = Depends(get_db)):
+    return await lead_service.create_lead(db, lead)
 
+@router.put("/lead-{lead_id}", response_model=LeadResponse)
+async def update_lead(lead_id: int, lead: LeadUpdate, db: Database = Depends(get_db)):    
+    return await lead_service.update_lead(db, lead_id, lead)
 
-# @router.delete("/{lead_id}")
-# def delete_lead(lead_id: str):
-#     return lead_service.delete_lead(lead_id)  # service function to be implemented
+@router.delete("/{lead_id}")
+async def delete_lead(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.delete_lead(db, lead_id)
+

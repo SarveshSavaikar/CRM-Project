@@ -26,5 +26,17 @@ async def get_users(
 
     return await user.get_users(db, **filters)
     
+async def create_user(db: Database, userObj: UserCreate):
+    return await user.create_user(db, userObj)    
+
 async def update_user(db: Database, user_id: str, userObj: UserUpdate):
-    return await user.update_user()
+    result = await user.get_user_by_id(db, user_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    update_data = userObj.model_dump(exclude_unset=True)
+    
+    return await user.update_user(db, user_id, update_data)
+
+async def delete_user(db: Database, user_id: int):
+    return await user.delete_user(db, user_id)

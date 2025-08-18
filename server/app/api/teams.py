@@ -17,11 +17,15 @@ async def get_team(team_id: int, db: Database = Depends(get_db)):
     return await team_service.get_team(db, team_id)
 
 
-@router.put("/{team_id}", response_model=TeamResponse)
-async def update_team(team_id: str, team: TeamUpdate):    
-    return await team_service.update_team(team_id, team)  # service function to be implemented
+@router.post("/create-team", response_model=TeamResponse)
+async def create_team(team: TeamCreate, db: Database = Depends(get_db)):
+    return await team_service.create_team(db, team)
 
+@router.put("/team-{team_id}", response_model=TeamResponse)
+async def update_team(team_id: int, team: TeamUpdate, db: Database = Depends(get_db)):    
+    return await team_service.update_team(db, team_id, team)
 
-# @router.delete("/{team_id}")
-# def delete_team(team_id: str):
-#     return team_service.delete_team(team_id)  # service function to be implemented
+@router.delete("/{team_id}")
+async def delete_team(team_id: int, db: Database = Depends(get_db)):
+    return await team_service.delete_team(db, team_id)
+

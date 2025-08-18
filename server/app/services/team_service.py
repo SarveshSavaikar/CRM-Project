@@ -22,14 +22,18 @@ async def get_teams(db: Database, name: Optional[str] = None):
     else:
         return await team.get_teams(db)
 
+async def create_team(db: Database, teamObj: TeamCreate):
+    return await team.create_team(db, teamObj)   
+
 async def update_team(db: Database, team_id: str, teamObj: TeamUpdate):
     result = await team.get_team_by_id(db, team_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    db_data = dict(result)
-
     update_data = teamObj.model_dump(exclude_unset=True)
     
-    team.update_team(db, update_data)
+    return await team.update_team(db, team_id, update_data)
+    
+async def delete_team(db: Database, team_id: int):
+    return await team.delete_team(db, team_id)
     

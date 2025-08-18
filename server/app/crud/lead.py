@@ -63,6 +63,17 @@ async def update_lead(db: Database, lead_id: int, update_data: dict):
         .values(**update_data)
         .returning(Lead)
     )
-    updated_lead = await db.execute(update_query)
+    updated_lead = await db.fetch_one(update_query)
 
     return updated_lead
+
+
+async def delete_team(db: Database, lead_id: int):
+    query = (
+        Lead
+        .delete()
+        .where(Lead.c.id == lead_id)
+    )
+    
+    
+    return await db.execute(query)
