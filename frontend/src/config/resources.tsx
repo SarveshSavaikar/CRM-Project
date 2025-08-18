@@ -9,6 +9,7 @@ import {
   NotificationOutlined,
   GlobalOutlined,
   SettingOutlined,
+  MailOutlined, // new Inbox icon
 } from "@ant-design/icons";
 
 export const resources: IResourceItem[] = [
@@ -31,7 +32,6 @@ export const resources: IResourceItem[] = [
       icon: <ProjectOutlined />,
     },
   },
-
   // New Additions
   {
     name: "leads",
@@ -67,6 +67,15 @@ export const resources: IResourceItem[] = [
     },
   },
 
+  // New Inbox addition
+  {
+    name: "inbox",
+    list: "/inbox",
+    meta: {
+      label: "Inbox",
+      icon: <MailOutlined />,
+    },
+  },
 
   // ✅ Added Customers before Geo Insights
   {
@@ -77,7 +86,6 @@ export const resources: IResourceItem[] = [
       icon: <ShopOutlined />, // using existing ShopOutlined icon, you can change if needed
     },
   },
-
 
   {
     name: "geo-insights",
