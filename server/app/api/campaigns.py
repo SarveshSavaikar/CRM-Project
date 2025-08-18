@@ -23,8 +23,14 @@ async def get_campaign(campaign_id: int, db: Database = Depends(get_db)):
     return await campaign_service.get_campaign(db, campaign_id)
 
 
-@router.put("/{campaign_id}", response_model=CampaignResponse)
-async def update_campaign(campaign_id: str, campaign: CampaignUpdate):    
-    return await campaign_service.update_campaign(campaign_id, campaign)  # service function to be implemented
+@router.post("/create-campaign", response_model=CampaignResponse)
+async def create_campaign(campaign: CampaignCreate, db: Database = Depends(get_db)):
+    return await campaign_service.create_campaign(db, campaign)
 
+@router.put("/campaign-{campaign_id}", response_model=CampaignResponse)
+async def update_campaign(campaign_id: int, campaign: CampaignUpdate, db: Database = Depends(get_db)):    
+    return await campaign_service.update_campaign(db, campaign_id, campaign)
 
+@router.delete("/{campaign_id}")
+async def delete_campaign(campaign_id: int, db: Database = Depends(get_db)):
+    return await campaign_service.delete_campaign(db, campaign_id)

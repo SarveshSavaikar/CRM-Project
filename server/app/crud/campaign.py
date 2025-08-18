@@ -44,7 +44,9 @@ async def create_campaign(db: Database, campaign_data: CampaignCreate):
         insert(Campaign)
         .values(
             name=campaign_data.name,
-            description=campaign_data.description
+            description=campaign_data.description,
+            start_date=campaign_data.start_date,
+            end_date=campaign_data.end_date
         )
         .returning(Campaign)
     )
@@ -66,3 +68,14 @@ async def update_campaign(db: Database, campaign_id: int, update_data: dict):
     updated_campaign = await db.execute(update_query)
 
     return updated_campaign
+
+
+async def delete_campaign(db: Database, campaign_id: int):
+    query = (
+        Campaign
+        .delete()
+        .where(Campaign.c.id == campaign_id)
+    )
+    
+    
+    return await db.execute(query)

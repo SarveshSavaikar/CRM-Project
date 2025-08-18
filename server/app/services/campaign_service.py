@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from app.crud import campaign
 from app.schemas.campaign import CampaignCreate, CampaignUpdate
-from datetime import date
+from datetime import date, datetime, time
 from databases import Database
 
 
@@ -41,9 +41,16 @@ async def update_campaign(db: Database, campaign_id: str, campaignObj: CampaignU
     if result is None:
         raise HTTPException(status_code=404, detail="Campaign not found")
 
-    db_data = dict(result)
 
     update_data = campaignObj.model_dump(exclude_unset=True)
     
     campaign.update_campaign(db, update_data)
-    
+
+async def create_campaign(db: Database, campaignObj: CampaignCreate):
+    campaignObj.start_date = datetime.combine(campaignObj.start_date, time.min)
+    campaignObj.end_date = datetime.combine(campaignObj.end_date, time.max)
+    print(campaignObj)
+    return await campaign.create_campaign(db, campaignObj)
+
+async def delete_campaign(db: Database, campaign_id: int):
+    return await campaign.delete_campaign(db, campaign_id)
