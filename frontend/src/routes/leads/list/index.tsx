@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DndContext, useSensors, useSensor, MouseSensor, TouchSensor, useDroppable, useDraggable, DragEndEvent } from "@dnd-kit/core";
 
-// --- UPDATED DUMMY LEADS DATA (NO MORE 'status') ---
+// --- DUMMY LEADS DATA (no changes needed) ---
 const initialLeads = [
   {
     id: "L001",
@@ -86,6 +86,7 @@ const boxStyle = {
   minWidth: 185,
   flex: 1,
 };
+
 const kanbanColumnStyle = {
   minWidth: 300,
   maxWidth: 350,
@@ -95,6 +96,7 @@ const kanbanColumnStyle = {
   flexShrink: 0,
   height: 'fit-content' as 'fit-content',
 };
+
 const kanbanHeaderStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -103,6 +105,7 @@ const kanbanHeaderStyle = {
   fontSize: 16,
   color: "#49527a",
 };
+
 const kanbanCountStyle = {
   background: "#e0e7ff",
   color: "#3858c1",
@@ -111,6 +114,7 @@ const kanbanCountStyle = {
   fontSize: 13,
   fontWeight: 500,
 };
+
 const kanbanCardStyle = {
   padding: 16,
   marginBottom: 10,
@@ -121,6 +125,7 @@ const kanbanCardStyle = {
   cursor: "grab",
   background: "#fff",
 };
+
 const formContainerStyle = {
   position: 'fixed' as 'fixed',
   top: 0,
@@ -131,8 +136,9 @@ const formContainerStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  zIndex: 100
+  zIndex: 1000, // Make sure this zIndex is high enough
 };
+
 const formModalStyle = {
   background: '#fff',
   padding: '28px',
@@ -143,7 +149,9 @@ const formModalStyle = {
   display: 'flex',
   flexDirection: 'column' as 'column',
   gap: '20px',
+  pointerEvents: 'auto' as 'auto',
 };
+
 const formGroupStyle = {
   marginBottom: '0',
   display: 'flex',
@@ -151,6 +159,7 @@ const formGroupStyle = {
   gap: '6px',
   flex: 1
 };
+
 const labelStyle = {
   fontWeight: 500,
   color: '#49527a',
@@ -167,6 +176,7 @@ const inputStyle = {
   boxSizing: 'border-box' as 'border-box',
   transition: 'border-color 0.2s, box-shadow 0.2s',
 };
+
 const cancelButton = {
   padding: "10px 20px",
   background: "#f0f2f7",
