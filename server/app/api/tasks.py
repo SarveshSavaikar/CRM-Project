@@ -41,6 +41,3 @@ async def update_task(task_id: int, task: TaskUpdate, db: Database = Depends(get
 async def delete_task(task_id: int, db: Database = Depends(get_db)):
     return await task_service.delete_task(db, task_id)
 
-# @router.delete("/{task_id}")
-# def delete_task(task_id: str):
-#     return task_service.delete_task(task_id)  # service function to be implemented

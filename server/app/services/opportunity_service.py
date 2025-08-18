@@ -1,0 +1,57 @@
+from fastapi import HTTPException
+from app.crud import opportunity
+from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
+from datetime import date, datetime, time
+from databases import Database
+from typing import Optional
+from datetime import date
+
+async def get_opportunity(db: Database, opportunity_id: int):
+    return await opportunity.get_opportunity_by_id(db, opportunity_id)
+
+
+async def get_opportunities(
+    db: Database,
+    close_date: date,
+    created: date,
+    min_value: float,
+    max_value: float,
+    lead_id: int,
+    pipeline_stage_id: int,
+    before: bool
+):
+    filters = {}
+
+    if min_value is not None:
+        filters["min_value"] = min_value
+    if max_value is not None:
+        filters["max_value"] = max_value
+    if lead_id is not None:
+        filters["lead_id"] = lead_id
+    if pipeline_stage_id is not None:
+        filters["pipeline_stage_id"] = pipeline_stage_id
+    if before is True and close_date is not None:
+        filters["close_date__lt"] = datetime.combine(close_date, time.max)
+    elif before is False and close_date is not None:
+        filters["close_date__gt"] = datetime.combine(close_date, time.max)
+    if before is True and created is not None:
+        filters["created__lt"] = datetime.combine(created, time.max)
+    elif before is False and created is not None:
+        filters["created__gt"] = datetime.combine(created, time.max)
+
+    return await opportunity.get_opportunities(db, **filters)
+
+async def update_opportunity(db: Database, opportunity_id: str, opportunityObj: OpportunityUpdate):
+    result = await opportunity.get_opportunity_by_id(db, opportunity_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+
+    update_data = opportunityObj.model_dump(exclude_unset=True)
+    
+    return await opportunity.update_opportunity(db, opportunity_id, update_data)
+    
+async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
+    return await opportunity.create_opportunity(db, opportunityObj)
+
+async def delete_opportunity(db: Database, opportunity_id: int):
+    return await opportunity.delete_opportunity(db, opportunity_id)
