@@ -27,7 +27,7 @@ export const wsClient =
         url: WS_URL,
         connectionParams: () => {
           const accessToken = localStorage.getItem("access_token");
-
+          console.log("this is access token",accessToken)
           return {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -42,3 +42,5 @@ export const dataProvider = graphqlDataProvider(client);
 export const liveProvider = wsClient
   ? graphqlLiveProvider(wsClient)
   : undefined;
+
+  

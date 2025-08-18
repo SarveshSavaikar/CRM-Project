@@ -4,6 +4,9 @@ class Settings(BaseSettings):
     jwt_secret_key: str
     access_token_expire_minutes: int
     algorithm : str
+    EMAIL_HOST : str
+    EMAIL_USER : str
+    EMAIL_PASS : str
     class Config:
         env_file = ".env"
         env_prefix = ""  # optional, no prefix

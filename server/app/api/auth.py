@@ -23,6 +23,7 @@ class LoginRequest(BaseModel):
 
 @router.post("/login")
 async def login(data: LoginRequest):
+    print("Trying to log in")
     user = await authenticate_user(data.username, data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")

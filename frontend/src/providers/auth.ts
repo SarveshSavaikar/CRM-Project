@@ -1,3 +1,121 @@
+// import { AuthBindings } from "@refinedev/core";
+// import axios from "axios";
+// import { access } from "fs";
+
+// export const authProvider: AuthBindings = {
+//   // 🔹 LOGIN (connects to your FastAPI /auth/login endpoint)
+//   login: async ({ email, password }) => {
+//     const response = await axios.post("http://localhost:8000/auth/login", {
+//         username: email, // FastAPI expects 'username'
+//         password,
+//       });
+
+//         if (response.status) {
+//             const data = await response.data["access_token"];
+//             console.log("Successfull login :- ",response.data)
+//             localStorage.setItem("access_token", data);
+//             return { success: true, redirectTo: "/" ,  authenticated: true};
+//         }
+
+        
+//         return {
+//             success: false,
+//             error: new Error("Invalid login"),
+//         };
+//   },
+
+//   // 🔹 SIGNUP (connects to your FastAPI /auth/signup endpoint)
+//   register: async ({ email, password , role }) => {
+//     try {
+//       const res = await axios.post("http://localhost:8000/auth/signup", {
+//         email: email,
+//         password: password,
+//         role: role,
+
+//       });
+
+//       const { access_token } = res.data;
+//       localStorage.setItem("access_token", access_token);
+
+//       return {
+//         success: true,
+//         redirectTo: "/",
+//       };
+//     } catch (error) {
+//       return {
+//         success: false,
+//         error: {
+//           message: "Signup failed",
+//           name: "User already exists?",
+//         },
+//       };
+//     }
+//   },
+
+//   // 🔹 LOGOUT
+//   logout: async () => {
+//     localStorage.removeItem("access_token");
+//     return { success: true, redirectTo: "/login" };
+//   },
+
+//   // 🔹 CHECK if user is authenticated
+//   check: async () => {
+//     const token = localStorage.getItem("access_token");
+//     if (token) {
+//       return { authenticated: true  };
+//     }
+//     return {
+//       authenticated: false,
+//       redirectTo: "/login",
+//     };
+//   },
+
+//   // 🔹 Extract role from JWT for RBAC
+//   getPermissions: async () => {
+//     const token = localStorage.getItem("access_token");
+//     if (!token) return null;
+
+//     try {
+//       const payload = JSON.parse(atob(token.split(".")[1])); // decode JWT payload
+//       return payload.role; // "admin", "manager", etc.
+//     } catch {
+//       console.log("Error in finding the Permsios")
+//       return null;
+//     }
+//   },
+
+//   // 🔹 Get logged in user identity
+//   getIdentity: async () => {
+//     const token = localStorage.getItem("access_token");
+//     if (!token) return null;
+
+//     try {
+//       const payload = JSON.parse(atob(token.split(".")[1]));
+//       return {
+//         id: payload.sub,
+//         role: payload.role,
+//       };
+//     } catch {
+//       console.log("error in finding the identity")
+//       return null;
+//     }
+//   },
+//    onError: async (error) => {
+//     console.error("Auth error:", error);
+
+//     if (error?.status === 401) {
+//       localStorage.removeItem("access_token");
+//       return {
+//         logout: true,
+//         redirectTo: "/login",
+//         error,
+//       };
+//     }
+
+//     return { error };
+//   },
+// };
+
 import type { AuthProvider } from "@refinedev/core";
 
 import type { User } from "@/graphql/schema.types";

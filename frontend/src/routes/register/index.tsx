@@ -59,12 +59,12 @@ export const RegisterPage = () => {
             rules={[{ required: true, message: "Please select your Role!" }]}
           >
             <Select size="large" placeholder="Select a role">
-              <Option value="admin">Admin</Option>
-              <Option value="manager">Manager</Option>
-              <Option value="sales-representative">Sales Representative</Option>
-              <Option value="marketing">Marketing</Option>
-              <Option value="support">Support</Option>
-              <Option value="viewer">Viewer</Option>
+              <Option value="Admin">Admin</Option>
+              <Option value="Manager">Manager</Option>
+              <Option value="Sales Rep">Sales Representative</Option>
+              <Option value="Marketing">Marketing</Option>
+              <Option value="Support">Support</Option>
+              <Option value="Viewer">Viewer</Option>
             </Select>
           </Form.Item>
 

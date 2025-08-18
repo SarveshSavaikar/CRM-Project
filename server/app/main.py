@@ -7,12 +7,21 @@ from app.api import users, leads, auth, teams, campaigns, tasks , admin
 from app.api import test_db
 from app.database.connection import database
 from app.middlewares.jwt_middleware import JWTMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 app = FastAPI(
     title="CRM-API",
     version="1.0.0",
     description="API server for CRM Application"
 )
+
+origins = [
+    "http://localhost:5173",  # frontend dev server
+    "http://127.0.0.1:5173",
+    # Add your deployed frontend domain here later
+]
 
 # Startup event → connect to DB
 @app.on_event("startup")
@@ -24,6 +33,15 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Then your JWT middleware
 app.add_middleware(JWTMiddleware)
 
 @app.get("/")
