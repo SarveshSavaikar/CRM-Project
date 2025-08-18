@@ -6,7 +6,12 @@ from databases import Database
 
 
 async def get_team(db: Database, team_id: int):
-    return await team.get_team_by_id(db, team_id)
+    result = await team.get_team_by_id(db, team_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    return result
 
 from typing import Optional
 from datetime import date

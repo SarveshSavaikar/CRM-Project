@@ -6,7 +6,12 @@ from databases import Database
 
 
 async def get_lead(db: Database, lead_id: int):
-    return await lead.get_lead_by_id(db, lead_id)
+    result = await lead.get_lead_by_id(db, lead_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    
+    return result
 
 from typing import Optional
 from datetime import date

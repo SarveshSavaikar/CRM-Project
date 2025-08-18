@@ -11,8 +11,8 @@ class CustomerBase(BaseModel):
     lead_id: Optional[int] = None
 
 class CustomerCreate(CustomerBase):
-    created_at: Optional[datetime] = Field(default=datetime.now())
-    updated_at: Optional[datetime] = Field(default=datetime.now())
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
     pass
     
         
@@ -24,7 +24,7 @@ class CustomerUpdate(BaseModel):
     company: Optional[str] = Field(None, max_length=255)
     industry: Optional[str] = Field(None, max_length=255)
     lead_id: Optional[int] = None
-    updated_at: Optional[datetime] = Field(default=datetime.now())  
+    updated_at: datetime = Field(default_factory=datetime.now)  
 
 class CustomerResponse(CustomerBase):
     id: int

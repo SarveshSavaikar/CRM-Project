@@ -7,7 +7,12 @@ from typing import Optional
 from datetime import date
 
 async def get_opportunity(db: Database, opportunity_id: int):
-    return await opportunity.get_opportunity_by_id(db, opportunity_id)
+    result = await opportunity.get_opportunity_by_id(db, opportunity_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+    
+    return result
 
 
 async def get_opportunities(

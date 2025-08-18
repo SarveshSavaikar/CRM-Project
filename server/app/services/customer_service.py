@@ -7,7 +7,12 @@ from typing import Optional
 from datetime import date
 
 async def get_customer(db: Database, customer_id: int):
-    return await customer.get_customer_by_id(db, customer_id)
+    result = await customer.get_customer_by_id(db, customer_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    return result
 
 
 async def get_customers(

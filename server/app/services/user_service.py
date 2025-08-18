@@ -1,10 +1,16 @@
 from typing import Optional
+from fastapi import HTTPException
 from app.crud import user
 from app.schemas.user import UserCreate, UserUpdate
 from databases import Database
 
 async def get_user(db: Database, user_id: int):
-    return await user.get_user_by_id(db, user_id)
+    result = await user.get_user_by_id(db, user_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return result
 
 async def get_users(
     db: Database,

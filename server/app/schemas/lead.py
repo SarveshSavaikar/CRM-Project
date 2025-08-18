@@ -26,7 +26,7 @@ class LeadUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
 
 class LeadResponse(LeadBase):
-    pass
+    id: int
     class Config:
         from_attributes = True
 
