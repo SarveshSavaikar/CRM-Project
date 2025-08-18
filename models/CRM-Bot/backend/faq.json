@@ -1,0 +1,92 @@
+{
+  "hello": "Hello! How can I help you today?",
+  "hi": "Hi there!",
+  "hey": "Hey! How’s your day going?",
+  "how are you": "I’m doing great, thanks for asking! How about you?",
+  "good morning": "Good morning! How can I assist you today?",
+  "good evening": "Good evening! How may I help you?",
+  
+  "pricing": "Our pricing depends on your chosen plan. Please check the Pricing section in the CRM.",
+  "plans": "We offer multiple plans depending on business size. Would you like to know about Basic, Pro, or Enterprise?",
+  "subscription cost": "Our subscription starts at $29/month for Basic, $99/month for Pro, and $299/month for Enterprise.",
+  "free trial": "Yes, we offer a 14-day free trial for new users.",
+  "discount": "We provide seasonal discounts and annual subscription offers. Please contact sales for details.",
+  "upgrade plan": "You can upgrade your plan anytime from the billing section of your CRM account.",
+  
+  "support": "Yes, all plans include customer support. Pro and Enterprise get 24/7 priority support.",
+  "customer care": "Our support team is available via chat, email, and phone.",
+  "technical support": "Please raise a support ticket under 'Help' in your dashboard.",
+  
+  "leads": "You can add or view leads in the CRM Leads page.",
+  "add lead": "To add a lead, go to Leads → Add New.",
+  "import leads": "You can bulk import leads using a CSV file in the Leads section.",
+  "lead status": "Lead statuses include New, In Progress, Won, and Lost.",
+  "track leads": "Check the Leads dashboard for tracking.",
+  
+  "contacts": "Your contacts can be managed under the Contacts page.",
+  "add contact": "To add a contact, go to Contacts → Add New.",
+  "merge contacts": "You can merge duplicate contacts by selecting them and clicking 'Merge'.",
+  
+  "opportunities": "Opportunities help track potential deals with clients.",
+  "create opportunity": "Go to Opportunities → Add New to create one.",
+  "opportunity status": "Statuses include Open, Negotiation, Won, Lost.",
+  
+  "dashboard": "The dashboard gives you an overview of leads, deals, and activities.",
+  "customize dashboard": "Click the 'Customize' button on the dashboard to add/remove widgets.",
+  "reports": "Reports are available in the Reports section. You can generate sales, leads, and activity reports.",
+  "download report": "Yes, reports can be downloaded in PDF or Excel format.",
+  
+  "integrations": "We integrate with Gmail, Outlook, Slack, and other popular tools.",
+  "connect email": "You can connect your email in Settings → Integrations.",
+  "calendar sync": "Yes, you can sync Google Calendar or Outlook calendar from integrations.",
+  
+  "tasks": "Tasks help you stay on top of daily activities.",
+  "add task": "Go to Tasks → Add New to assign a task.",
+  "assign task": "You can assign tasks to team members by selecting them from the dropdown.",
+  "task reminder": "You can set reminders and due dates for tasks.",
+  
+  "notifications": "Notifications alert you about lead updates, tasks, and meetings.",
+  "turn off notifications": "You can disable or customize notifications from Settings.",
+  
+  "account settings": "You can update your details from Account Settings.",
+  "change password": "Go to Settings → Security → Change Password.",
+  "reset password": "Click 'Forgot Password' on the login page to reset it.",
+  "delete account": "Please contact support to delete your account permanently.",
+  
+  "billing": "Billing information can be managed in the Billing section.",
+  "payment methods": "We accept credit cards, debit cards, PayPal, and bank transfers.",
+  "invoice": "You can download invoices from the Billing → Invoices page.",
+  "refund policy": "Refunds are processed if requested within 14 days of payment.",
+  
+  "security": "We use industry-standard encryption to protect your data.",
+  "2fa": "Yes, two-factor authentication is available under Security Settings.",
+  "data backup": "Your data is backed up daily to ensure safety.",
+  
+  "api": "We provide REST API for developers.",
+  "api key": "You can generate an API key under Developer Settings.",
+  "webhooks": "Yes, webhooks are supported for lead updates and task creation.",
+  
+  "mobile app": "Yes, we have mobile apps for both iOS and Android.",
+  "download app": "You can download the app from the App Store or Google Play.",
+  
+  "team": "You can manage your team in the Team section.",
+  "add user": "Go to Team → Add User to invite members.",
+  "user roles": "We support roles like Admin, Manager, and Agent.",
+  "permissions": "Admins can set permissions for different users.",
+  
+  "activity log": "The activity log tracks all user actions in the CRM.",
+  "audit log": "Admins can access detailed audit logs for compliance.",
+  
+  "training": "We provide training videos and documentation in the Help Center.",
+  "documentation": "Official docs are available at support portal.",
+  "webinar": "You can join our free product webinars every month.",
+  
+  "language": "The CRM is available in English, Spanish, French, and German.",
+  "timezone": "You can change your timezone from Account Settings.",
+  "logout": "To log out, click on your profile icon and select Logout.",
+  
+  "bye": "Goodbye! Have a nice day",
+  "thanks": "You’re welcome! Happy to help.",
+  "thank you": "Glad I could help!",
+  "goodbye": "Take care! See you soon."
+}
