@@ -38,3 +38,4 @@ class LeadInDB(LeadBase):
 
     class Config:
         from_attributes = True
+        
