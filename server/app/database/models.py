@@ -90,3 +90,17 @@ Task = Table(
     Column("user_id", Integer, ForeignKey(Lead.c.id)),
     Column("opportunity_id", Integer, ForeignKey(PipelineStage.c.id))
 )
+
+Customer = Table(
+    "Customer",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name", String(100), nullable=False),
+    Column("email", String(100), unique=True, nullable=True),
+    Column("phone", Integer, unique=False, nullable=True),
+    Column("company", String(255), nullable=True, default="UNKNOWN"),
+    Column("industry", String(50), nullable=True, default="UNKNOWN"),
+    Column("created_at", DateTime, nullable=False),
+    Column("updated_at", DateTime, nullable=False),
+    Column("lead_id", Integer, ForeignKey(Lead.c.id))
+)
