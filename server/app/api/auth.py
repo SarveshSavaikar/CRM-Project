@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.auth import Token, UserCreate, UserResponse
+from app.schemas.permissions import ROLES , PERMISSIONS
 from app.services.auth_service import authenticate_user, create_user, check_user
 from app.core.security import create_access_token
 from app.core.dependencies import get_current_user, require_roles
@@ -50,6 +51,17 @@ async def signup(user: UserCreate):
 async def get_me(current_user: dict = Depends(get_current_user)):
     return current_user
 
+@router.get("/roles")
+async def get_roles():
+    return {"roles":ROLES}
+
+@router.get("/permissions", response_model=str)
+async def get_permissions(role : str):
+    # permissions = PERMISSIONS.get(role)
+    permissions =  { page: perm[role] for page , perm in PERMISSIONS.items()}
+    if permissions is None:
+        raise HTTPException(status_code=404, detail="Role Not Found")
+    return f"Permissions for {role} : {permissions}"
 
 # ------------------------
 # ADMIN TEST ROUTE
@@ -60,5 +72,6 @@ async def admin_dashboard(_: dict = Depends(require_roles("admin"))):
 
 
 @router.get("/view-dashboard")
-async def admin_dashboard(_: dict = Depends(require_roles("viewer"))):
+async def Viewer_dashboard(_: dict = Depends(require_roles("viewer"))):
     return {"message": "Welcome, Viewer! Only admins can see this."}
+
