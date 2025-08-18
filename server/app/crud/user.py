@@ -15,18 +15,18 @@ async def get_all_users(db: Database):
 
 
 # Get User by ID
-async def get_User_by_id(db: Database, User_id: int):
+async def get_user_by_id(db: Database, User_id: int):
     query = select(User).where(User.c.id == User_id)
     return await db.fetch_one(query)
 
 # Get User by email
-async def get_User_by_email(db: Database, email: str):
+async def get_user_by_email(db: Database, email: str):
     query = select(User).where(User.c.email == email)
     return await db.fetch_one(query)
 
 
 # Get Users by filters
-async def get_Users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     query = select(User)
     conditions = []
 
@@ -45,14 +45,14 @@ async def get_Users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
 
 
 # Create User
-async def create_User(db: Database, User_data: UserCreate):
+async def create_user(db: Database, user_data: UserCreate):
     query = (
         insert(User)
         .values(
-            name=User_data.name,
-            role=User_data.role,
+            name=user_data.name,
+            role=user_data.role,
             status="Idle",
-            email=User_data.email
+            email=user_data.email
         )
         .returning(User)
 
@@ -64,7 +64,7 @@ async def create_User(db: Database, User_data: UserCreate):
         raise e
 
 # Update User
-async def update_User(db: Database, User_id: int, update_data: dict):
+async def update_user(db: Database, User_id: int, update_data: dict):
     query = (
         update(User)
         .where(User.c.id == User_id)
@@ -72,3 +72,13 @@ async def update_User(db: Database, User_id: int, update_data: dict):
         .returning(User)
     )
     return await db.fetch_one(query)
+
+async def delete_user(db: Database, user_id: int):
+    query = (
+        User
+        .delete()
+        .where(User.c.id == user_id)
+    )
+    
+    
+    return await db.execute(query)

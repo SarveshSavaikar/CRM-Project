@@ -21,8 +21,8 @@ Campaign = Table(
     Column("name", String(100), nullable=False),
     Column("description", Text, nullable=True),
     Column("channel", String(50), nullable=False),
-    Column("start_date", Date, nullable=True),
-    Column("end_date", Date, nullable=True)
+    Column("start_date", DateTime, nullable=True),
+    Column("end_date", DateTime, nullable=True)
 )
 
 PipelineStage = Table(
@@ -53,8 +53,8 @@ Lead = Table(
     Column("source", String(100), nullable=True, default="UNKNOWN"),
     Column("status", String(50), nullable=True, default="--"),
     Column("score", Float, nullable=True, default=0.0),
-    Column("created_at", Date, nullable=False),
-    Column("updated_at", Date, nullable=False),
+    Column("created_at", DateTime, nullable=False),
+    Column("updated_at", DateTime, nullable=False),
     Column("team_id", Integer, ForeignKey(Team.c.id)),
     Column("user_id", Integer, ForeignKey(User.c.id))
 )
@@ -74,8 +74,8 @@ Opportunity = Table(
     Column("id", Integer, primary_key=True, index=True),
     Column("name", String(100), nullable=False),
     Column("value", Float, nullable=True, default=0.0),
-    Column("close_date", Date, nullable=False),
-    Column("created_at", Date, nullable=False),
+    Column("close_date", DateTime, nullable=False),
+    Column("created_at", DateTime, nullable=False),
     Column("lead_id", Integer, ForeignKey(Lead.c.id)),
     Column("pipeline_stage_id", Integer, ForeignKey(PipelineStage.c.id))
 )

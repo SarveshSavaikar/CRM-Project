@@ -50,6 +50,16 @@ async def update_team(db: Database, team_id: int, update_data: dict):
         .values(**update_data)
         .returning(Team)
     )
-    updated_team = await db.execute(update_query)
+    updated_team = await db.fetch_one(update_query)
 
     return updated_team
+
+async def delete_team(db: Database, team_id: int):
+    query = (
+        Team
+        .delete()
+        .where(Team.c.id == team_id)
+    )
+    
+    
+    return await db.execute(query)

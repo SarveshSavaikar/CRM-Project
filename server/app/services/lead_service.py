@@ -50,14 +50,18 @@ async def get_leads(
 
     return await lead.get_leads(db, **filters)
 
+async def create_lead(db: Database, leadObj: LeadCreate):
+    return await lead.create_lead(db, leadObj)   
+
 async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
     result = await lead.get_lead_by_id(db, lead_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Lead not found")
 
-    db_data = dict(result)
-
     update_data = leadObj.model_dump(exclude_unset=True)
     
-    lead.update_lead(db, update_data)
+    return await lead.update_lead(db, lead_id, update_data)
+    
+async def delete_lead(db: Database, lead_id: int):
+    return await lead.delete_lead(db, lead_id)
     

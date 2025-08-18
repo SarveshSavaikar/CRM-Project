@@ -17,12 +17,11 @@ async def get_users(role: str = None, team_id: int = None, db: Database = Depend
 async def get_user(user_id: int, db: Database = Depends(get_db)):
     return await user_service.get_user(db, user_id)
 
-
 @router.put("/user-{user_id}", response_model=UserResponse)
 async def update_user(user_id: str, user: UserUpdate, db: Database = Depends(get_db)):    
-    return await user_service.update_user(user_id, user)  # service function to be implemented
+    return await user_service.update_user(user_id, user)
 
+@router.delete("/{user_id}")
+async def delete_user(user_id: int, db: Database = Depends(get_db)):
+    return await user_service.delete_user(db, user_id)
 
-# @router.delete("/{user_id}")
-# def delete_user(user_id: str):
-#     return user_service.delete_user(user_id)  # service function to be implemented
