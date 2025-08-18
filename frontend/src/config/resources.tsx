@@ -66,6 +66,7 @@ export const resources: IResourceItem[] = [
       icon: <NotificationOutlined />,
     },
   },
+
   // New Inbox addition
   {
     name: "inbox",
@@ -75,6 +76,7 @@ export const resources: IResourceItem[] = [
       icon: <MailOutlined />,
     },
   },
+
   // ✅ Added Customers before Geo Insights
   {
     name: "customers",
@@ -84,6 +86,7 @@ export const resources: IResourceItem[] = [
       icon: <ShopOutlined />, // using existing ShopOutlined icon, you can change if needed
     },
   },
+
   {
     name: "geo-insights",
     list: "/geo-insights",

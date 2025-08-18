@@ -82,6 +82,7 @@ const App = () => {
                   <Route path="calendar" element={<TasksCalendarPage />} />
                 </Route>
 
+
                 {/* Companies */}
                 <Route path="/companies">
                   <Route index element={<CompanyListPage />} />
@@ -89,10 +90,12 @@ const App = () => {
                   <Route path="edit/:id" element={<CompanyEditPage />} />
                 </Route>
 
+
                 {/* Leads */}
                 <Route path="/leads">
                   <Route index element={<LeadsListIndex />} />
                 </Route>
+
 
                 {/* GeoInsights */}
                 <Route path="/geo-insights">
@@ -115,9 +118,11 @@ const App = () => {
                   <Route index element={<CustomersPage />} />
                 </Route>
 
+
                 {/* Deals */}
                 <Route path="/deals">
                   <Route index element={<DealsPage />} />
+
                 </Route>
 
                 {/* Admin Settings & Audit Log Custom Routes */}
