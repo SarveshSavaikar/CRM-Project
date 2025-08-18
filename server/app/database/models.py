@@ -4,6 +4,8 @@ from sqlalchemy import Date, Float, ForeignKey, Table, Column, Integer, String, 
 
 metadata = MetaData()
 
+
+
 Team = Table(
     "Team",
     metadata,
