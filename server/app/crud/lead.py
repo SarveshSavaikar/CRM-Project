@@ -41,9 +41,13 @@ async def create_lead(db: Database, lead_data: LeadCreate):
         insert(Lead)
         .values(
             name=lead_data.name,
-            role=lead_data.role,
-            status="Idle",
-            email=lead_data.email
+            email = lead_data.email,
+            phone = lead_data.phone,
+            source = lead_data.source,
+            status = lead_data.status,
+            score = lead_data.score,
+            team_id = lead_data.team_id,
+            user_id = lead_data.user_id
         )
         .returning(Lead)
 
@@ -68,7 +72,7 @@ async def update_lead(db: Database, lead_id: int, update_data: dict):
     return updated_lead
 
 
-async def delete_team(db: Database, lead_id: int):
+async def delete_lead(db: Database, lead_id: int):
     query = (
         Lead
         .delete()

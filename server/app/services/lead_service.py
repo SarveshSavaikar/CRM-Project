@@ -1,4 +1,6 @@
+from asyncpg import UniqueViolationError
 from fastapi import HTTPException
+from psycopg2 import IntegrityError
 from app.crud import lead
 from app.schemas.lead import LeadCreate, LeadUpdate
 from datetime import date
@@ -65,3 +67,21 @@ async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
 async def delete_lead(db: Database, lead_id: int):
     return await lead.delete_lead(db, lead_id)
     
+async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
+    success_count = fail_count = 0
+    failed_inserts = []
+    successful_inserts = []
+    total = len(leads)
+    for l in leads:
+        try:
+            response = await lead.create_lead(db, l)
+            success_count+=1
+            successful_inserts.append(l)
+        except UniqueViolationError as e:
+            print("[lead_service(create_leads_from_list)]Unique Violation Error:")
+            fail_count+=1
+            failed_inserts.append(l)
+            
+    
+    return successful_inserts
+        
