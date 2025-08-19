@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from app.crud import opportunity
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
+from app.schemas.lead import LeadStageUpdate
 from datetime import date, datetime, time
 from databases import Database
 from typing import Optional
@@ -60,3 +61,11 @@ async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
 
 async def delete_opportunity(db: Database, opportunity_id: int):
     return await opportunity.delete_opportunity(db, opportunity_id)
+
+async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadStageUpdate):
+    result = await opportunity.update_opportunity_by_lead_id(db, lead_id, update.pipeline_stage_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Record(Opportunity) not found")
+    
+    return result

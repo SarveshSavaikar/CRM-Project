@@ -2,9 +2,10 @@ from asyncpg import UniqueViolationError
 from fastapi import HTTPException
 from psycopg2 import IntegrityError
 from app.crud import lead
-from app.schemas.lead import LeadCreate, LeadUpdate
+from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate
 from datetime import date
 from databases import Database
+from . import opportunity_service
 
 
 async def get_lead(db: Database, lead_id: int):
@@ -56,10 +57,13 @@ async def create_lead(db: Database, leadObj: LeadCreate):
     return await lead.create_lead(db, leadObj)   
 
 async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
+    status_values = ['active', 'inactive', 'converted', 'lost', 'archived']
     result = await lead.get_lead_by_id(db, lead_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Lead not found")
-
+    leadObj.status = leadObj.status.lower()
+    if leadObj.status not in status_values:
+        raise HTTPException(status_code=400, detail="Invalid status field value")
     update_data = leadObj.model_dump(exclude_unset=True)
     
     return await lead.update_lead(db, lead_id, update_data)
@@ -85,3 +89,6 @@ async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
     
     return successful_inserts
         
+async def update_lead_stage(db: Database, lead_id: int, update: LeadStageUpdate):
+    return await opportunity_service.update_opportunity_by_lead(db, lead_id, update)
+    

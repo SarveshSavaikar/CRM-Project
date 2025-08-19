@@ -83,3 +83,13 @@ async def delete_opportunity(db: Database, opportunity_id: int):
     
     
     return await db.execute(query)
+
+async def update_opportunity_by_lead_id(db: Database, lead_id: int, pipeline_stage_id: int):
+    query = (
+        Opportunity
+        .update()
+        .where(Opportunity.c.lead_id == lead_id)
+        .values({Opportunity.c.pipeline_stage_id: pipeline_stage_id})
+        .returning(Opportunity)
+    )
+    return await db.fetch_one(query)
