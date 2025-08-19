@@ -3,7 +3,7 @@
 # from server_utils import User, UserPydantic
 # import json
 from fastapi import FastAPI # type: ignore
-from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions
+from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions, analytics
 from app.api import test_db
 from app.database.connection import database
 from app.middlewares.jwt_middleware import JWTMiddleware
@@ -40,5 +40,6 @@ app.include_router(tasks.router)
 app.include_router(customers.router)
 app.include_router(opportunities.router)
 app.include_router(interactions.router)
+app.include_router(analytics.router)
 
 

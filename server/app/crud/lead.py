@@ -1,5 +1,5 @@
 from app.schemas.lead import LeadCreate, LeadUpdate
-from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
+from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import Lead
@@ -10,8 +10,8 @@ async def get_lead_by_id(db: Database, lead_id: int):
     query = select(Lead).where(Lead.c.id == lead_id)
     return await db.fetch_one(query)
 
-async def get_leads(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(Lead)
+async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    query = select(func.count()).select_from(Lead) if count else select(Lead)
     conditions = []
 
     for attr, value in filters.items():
@@ -31,8 +31,12 @@ async def get_leads(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
     if conditions:
         query = query.where(and_(*conditions))
 
-    rows = await db.fetch_all(query)
-    return [dict(row) for row in rows]
+    if count:
+        result = await db.execute(query)
+        return result#.scalar_one() 
+    else:
+        rows = await db.fetch_all(query)
+        return [dict(row) for row in rows]
 
 
 # Create lead
@@ -81,3 +85,18 @@ async def delete_lead(db: Database, lead_id: int):
     
     
     return await db.execute(query)
+
+async def get_lead_count(db: Database):
+    query = select(func.count()).select_from(Lead)
+    result = await db.execute(query)
+    return result.scalar_one()
+
+async def get_leads_grouped(db: Database, group_by: str):
+    if group_by == "source":
+        query = (
+            select(Lead.c.source, func.count().label("count"))
+            .group_by(Lead.c.source)
+        )
+    
+    rows = await db.fetch_all(query)
+    return {"group": [row[0] for row in rows], "count": [row[1] for row in rows]}
