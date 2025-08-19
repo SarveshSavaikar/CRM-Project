@@ -39,3 +39,6 @@ class LeadInDB(LeadBase):
     class Config:
         from_attributes = True
         
+class LeadStageUpdate(BaseModel):
+    pipeline_stage_id: int = Field(...)
+        

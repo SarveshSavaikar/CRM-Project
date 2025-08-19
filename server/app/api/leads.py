@@ -1,8 +1,9 @@
+import json
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 # from sqlalchemy.orm import Session
 from databases import Database
 from app.database.connection import get_db
-from app.schemas.lead import LeadCreate, LeadUpdate, LeadResponse
+from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate, LeadResponse
 from app.services import lead_service
 from datetime import date
 import csv
@@ -65,3 +66,8 @@ async def import_leads_from_csv(leadCSV: UploadFile = File(...), db: Database = 
     leads = [LeadCreate(**row) for row in reader]
 
     return await lead_service.create_leads_from_list(db, leads)
+
+@router.patch("/{lead_id}/stage")
+async def update_lead_stage(lead_id: int, update: LeadStageUpdate, db: Database = Depends(get_db)):
+    result = await lead_service.update_lead_stage(db, lead_id, update)
+    return json.dumps({"lead_id": lead_id, "stage": result.pipeline_stage_id})
