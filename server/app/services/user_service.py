@@ -4,6 +4,9 @@ from app.crud import user
 from app.schemas.user import UserCreate, UserUpdate
 from databases import Database
 
+from app.schemas.lead import LeadUpdate
+from . import lead_service
+
 async def get_user(db: Database, user_id: int):
     result = await user.get_user_by_id(db, user_id)
     
@@ -39,4 +42,5 @@ async def update_user(db: Database, user_id: str, userObj: UserUpdate):
     return await user.update_user(db, user_id, update_data)
 
 async def delete_user(db: Database, user_id: int):
+    result = await lead_service.update_lead(db, leadObj=LeadUpdate(user_id=None, status="Unassigned"), user_id=user_id)
     return await user.delete_user(db, user_id)

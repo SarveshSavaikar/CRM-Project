@@ -75,6 +75,25 @@ async def update_lead(db: Database, lead_id: int, update_data: dict):
 
     return updated_lead
 
+async def update_leads_by_filters(db: Database, update_data: dict, **filters: dict[str, Any]):
+    query = (
+        Lead
+        .update()
+        .values(**update_data)
+        .returning(Lead)
+    )
+    
+    conditions = []
+    for attr, val in filters.items():
+        if hasattr(Lead.c, attr):
+            conditions.append(getattr(Lead.c, attr) == val)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+        
+    updated_leads = await db.fetch_all(query)
+    
+    return updated_leads
 
 async def delete_lead(db: Database, lead_id: int):
     query = (
