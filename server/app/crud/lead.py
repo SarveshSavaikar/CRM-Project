@@ -2,16 +2,32 @@ from app.schemas.lead import LeadCreate, LeadUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Lead
+from app.database.models import Lead, Team, User
 from typing import Any
+from . import crud_utils
 
+prefix_columns = crud_utils.prefix_columns
 # Get lead by ID
 async def get_lead_by_id(db: Database, lead_id: int):
     query = select(Lead).where(Lead.c.id == lead_id)
     return await db.fetch_one(query)
 
 async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(func.count()).select_from(Lead) if count else select(Lead)
+    if count:
+        query = select(func.count()).select_from(Lead)
+    else:
+        query = (
+            select(
+                *prefix_columns(User, "user"),
+                *prefix_columns(Team, "team"),
+                *prefix_columns(Lead, "")
+            )
+            .select_from(
+                Lead
+                .join(User, Lead.c.user_id == User.c.id)
+                .join(Team, Lead.c.team_id == Team.c.id)
+            )
+        )
     conditions = []
 
     for attr, value in filters.items():
@@ -25,6 +41,10 @@ async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> lis
                     conditions.append(Lead.c.last_updated < last_updated)
                 else:      # before = False
                     conditions.append(Lead.c.last_updated > last_updated)
+        elif attr == "user_name":
+            conditions.append(User.c.name.ilike(f"%{value}%"))
+        elif attr == "team_name":
+            conditions.append(Team.c.name.ilike(f"%{value}%"))
         elif hasattr(Lead.c, attr):
             conditions.append(getattr(Lead.c, attr) == value)
 
@@ -36,7 +56,9 @@ async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> lis
         return result#.scalar_one() 
     else:
         rows = await db.fetch_all(query)
-        return [dict(row) for row in rows]
+        returning = [dict(row) for row in rows]
+        print(returning)
+        return returning
 
 
 # Create lead

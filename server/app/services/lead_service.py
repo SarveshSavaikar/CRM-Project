@@ -26,6 +26,8 @@ async def get_leads(
     min_score: Optional[float] = None,
     team_id: Optional[int] = None,
     user_id: Optional[int] = None,
+    team_name: Optional[str] = None,
+    user_name: Optional[str] = None,
     created: Optional[date] = None,
     last_updated: Optional[date] = None,
     before: Optional[bool] = None
@@ -42,6 +44,10 @@ async def get_leads(
         filters["team_id"] = team_id
     if user_id is not None:
         filters["user_id"] = user_id
+    if team_name is not None:
+        filters["team_name"] = team_name
+    if user_name is not None:
+        filters["user_name"] = user_name
     if created is not None:
         filters["created"] = created
     if last_updated is not None:

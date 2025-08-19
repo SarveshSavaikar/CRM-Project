@@ -24,11 +24,13 @@ class LeadUpdate(BaseModel):
     status: Optional[str] = Field(None, max_length=10)
     email: Optional[EmailStr] = None
     phone: Optional[str] = Field(None, max_length=20)
-    user_id: Optional[int] = None
-    team_id: Optional[int] = None
+    # user_id: Optional[int] = None
+    # team_id: Optional[int] = None
 
 class LeadResponse(LeadBase):
     id: int
+    user_name: str = Field(default=None, alias="user_name")
+    team_name: str = Field(default=None, alias="team_name")
     class Config:
         from_attributes = True
 

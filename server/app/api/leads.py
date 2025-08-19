@@ -17,13 +17,15 @@ async def get_lead(
     status: str = None, 
     min_score: float = None, 
     team_id: int = None, 
-    user_id: int = None, 
+    user_id: int = None,
+    team_name: str = None, 
+    user_name: str = None,
     created: date = None, 
     last_updated: date = None, 
     before: bool = False, 
     db: Database = Depends(get_db)
 ):
-    return await lead_service.get_leads(db, source, status, min_score, team_id, user_id, created, last_updated, before)
+    return await lead_service.get_leads(db, source, status, min_score, team_id, user_id, team_name, user_name, created, last_updated, before)
 
 
 @router.get("/lead-{lead_id}", response_model=LeadResponse)
