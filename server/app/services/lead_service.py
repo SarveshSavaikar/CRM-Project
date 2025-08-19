@@ -60,6 +60,8 @@ async def get_leads(
     return await lead.get_leads(db, **filters)
 
 async def create_lead(db: Database, leadObj: LeadCreate):
+    leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
+    leadObj.user_id = None if leadObj.team_id==0 else leadObj.team_id
     return await lead.create_lead(db, leadObj)   
 
 async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):

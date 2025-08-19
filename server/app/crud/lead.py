@@ -21,11 +21,11 @@ async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> lis
                 *prefix_columns(User, "user"),
                 *prefix_columns(Team, "team"),
                 *prefix_columns(Lead, "")
-            )
+            )   
             .select_from(
                 Lead
-                .join(User, Lead.c.user_id == User.c.id)
-                .join(Team, Lead.c.team_id == Team.c.id)
+                .outerjoin(User, Lead.c.user_id == User.c.id)
+                .outerjoin(Team, Lead.c.team_id == Team.c.id)
             )
         )
     conditions = []

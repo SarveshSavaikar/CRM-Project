@@ -29,8 +29,8 @@ class LeadUpdate(BaseModel):
 
 class LeadResponse(LeadBase):
     id: int
-    user_name: str = Field(default=None, alias="user_name")
-    team_name: str = Field(default=None, alias="team_name")
+    user_name: Optional[str] = Field(default=None, alias="user_name")
+    team_name: Optional[str] = Field(default=None, alias="team_name")
     class Config:
         from_attributes = True
 
