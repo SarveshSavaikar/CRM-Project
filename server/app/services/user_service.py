@@ -17,11 +17,17 @@ async def get_user(db: Database, user_id: int):
 
 async def get_users(
     db: Database,
+    name: str,
+    email: str,
     role: Optional[str] = None,
     team_id: Optional[int] = None
 ):
     filters = {}
 
+    if name is not None:
+        filters["name"] = name
+    if email is not None:
+        filters["email"] = email
     if role is not None:
         filters["role"] = role
     if team_id is not None:
