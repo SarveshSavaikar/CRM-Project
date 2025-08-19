@@ -129,30 +129,40 @@ const inboxHeaderStyle = {
   padding: "16px 24px",
   borderBottom: "1px solid #f0f1f3",
 };
+
+// --- NEW SEARCH INPUT STYLES ---
 const searchInputContainerStyle = {
-  width: "300px",
-  marginLeft: "24px",
+  flex: 1,
   position: "relative" as "relative",
+  maxWidth: "300px",
+  border: "1px solid #d9d9d9",
+  borderRadius: "6px",
+  display: "flex",
+  overflow: "hidden",
 };
+
 const searchInputStyle = {
-  width: "100%",
-  padding: "8px 12px 8px 40px",
-  borderRadius: "20px",
-  border: "1px solid #dbe4f3",
-  background: "#f7fafd",
+  border: "none",
+  outline: "none",
+  padding: "8px 12px",
   fontSize: "15px",
-  color: "#49527a",
+  flex: 1,
 };
-const searchIconStyle = {
-  position: "absolute" as "absolute",
-  left: "15px",
-  top: "50%",
-  transform: "translateY(-50%)",
-  color: "#a8b0c8",
+
+const searchButtonStyle = {
+  background: "#1467fa",
+  border: "none",
+  padding: "8px 12px",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  color: "#fff",
 };
+// ------------------------------------
+
 const newMessageButtonStyle = {
   padding: "8px 16px",
-  borderRadius: "20px",
+  borderRadius: "5px",
   background: "#1467fa",
   color: "#fff",
   border: "none",
@@ -175,9 +185,11 @@ const tabStyle = (active: boolean) => ({
   cursor: "pointer",
   transition: "background 0.2s",
   background: active ? "#eef2ff" : "transparent",
-  color: active ? "#3858c1" : "#636b91",
+  color: active ? "#1467fa" : "#636b91",
   marginRight: "8px",
 });
+
+// --- MODIFIED filterSortContainerStyle
 const filterSortContainerStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -187,6 +199,8 @@ const filterSortContainerStyle = {
   color: "#a8b0c8",
   fontSize: "14px",
 };
+// ------------------------------------
+
 const messageListStyle = {
   overflowY: "auto" as "auto",
   flex: 1,
@@ -534,6 +548,7 @@ export const InboxIndex = () => {
     setIsForwarding(false); // Not a forward
   };
 
+  // --- NEW: handleForward function to set the state for the modal ---
   const handleReply = () => {
     if (!selectedMessage) return;
 
@@ -719,16 +734,6 @@ export const InboxIndex = () => {
             >
               Inbox
             </h2>
-            <div style={searchInputContainerStyle}>
-              <SearchOutlined style={searchIconStyle} />
-              <input
-                type="text"
-                placeholder="Search messages, contacts, or"
-                style={searchInputStyle}
-                onChange={(e) => handleSearchChange(e.target.value)}
-              />
-            </div>
-
             <div style={newMessageDropdownContainerStyle}>
               <button
                 style={newMessageDropdownButtonStyle}
@@ -773,59 +778,78 @@ export const InboxIndex = () => {
             ))}
           </div>
           {/* Filter and Sort */}
-          <div style={filterSortContainerStyle}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <FilterOutlined /> Filter by:
-              <span
-                style={filterOptionStyle(readFilter === "all")}
-                onClick={() => setReadFilter("all")}
-              >
-                All
-              </span>
-              <span
-                style={filterOptionStyle(readFilter === "unread")}
-                onClick={() => setReadFilter("unread")}
-              >
-                Unread
-              </span>
-              <span
-                style={filterOptionStyle(readFilter === "read")}
-                onClick={() => setReadFilter("read")}
-              >
-                Read
-              </span>
-            </div>
-            <div style={sortDropdownStyle}>
-              <div
-                style={sortDropdownButtonStyle}
-                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              >
-                <SortAscendingOutlined />
-                Sort by: {sortOrder === "newest" ? "Newest" : "Oldest"}
-                <DownOutlined style={{ fontSize: "12px", marginLeft: "4px" }} />
-              </div>
-              {isSortDropdownOpen && (
-                <div style={sortDropdownMenuContainerStyle}>
-                  <div
-                    style={sortDropdownMenuItemStyle(sortOrder === "newest")}
-                    onClick={() => {
-                      setSortOrder("newest");
-                      setIsSortDropdownOpen(false);
-                    }}
-                  >
-                    Newest First
-                  </div>
-                  <div
-                    style={sortDropdownMenuItemStyle(sortOrder === "oldest")}
-                    onClick={() => {
-                      setSortOrder("oldest");
-                      setIsSortDropdownOpen(false);
-                    }}
-                  >
-                    Oldest First
-                  </div>
+          {/* UPDATED: Split the row into two sections */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f0f1f3', color: '#a8b0c8', fontSize: '14px' }}>
+            {/* Left Section: Sort & Filter */}
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+              <div style={sortDropdownStyle}>
+                <div
+                  style={sortDropdownButtonStyle}
+                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                >
+                  <SortAscendingOutlined />
+                  Sort by: {sortOrder === "newest" ? "Newest" : "Oldest"}
+                  <DownOutlined style={{ fontSize: "12px", marginLeft: "4px" }} />
                 </div>
-              )}
+                {isSortDropdownOpen && (
+                  <div style={sortDropdownMenuContainerStyle}>
+                    <div
+                      style={sortDropdownMenuItemStyle(sortOrder === "newest")}
+                      onClick={() => {
+                        setSortOrder("newest");
+                        setIsSortDropdownOpen(false);
+                      }}
+                    >
+                      Newest First
+                    </div>
+                    <div
+                      style={sortDropdownMenuItemStyle(sortOrder === "oldest")}
+                      onClick={() => {
+                        setSortOrder("oldest");
+                        setIsSortDropdownOpen(false);
+                      }}
+                    >
+                      Oldest First
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <FilterOutlined /> Filter by:
+                <span
+                  style={filterOptionStyle(readFilter === "all")}
+                  onClick={() => setReadFilter("all")}
+                >
+                  All
+                </span>
+                <span
+                  style={filterOptionStyle(readFilter === "unread")}
+                  onClick={() => setReadFilter("unread")}
+                >
+                  Unread
+                </span>
+                <span
+                  style={filterOptionStyle(readFilter === "read")}
+                  onClick={() => setReadFilter("read")}
+                >
+                  Read
+                </span>
+              </div>
+            </div>
+            {/* Right Section: Search */}
+            <div style={searchInputContainerStyle}>
+              <input
+                type="text"
+                placeholder="Search messages..."
+                style={searchInputStyle}
+                onChange={(e) => handleSearchChange(e.target.value)}
+              />
+              <button
+                style={searchButtonStyle}
+                onClick={() => handleSearchChange("")}
+              >
+                <SearchOutlined />
+              </button>
             </div>
           </div>
           {/* Message List */}

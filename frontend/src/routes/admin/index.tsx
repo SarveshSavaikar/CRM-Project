@@ -140,7 +140,7 @@ const ContactsTable: React.FC<{ contacts: Contact[] }> = ({ contacts }) => (
               textAlign: "left",
               padding: 8,
               fontWeight: 600,
-              color: "#377afd",
+              color: "#1467fa",
               borderBottom: "1px solid #eef0f2",
             }}
           >
@@ -679,7 +679,7 @@ const CompanyCard: React.FC<{
                     padding: "8px 16px",
                     border: "none",
                     borderRadius: "6px",
-                    background: "#4e79ff",
+                    background: "#1467fa",
                     color: "#fff",
                     cursor: "pointer",
                   }}

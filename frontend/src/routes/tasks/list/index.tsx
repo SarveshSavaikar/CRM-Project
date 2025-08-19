@@ -141,7 +141,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   return (
     <>
       {/* ✅ Added calendar button above the board */}
-      <div style={{ display: "flex", gap: "8px", margin: "8px 16px" }}>
+      <div style={{ display: "flex", gap: "8px", margin: "8px 66px" }}>
         <KanbanOpenCalendarButton />
       </div>
 

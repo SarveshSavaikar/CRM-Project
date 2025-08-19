@@ -2,12 +2,14 @@ import React, { useState, CSSProperties } from "react";
 import { Card, Modal, Form, Input, Button } from "antd";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
   useSensors,
   useSensor,
   PointerSensor,
   DragEndEvent,
   useDroppable,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -16,6 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { PlusCircleOutlined } from "@ant-design/icons";
 
 // --- Types ---
 type Deal = {
@@ -57,41 +60,53 @@ const initialStages: Stage[] = [
   },
 ];
 
-// --- Sortable Card Component ---
-const SortableDealCard = ({ deal }: { deal: Deal }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+// --- Sortable Card Component with visual feedback ---
+const SortableDealCard = ({ deal, isDragging }: { deal: Deal, isDragging: boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: deal.id,
   });
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
+    zIndex: isDragging ? 10 : 'auto',
     cursor: "grab",
-    background: "#fff", // White inner deal cards
-    border: "1px solid #e7ebf6",
-    borderRadius: 10,
-    padding: "18px 16px",
-    marginBottom: 14,
-    boxShadow: isDragging ? "0 4px 16px #377afd30" : "0 1.2px 7px #0001",
-    minHeight: 62,
+    background: "#fff",
+    border: "1px solid #dcdfe6", // Lighter, more subtle border
+    borderRadius: 6,
+    padding: "16px 14px",
+    marginBottom: 10,
+    minHeight: 60,
     display: "flex",
     flexDirection: "column",
     gap: 2,
+    opacity: isDragging ? 0.5 : 1,
     transitionDuration: "0.15s",
+  };
+  
+  const hoverStyle: CSSProperties = {
+    background: "#f8f9fa", // Subtle background change on hover
+    border: "1px solid #c9d8e5",
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <span style={{ fontWeight: 700, fontSize: 15, color: "#000" }}>{deal.leadName}</span>
-      <span style={{ color: "#000", fontWeight: 600, fontSize: 14 }}>{deal.value}</span>
-      <span style={{ color: "#000", fontSize: 13 }}>
+    <div
+      ref={setNodeRef}
+      style={{ ...style, ...(!isDragging ? hoverStyle : {}) }} 
+      {...attributes}
+      {...listeners}
+    >
+      <span style={{ fontWeight: 600, fontSize: 14, color: "#2c3e50" }}>{deal.leadName}</span>
+      <span style={{ color: "#34495e", fontWeight: 700, fontSize: 13 }}>{deal.value}</span>
+      <span style={{ color: "#7f8c8d", fontSize: 12 }}>
         Close: {deal.expectedClose}
       </span>
     </div>
   );
 };
 
-const DroppableStage = ({ stageId, children }: { stageId: string; children: React.ReactNode }) => {
+// --- Droppable Stage Component ---
+const DroppableStage = ({ stageId, children, title, dealCount, onAddDeal }: { stageId: string, children: React.ReactNode, title: string, dealCount: number, onAddDeal: (stageId: string) => void }) => {
   const { setNodeRef } = useDroppable({
     id: stageId,
   });
@@ -100,17 +115,67 @@ const DroppableStage = ({ stageId, children }: { stageId: string; children: Reac
     <div
       ref={setNodeRef}
       style={{
-       
-        borderRadius: 14,
-        padding: "10px 0 10px 0",
-        minWidth: 290,
+        background: "#ebecf0", // Typical Kanban board column background
+        borderRadius: 8,
+        padding: "12px",
+        minWidth: 280,
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
-        maxHeight: "74vh",
+        border: "1px solid #dfe1e6",
       }}
     >
-      {children}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginBottom: "12px",
+      }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <h3 style={{
+            fontWeight: 700, margin: 0,
+            fontSize: 16, color: "#2c3e50"
+          }}>{title}</h3>
+          <span
+            style={{
+              backgroundColor: "#d1e5ff",
+              color: "#3498db",
+              padding: "2px 8px",
+              borderRadius: 12,
+              fontSize: 12,
+              fontWeight: 600,
+              marginLeft: 8,
+            }}
+          >
+            {dealCount}
+          </span>
+        </div>
+        <Button
+          type="text"
+          shape="circle"
+          onClick={() => onAddDeal(stageId)}
+          icon={<PlusCircleOutlined />}
+          style={{
+            color: "#3498db",
+            fontSize: 20,
+            transition: "color 0.2s",
+          }}
+        />
+      </div>
+      <div style={{ flex: 1 }}>
+        {children}
+        {dealCount === 0 && (
+          <div
+            style={{
+              color: "#aaa",
+              textAlign: "center",
+              fontStyle: "italic",
+              marginTop: "4em",
+              fontSize: 14.2,
+            }}
+          >
+            Drag deals here or click `+` to add one.
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -123,80 +188,89 @@ export const DealsPage: React.FC = () => {
   const [form] = Form.useForm();
   const sensors = useSensors(useSensor(PointerSensor));
 
+  const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
+
   const findStage = (dealId: string) => {
     return stages.find(stage => stage.deals.some(deal => deal.id === dealId));
   };
 
+  const findDeal = (dealId: string) => {
+    const allDeals = stages.flatMap(stage => stage.deals);
+    return allDeals.find(deal => deal.id === dealId);
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const activeId = event.active.id as string;
+    const deal = findDeal(activeId);
+    if (deal) {
+      setActiveDeal(deal);
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveDeal(null);
+
     if (!over) return;
 
     const activeDealId = active.id as string;
     const overId = over.id as string;
 
-    // Find the stage of the active deal
     const activeStage = findStage(activeDealId);
+    const overStage = stages.find(stage => stage.id === overId) || findStage(overId);
 
-    // If the drag target is another deal
-    const overStage = findStage(overId);
+    if (!activeStage || !overStage) return;
+
+    const dealToMove = findDeal(activeDealId);
+    if (!dealToMove) return;
 
     // Case 1: Dragging within the same stage
-    if (activeStage && overStage && activeStage.id === overStage.id) {
-      const deals = [...activeStage.deals];
-      const oldIndex = deals.findIndex(deal => deal.id === activeDealId);
-      const newIndex = deals.findIndex(deal => deal.id === overId);
-      
-      const newDeals = arrayMove(deals, oldIndex, newIndex);
-
-      setStages(prevStages =>
-        prevStages.map(stage =>
-          stage.id === activeStage.id ? { ...stage, deals: newDeals } : stage
-        )
-      );
+    if (activeStage.id === overStage.id) {
+        setStages(prevStages => {
+            const newStages = [...prevStages];
+            const stageIndex = newStages.findIndex(stage => stage.id === activeStage.id);
+            const deals = [...newStages[stageIndex].deals];
+            const oldIndex = deals.findIndex(deal => deal.id === activeDealId);
+            const newIndex = deals.findIndex(deal => deal.id === overId);
+            
+            if (oldIndex !== newIndex) {
+                const newDeals = arrayMove(deals, oldIndex, newIndex);
+                newStages[stageIndex] = { ...newStages[stageIndex], deals: newDeals };
+            }
+            return newStages;
+        });
     }
     // Case 2: Dragging between different stages
-    else if (activeStage && overStage && activeStage.id !== overStage.id) {
-      setStages(prevStages => {
-        const newStages = [...prevStages];
-        const oldStageIndex = newStages.findIndex(stage => stage.id === activeStage.id);
-        const newStageIndex = newStages.findIndex(stage => stage.id === overStage.id);
-        
-        const dealToMove = newStages[oldStageIndex].deals.find(deal => deal.id === activeDealId);
-        if (!dealToMove) return prevStages;
+    else {
+        setStages(prevStages => {
+            const newStages = [...prevStages];
+            const oldStageIndex = newStages.findIndex(stage => stage.id === activeStage.id);
+            const newStageIndex = newStages.findIndex(stage => stage.id === overStage.id);
+            
+            newStages[oldStageIndex] = {
+                ...newStages[oldStageIndex],
+                deals: newStages[oldStageIndex].deals.filter(d => d.id !== activeDealId),
+            };
 
-        // Find index in the new stage
-        const newDealIndex = newStages[newStageIndex].deals.findIndex(deal => deal.id === overId);
-        
-        // Remove from old stage
-        newStages[oldStageIndex].deals = newStages[oldStageIndex].deals.filter(deal => deal.id !== activeDealId);
-        
-        // Add to new stage
-        newStages[newStageIndex].deals.splice(newDealIndex, 0, dealToMove);
-        
-        return newStages;
-      });
-    }
-    // Case 3: Dragging a deal into an empty stage
-    else if (activeStage && !overStage) {
-        const emptyStage = stages.find(stage => stage.id === overId);
-        if(emptyStage) {
-            setStages(prevStages => {
-                const newStages = [...prevStages];
-                const oldStageIndex = newStages.findIndex(stage => stage.id === activeStage.id);
-                const newStageIndex = newStages.findIndex(stage => stage.id === emptyStage.id);
-                
-                const dealToMove = newStages[oldStageIndex].deals.find(deal => deal.id === activeDealId);
-                if (!dealToMove) return prevStages;
-                
-                // Remove from old stage
-                newStages[oldStageIndex].deals = newStages[oldStageIndex].deals.filter(deal => deal.id !== activeDealId);
-                
-                // Add to new empty stage
-                newStages[newStageIndex].deals.push(dealToMove);
-
-                return newStages;
-            });
-        }
+            const overDealIndex = newStages[newStageIndex].deals.findIndex(d => d.id === overId);
+            
+            if (overDealIndex !== -1) {
+                newStages[newStageIndex] = {
+                    ...newStages[newStageIndex],
+                    deals: [
+                        ...newStages[newStageIndex].deals.slice(0, overDealIndex),
+                        dealToMove,
+                        ...newStages[newStageIndex].deals.slice(overDealIndex)
+                    ],
+                };
+            } else {
+                newStages[newStageIndex] = {
+                    ...newStages[newStageIndex],
+                    deals: [...newStages[newStageIndex].deals, dealToMove],
+                };
+            }
+            return newStages;
+        });
     }
   };
 
@@ -240,140 +314,105 @@ export const DealsPage: React.FC = () => {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        
-        padding: "36px 18px",
-        color: "#000",
+        background: "#f7f9fc",
+        padding: "36px 28px",
+        color: "#2c3e50",
+        overflowX: "hidden",
       }}
     >
       <h1 style={{
         fontWeight: 700,
-        fontSize: 33,
-        marginBottom: 12,
-        color: "#000"
-      }}>Deals</h1>
+        fontSize: 28,
+        marginBottom: 16,
+        color: "#1d293f",
+      }}>Deals Pipeline</h1>
 
-      {/* Forecast View */}
+      {/* Simplified Forecast Card */}
       <Card
         style={{
-          marginBottom: 26,
-          borderRadius: 14,
-          boxShadow: "0 2.5px 10px rgba(83,127,231,0.09)",
-          border: "1px solid #e9eef8",
-          color: "#000"
+          marginBottom: 32,
+          borderRadius: 8,
+          boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+          border: "1px solid #dfe1e6",
+          background: "#fff",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <h3 style={{
             margin: 0,
-            fontSize: 18,
-            fontWeight: 700,
-            color: "#000",
+            fontSize: 16,
+            fontWeight: 600,
+            color: "#34495e",
             letterSpacing: ".01em"
           }}>
-            Forecasted Revenue
+            Total Forecasted Revenue
           </h3>
           <span style={{
-            fontSize: 25,
+            fontSize: 24,
             fontWeight: 800,
             marginLeft: 8,
-            color: "#000",
-            letterSpacing: ".02em"
+            color: "#1467fa",
           }}>
             ${totalForecast.toLocaleString()}
           </span>
         </div>
       </Card>
-
-      {/* Pipeline */}
+      
       <div style={{
         display: "flex",
-        gap: 20,
+        gap: 16,
         overflowX: "auto",
-        paddingBottom: 2,
+        paddingBottom: "16px",
       }}>
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
           {stages.map((stage) => {
             return (
-              <DroppableStage key={stage.id} stageId={stage.id}>
-                {/* Stage Title, Badge, and Add Button */}
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  margin: "0 18px 17px 18px"
-                }}>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <h3 style={{
-                      fontWeight: 700, margin: 0,
-                      fontSize: 18, color: "#000"
-                    }}>{stage.title}</h3>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: "#84d8dcff",
-                        color: "#000",
-                        borderRadius: "50%",
-                        width: 26,
-                        height: 26,
-                        fontSize: 14.5,
-                        fontWeight: 700,
-                        marginLeft: 7,
-                        boxShadow: "0 1.2px 6px #377afd20"
-                      }}
-                    >
-                      {stage.deals.length}
-                    </span>
-                  </div>
-                  <Button
-                        type="primary"
-                        shape="circle"
-                        onClick={() => handleAddClick(stage.id)}
-                        style={{
-                            background: "#fff",
-                            borderColor: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                           
-                            width: 32,
-                            height: 32,
-                            fontSize: 20,
-                            color: "#000", // Change the color of the plus icon to black
-                        }}
-                        >
-                        +
-                    </Button>
-                </div>
-                <div style={{ padding: "0 18px", flex: 1, overflowY: "auto" }}>
-                  <SortableContext
-                    items={stage.deals.map((deal) => deal.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {stage.deals.length === 0 && (
-                      <div
-                        style={{
-                          color: "#aaa",
-                          textAlign: "center",
-                          fontStyle: "italic",
-                          margin: "2.7em 0",
-                          fontSize: 14.2,
-                        }}
-                      >
-                        No deals in this stage.
-                      </div>
-                    )}
-                    {stage.deals.map((deal) => (
-                      <SortableDealCard key={deal.id} deal={deal} />
-                    ))}
-                  </SortableContext>
-                </div>
+              <DroppableStage
+                key={stage.id}
+                stageId={stage.id}
+                title={stage.title}
+                dealCount={stage.deals.length}
+                onAddDeal={handleAddClick}
+              >
+                <SortableContext
+                  items={stage.deals.map((deal) => deal.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {stage.deals.map((deal) => (
+                    <SortableDealCard key={deal.id} deal={deal} isDragging={deal.id === activeDeal?.id} />
+                  ))}
+                </SortableContext>
               </DroppableStage>
             );
           })}
+          <DragOverlay>
+            {activeDeal ? (
+              <div style={{
+                cursor: "grabbing",
+                background: "#fff",
+                border: "1px solid #e7ebf6",
+                borderRadius: 10,
+                padding: "18px 16px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                transform: "rotate(2deg)",
+                minHeight: 62,
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}>
+                <span style={{ fontWeight: 700, fontSize: 15, color: "#1d293f" }}>{activeDeal.leadName}</span>
+                <span style={{ color: "#34495e", fontWeight: 600, fontSize: 14 }}>{activeDeal.value}</span>
+                <span style={{ color: "#6c7a89", fontSize: 13 }}>
+                  Close: {activeDeal.expectedClose}
+                </span>
+              </div>
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </div>
 
@@ -382,6 +421,7 @@ export const DealsPage: React.FC = () => {
         open={isModalVisible}
         onCancel={handleModalClose}
         footer={null}
+        style={{ top: 20 }}
       >
         <Form
           form={form}
@@ -410,7 +450,7 @@ export const DealsPage: React.FC = () => {
             <Input type="date" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+            <Button type="primary" htmlType="submit" style={{ width: '100%', background: "#1467fa" }}>
               Add Deal
             </Button>
           </Form.Item>

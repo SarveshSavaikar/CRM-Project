@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Table, Card, Select, Row, Col, Input } from "antd";
+import { Table, Card, Select, Row, Col, Input, Pagination } from "antd";
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -54,12 +54,14 @@ const retentionDataSample = {
 
 type QuarterKey = keyof typeof retentionDataSample;
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = ["#1467fa", "#00C49F", "#FFBB28", "#FF8042"];
 
 export const CustomersPage: React.FC = () => {
   const [selectedQuarter, setSelectedQuarter] = useState<QuarterKey>("Q1");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStage, setSelectedStage] = useState<string | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   const retentionData = useMemo(() => {
     return [...retentionDataSample[selectedQuarter]];
@@ -80,6 +82,12 @@ export const CustomersPage: React.FC = () => {
 
     return filtered;
   }, [searchQuery, selectedStage]);
+
+  const paginatedCustomers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredCustomers.slice(start, end);
+  }, [filteredCustomers, currentPage, pageSize]);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -106,7 +114,7 @@ export const CustomersPage: React.FC = () => {
       {/* Customer List */}
       <Card
         title="Customer List"
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 24, minHeight: 500 }}
         extra={
           <div style={{ display: 'flex', gap: 8 }}>
             <Select
@@ -124,19 +132,30 @@ export const CustomersPage: React.FC = () => {
             </Select>
             <Search
               placeholder="Search customers"
-              onSearch={setSearchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: 200 }}
-              enterButton
+              enterButton // This prop adds the blue search button
+              value={searchQuery} // This ensures the input is controlled
             />
           </div>
         }
       >
-        <Table
-          dataSource={filteredCustomers}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', height: '400px', justifyContent: 'space-between' }}>
+          <Table
+            dataSource={paginatedCustomers}
+            columns={columns}
+            rowKey="id"
+            pagination={false}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredCustomers.length}
+              onChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
       </Card>
 
       <Row gutter={[24, 24]}>
@@ -189,7 +208,7 @@ export const CustomersPage: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="retention" fill="#0088FE" />
+                <Bar dataKey="retention" fill="#1467fa" />
                 <Bar dataKey="churn" fill="#FF8042" />
               </BarChart>
             </div>
