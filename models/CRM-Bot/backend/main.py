@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-import json, re
+import json, re, random
 from rapidfuzz import process, fuzz
 
 app = FastAPI()
 
-# ✅ Enable CORS for frontend (React on port 3000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -18,15 +17,14 @@ app.add_middleware(
 class Message(BaseModel):
     message: str
 
-# ✅ Load FAQ file
 with open('faq.json', 'r') as f:
     faq = json.load(f)
 
-# ---- Memory ----
-context_memory = {"last_topic": None}
-chat_history = []
+with open('badwords.json', 'r') as f:
+    BAD_WORDS = json.load(f)
 
-# ---- Intent helpers ----
+context_memory = {"last_topic": None}
+
 CHITCHAT_KEYS = {
     "hi","hello","hey","good morning","good evening","how are you",
     "thanks","thank you","bye","goodbye","who are you"
@@ -44,6 +42,14 @@ STOPWORDS = {
     "your","their","our","can","how","what","where","when","why","please"
 }
 
+response_templates = [
+    "Thank you for reaching out! Your request is being processed, and we truly appreciate your patience.",
+    "We’re grateful for your query. Our team is already working on it for you!",
+    "Your request has been received successfully. We're thankful for your trust in us.",
+    "Thanks a lot! We’ve got your request, and it’s now in progress.",
+    "We appreciate your message. Rest assured, your request is being taken care of."
+]
+
 def tokens(text: str):
     return [w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in STOPWORDS]
 
@@ -51,7 +57,22 @@ def best_faq_match(query: str, candidate_keys):
     results = process.extract(query, candidate_keys, scorer=fuzz.token_set_ratio, limit=5)
     return results[0] if results else (None, 0, None)
 
-# ---- Routes ----
+def normalize_text(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r'(.)\1+', r'\1', text)  # collapse consecutive repeated chars
+    return text
+
+def contains_badword(message: str, badwords: list) -> bool:
+    words = re.findall(r"\w+", message.lower())  # split into words
+    for word in words:
+        for bad in badwords:
+            # ✅ exact match
+            if word == bad:
+                return True
+            # ✅ fuzzy match (avoid false positives with a higher threshold)
+            if fuzz.ratio(word, bad) > 85:
+                return True
+    return False
 
 @app.get("/chat/{query}")
 def chat(query: str):
@@ -64,40 +85,36 @@ def chat(query: str):
 def respond(msg: Message):
     user_raw = msg.message
     user_message = user_raw.lower()
-    chat_history.append({"role": "user", "text": user_raw})
-
-    # 1) Pronoun follow-up
-    if context_memory["last_topic"] and any(p in user_message.split() for p in ["they","it","that","those","them","this"]):
+    normalized_message = normalize_text(user_raw)
+    
+    if contains_badword(normalized_message, BAD_WORDS):
+        return {"reply": " Please avoid using offensive language. Your response is being recorded."}
+    
+    if context_memory["last_topic"] and any(p in normalized_message.split() for p in ["they","it","that","those","them","this"]):
         topic = context_memory["last_topic"]
         reply = f"You're asking about {topic}. {faq.get(topic, 'I don’t have more details on that.')}"
-        chat_history.append({"role": "bot", "text": reply})
-        return {"reply": reply, "chat_history": chat_history}
+        return {"reply": reply}
 
-    # 2) Detect intent → task-like vs chitchat
-    tok = set(tokens(user_message))
-    looks_tasky = len(tok & TASK_KEYWORDS) > 0 or user_message.startswith(("how to","how do i","where do i","can i","how can i"))
+    tok = set(tokens(normalized_message))
+    looks_tasky = len(tok & TASK_KEYWORDS) > 0 or normalized_message.startswith(
+        ("how to", "how do i", "where do i", "can i", "how can i")
+    )   
+
     candidate_keys = [k for k in faq.keys() if not (looks_tasky and k in CHITCHAT_KEYS)]
     if not candidate_keys:
         candidate_keys = list(faq.keys())
 
-    # 3) Match
-    best_key, score, _ = best_faq_match(user_message, candidate_keys)
+    best_key, score, _ = best_faq_match(normalized_message, candidate_keys)
 
-    # 4) Guardrail: don’t return chitchat when query looks tasky
-    if best_key in CHITCHAT_KEYS and looks_tasky:
-        results = process.extract(user_message, candidate_keys, scorer=fuzz.token_set_ratio, limit=5)
-        alt = next((k for k, s, _ in results if k not in CHITCHAT_KEYS and s >= 60), None)
-        if alt:
-            best_key = alt
-            score = next(s for k, s, _ in results if k == alt)
-
-    # 5) Final answer
-    if best_key and score >= 50:
+    if best_key and score >= 70:
         reply = faq[best_key]
         context_memory["last_topic"] = best_key
+    # If weak FAQ match → use generic gratitude template
+    elif best_key and score >= 50:
+        reply = random.choice(response_templates)
+        context_memory["last_topic"] = best_key
     else:
-        reply = "Sorry, I don't have an answer for that."
+        reply = "Sorry, I don’t have an answer for that."
         context_memory["last_topic"] = None
 
-    chat_history.append({"role": "bot", "text": reply})
-    return {"reply": reply, "chat_history": chat_history}
+    return {"reply": reply}
