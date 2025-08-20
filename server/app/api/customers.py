@@ -9,13 +9,13 @@ from datetime import date
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
 @router.get("/", response_model=list[CustomerResponse])
-async def get_customer(
+async def get_customers(
     company: str = None,
     industry: str = None, 
     lead_id: int = None, 
     created: date = None, 
     last_updated: date = None, 
-    before: bool = True, 
+    before: bool = True,
     db: Database = Depends(get_db)
 ):
     return await customer_service.get_customers(db, company, industry, lead_id, created, last_updated, before)
@@ -38,3 +38,14 @@ async def update_customer(customer_id: int, customer: CustomerUpdate, db: Databa
 async def delete_customer(customer_id: int, db: Database = Depends(get_db)):
     return await customer_service.delete_customer(db, customer_id)
 
+@router.get('/count')
+async def get_customer_count(
+    description: str = None,
+    industry: str = None, 
+    lead_id: int = None, 
+    created: date = None, 
+    last_updated: date = None, 
+    before: bool = True,
+    db: Database = Depends(get_db)
+):
+    return await customer_service.get_customers(db, description, industry, lead_id, created, last_updated, before, count=True)

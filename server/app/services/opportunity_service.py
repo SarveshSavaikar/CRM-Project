@@ -6,6 +6,8 @@ from datetime import date, datetime, time
 from databases import Database
 from typing import Any, Optional
 from datetime import date
+from app.schemas.task import TaskUpdate
+from . import task_service
 
 async def get_opportunity(db: Database, opportunity_id: int):
     result = await opportunity.get_opportunity_by_id(db, opportunity_id)
@@ -48,7 +50,6 @@ async def get_opportunities(
     return await opportunity.get_opportunities(db, **filters)
 
 async def update_opportunity(db: Database, opportunity_id: int=None, opportunityObj: OpportunityUpdate=None, **filters: dict[str, Any]):
-    opportunityObj.lead_id = None if opportunityObj.lead_id==0 else opportunityObj.lead_id
     if opportunity_id is not None:
         result = await opportunity.get_opportunity_by_id(db, opportunity_id)
         if result is None:
@@ -62,9 +63,12 @@ async def update_opportunity(db: Database, opportunity_id: int=None, opportunity
         return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
     
 async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
+    opportunityObj.lead_id = None if opportunityObj.lead_id == 0 else opportunityObj.lead_id
+    opportunityObj.pipeline_stage_id = None if opportunityObj.pipeline_stage_id==0 else opportunityObj.pipeline_stage_id
     return await opportunity.create_opportunity(db, opportunityObj)
 
 async def delete_opportunity(db: Database, opportunity_id: int):
+    await task_service.update_task(db, taskObj=TaskUpdate(opportunity_id=None), opportunity_id=opportunity_id)
     result = await opportunity.delete_opportunity(db, opportunity_id)
     if not result:
         raise HTTPException(status_code=404, detail=f"Opportunity(id:{opportunity_id}) not found. Failed to delete.")
