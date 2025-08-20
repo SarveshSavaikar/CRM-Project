@@ -42,5 +42,7 @@ async def update_team(db: Database, teamObj: TeamUpdate ,team_name: str = "", te
     return await team.update_team(db, team_id=result[0]['id'], update_data=update_data )
     
 async def delete_team(db: Database, team_id: int):
-    return await team.delete_team(db, team_id)
-    
+    result = await team.delete_team(db, team_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Team(id:{team_id}) not found. Failed to delete.")
+    return result

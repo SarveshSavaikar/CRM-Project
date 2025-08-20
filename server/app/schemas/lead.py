@@ -28,8 +28,11 @@ class LeadUpdate(BaseModel):
     team_id: Optional[int] = None
     user_id: Optional[int] = None
 
+
 class LeadResponse(LeadBase):
     id: int
+    user_name: Optional[str] = Field(default=None, alias="user_name")
+    team_name: Optional[str] = Field(default=None, alias="team_name")
     class Config:
         from_attributes = True
 
@@ -41,4 +44,7 @@ class LeadInDB(LeadBase):
 
     class Config:
         from_attributes = True
+        
+class LeadStageUpdate(BaseModel):
+    pipeline_stage_id: int = Field(...)
         

@@ -1,18 +1,36 @@
 from app.schemas.lead import LeadCreate, LeadUpdate
-from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
+from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Lead
+from app.database.models import Lead, Team, User
 from typing import Any
-from datetime import datetime
 
+from datetime import datetime
+from . import crud_utils
+
+
+prefix_columns = crud_utils.prefix_columns
 # Get lead by ID
 async def get_lead_by_id(db: Database, lead_id: int):
     query = select(Lead).where(Lead.c.id == lead_id)
     return await db.fetch_one(query)
 
-async def get_leads(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(Lead)
+async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    if count:
+        query = select(func.count()).select_from(Lead)
+    else:
+        query = (
+            select(
+                *prefix_columns(User, "user"),
+                *prefix_columns(Team, "team"),
+                *prefix_columns(Lead, "")
+            )   
+            .select_from(
+                Lead
+                .outerjoin(User, Lead.c.user_id == User.c.id)
+                .outerjoin(Team, Lead.c.team_id == Team.c.id)
+            )
+        )
     conditions = []
 
     for attr, value in filters.items():
@@ -26,14 +44,24 @@ async def get_leads(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
                     conditions.append(Lead.c.last_updated < last_updated)
                 else:      # before = False
                     conditions.append(Lead.c.last_updated > last_updated)
+        elif attr == "user_name":
+            conditions.append(User.c.name.ilike(f"%{value}%"))
+        elif attr == "team_name":
+            conditions.append(Team.c.name.ilike(f"%{value}%"))
         elif hasattr(Lead.c, attr):
             conditions.append(getattr(Lead.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
 
-    rows = await db.fetch_all(query)
-    return [dict(row) for row in rows]
+    if count:
+        result = await db.execute(query)
+        return result#.scalar_one() 
+    else:
+        rows = await db.fetch_all(query)
+        returning = [dict(row) for row in rows]
+        print(returning)
+        return returning
 
 
 # Create lead
@@ -73,13 +101,48 @@ async def update_lead(db: Database, lead_id: int, update_data: dict):
 
     return updated_lead
 
+async def update_leads_by_filters(db: Database, update_data: dict, **filters: dict[str, Any]):
+    query = (
+        Lead
+        .update()
+        .values(**update_data)
+        .returning(Lead)
+    )
+    
+    conditions = []
+    for attr, val in filters.items():
+        if hasattr(Lead.c, attr):
+            conditions.append(getattr(Lead.c, attr) == val)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+        
+    updated_leads = await db.fetch_all(query)
+    
+    return updated_leads
 
 async def delete_lead(db: Database, lead_id: int):
     query = (
         Lead
         .delete()
         .where(Lead.c.id == lead_id)
+        .returning(Lead)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)
+
+async def get_lead_count(db: Database):
+    query = select(func.count()).select_from(Lead)
+    result = await db.execute(query)
+    return result.scalar_one()
+
+async def get_leads_grouped(db: Database, group_by: str):
+    if group_by == "source":
+        query = (
+            select(Lead.c.source, func.count().label("count"))
+            .group_by(Lead.c.source)
+        )
+    
+    rows = await db.fetch_all(query)
+    return {"group": [row[0] for row in rows], "count": [row[1] for row in rows]}

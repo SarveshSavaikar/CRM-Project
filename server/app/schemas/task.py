@@ -12,8 +12,9 @@ class TaskBase(BaseModel):
     opportunity_id: Optional[int] = None
 
 class TaskCreate(TaskBase):
-    status: str = Field(default="Pending", max_length=50)
-    
+    status: Optional[str] = Field(default="Pending", max_length=50)
+
+
     
         
 

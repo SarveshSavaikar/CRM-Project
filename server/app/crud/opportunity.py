@@ -1,8 +1,8 @@
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
-from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
+from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Opportunity
+from app.database.models import Opportunity, PipelineStage
 from typing import Any
 
 # Get opportunity by ID
@@ -10,8 +10,8 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
     query = select(Opportunity).where(Opportunity.c.id == opportunity_id)
     return await db.fetch_one(query)
 
-async def get_opportunities(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(Opportunity)
+async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
     conditions = []
 
     for attr, value in filters.items():
@@ -36,8 +36,13 @@ async def get_opportunities(db: Database, **filters: dict[str, Any]) -> list[dic
 
     if conditions:
         query = query.where(and_(*conditions))
-    rows = await db.fetch_all(query)
-    return [dict(row) for row in rows]
+        
+    if count:
+        result = await db.execute(query)
+        return result
+    else:
+        rows = await db.fetch_all(query)
+        return [dict(row) for row in rows]
     
 
 
@@ -79,7 +84,55 @@ async def delete_opportunity(db: Database, opportunity_id: int):
         Opportunity
         .delete()
         .where(Opportunity.c.id == opportunity_id)
+        .returning(Opportunity)
     )
     
     
+    return await db.fetch_one(query)
+
+async def update_opportunity_by_lead_id(db: Database, lead_id: int, pipeline_stage_id: int):
+    query = (
+        Opportunity
+        .update()
+        .where(Opportunity.c.lead_id == lead_id)
+        .values({Opportunity.c.pipeline_stage_id: pipeline_stage_id})
+        .returning(Opportunity)
+    )
+    return await db.fetch_one(query)
+
+async def update_opportunity_by_filters(db: Database, update_data: dict, **filters: dict[str, Any]):
+    query = (
+        Opportunity
+        .update()
+        .values(**update_data)
+        .returning(Opportunity)
+    )
+    
+    conditions = []
+    for attr, val in filters.items():
+        if hasattr(Opportunity.c, attr):
+            conditions.append(getattr(Opportunity.c, attr) == val)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+        
+    updated_opps = await db.fetch_all(query)
+    
+    return updated_opps
+
+async def get_total_opportunity_value(db: Database):
+    query = select(func.sum(Opportunity.c.value))
     return await db.execute(query)
+
+async def get_opportunities_grouped(db: Database, group_by: str):
+    if group_by == "stage":
+        query = (
+            select(PipelineStage.c.name, func.count().label("count"))
+            .select_from(
+                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+            )
+            .group_by(PipelineStage.c.name)
+        )
+    
+    rows = await db.fetch_all(query)
+    return {"group": [row[0] for row in rows], "count": [row[1] for row in rows]}

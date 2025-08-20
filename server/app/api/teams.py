@@ -31,7 +31,7 @@ async def update_team( team_id: int, team: TeamUpdate, db: Database = Depends(ge
     print("Team ID ----------> ",team_id)
     return await team_service.update_team(db, team_id=team_id, teamObj=team)
 
-@router.delete("/{team_id}")
+@router.delete("/{team_id}", response_model=TeamResponse)
 async def delete_team(team_id: int, db: Database = Depends(get_db)):
     return await team_service.delete_team(db, team_id)
 

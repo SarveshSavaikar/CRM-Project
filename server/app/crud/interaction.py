@@ -69,7 +69,8 @@ async def delete_interaction(db: Database, interaction_id: int):
         Interaction
         .delete()
         .where(Interaction.c.id == interaction_id)
+        .returning(Interaction)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

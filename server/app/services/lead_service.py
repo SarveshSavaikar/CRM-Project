@@ -2,9 +2,11 @@ from asyncpg import UniqueViolationError
 from fastapi import HTTPException
 from psycopg2 import IntegrityError
 from app.crud import lead
-from app.schemas.lead import LeadCreate, LeadUpdate
+from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate
 from datetime import date
 from databases import Database
+from app.schemas.opportunity import OpportunityUpdate
+from . import opportunity_service
 
 
 async def get_lead(db: Database, lead_id: int):
@@ -15,7 +17,7 @@ async def get_lead(db: Database, lead_id: int):
     
     return result
 
-from typing import Optional
+from typing import Any, Optional
 from datetime import date
 
 async def get_leads(
@@ -25,6 +27,8 @@ async def get_leads(
     min_score: Optional[float] = None,
     team_id: Optional[int] = None,
     user_id: Optional[int] = None,
+    team_name: Optional[str] = None,
+    user_name: Optional[str] = None,
     created: Optional[date] = None,
     last_updated: Optional[date] = None,
     before: Optional[bool] = None
@@ -41,6 +45,10 @@ async def get_leads(
         filters["team_id"] = team_id
     if user_id is not None:
         filters["user_id"] = user_id
+    if team_name is not None:
+        filters["team_name"] = team_name
+    if user_name is not None:
+        filters["user_name"] = user_name
     if created is not None:
         filters["created"] = created
     if last_updated is not None:
@@ -53,13 +61,16 @@ async def get_leads(
     return await lead.get_leads(db, **filters)
 
 async def create_lead(db: Database, leadObj: LeadCreate):
+    leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
+    leadObj.user_id = None if leadObj.user_id==0 else leadObj.user_id
     return await lead.create_lead(db, leadObj)   
 
-async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
-    result = await lead.get_lead_by_id(db, lead_id)
-    if result is None:
-        raise HTTPException(status_code=404, detail="Lead not found")
-
+async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
+    status_values = ['active', 'inactive', 'converted', 'lost', 'archived', 'unassigned']
+    if leadObj.status is not None:
+        leadObj.status = leadObj.status.lower()
+        if leadObj.status not in status_values:
+            raise HTTPException(status_code=400, detail="Invalid status field value")
     update_data = leadObj.model_dump(exclude_unset=True)
     # if(leadObj.name.replace(" ","") != ""):
     #     update_data["name"] = leadObj.name
@@ -79,10 +90,17 @@ async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
     #     update_data["user_id"] = leadObj.user_id
 
     
-    return await lead.update_lead(db, lead_id, update_data)
+    if lead_id is not None:
+        return await lead.update_lead(db, lead_id, update_data)
+    else:
+        return await lead.update_leads_by_filters(db, update_data, **filters)
     
 async def delete_lead(db: Database, lead_id: int):
-    return await lead.delete_lead(db, lead_id)
+    result = await opportunity_service.update_opportunity(db, opportunityObj=OpportunityUpdate(lead_id=None), lead_id=lead_id)
+    result = await lead.delete_lead(db, lead_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Lead(id:{lead_id}) not found. Failes to delete.")
+    return result
     
 async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
     success_count = fail_count = 0
@@ -102,3 +120,6 @@ async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
     
     return successful_inserts
         
+async def update_lead_stage(db: Database, lead_id: int, update: LeadStageUpdate):
+    return await opportunity_service.update_opportunity_by_lead(db, lead_id, update)
+    

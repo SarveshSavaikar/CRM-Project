@@ -65,7 +65,7 @@ async def update_campaign(db: Database, campaign_id: int, update_data: dict):
         .values(**update_data)
         .returning(Campaign)
     )
-    updated_campaign = await db.execute(update_query)
+    updated_campaign = await db.fetch_one(update_query)
 
     return updated_campaign
 
@@ -75,7 +75,8 @@ async def delete_campaign(db: Database, campaign_id: int):
         Campaign
         .delete()
         .where(Campaign.c.id == campaign_id)
+        .returning(Campaign)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

@@ -61,7 +61,8 @@ async def delete_team(db: Database, team_id: int):
         Team
         .delete()
         .where(Team.c.id == team_id)
+        .returning(Team)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)
