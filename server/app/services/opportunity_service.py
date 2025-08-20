@@ -20,13 +20,14 @@ async def get_opportunity(db: Database, opportunity_id: int):
 
 async def get_opportunities(
     db: Database,
-    close_date: date,
-    created: date,
-    min_value: float,
-    max_value: float,
-    lead_id: int,
-    pipeline_stage_id: int,
-    before: bool
+    close_date: date = None,
+    created: date = None,
+    min_value: float = None,
+    max_value: float = None,
+    lead_id: int = None,
+    pipeline_stage_id: int = None,
+    before: bool = True,
+    count: bool = False
 ):
     filters = {}
 
@@ -47,7 +48,7 @@ async def get_opportunities(
     elif before is False and created is not None:
         filters["created__gt"] = datetime.combine(created, time.max)
 
-    return await opportunity.get_opportunities(db, **filters)
+    return await opportunity.get_opportunities(db, count, **filters)
 
 async def update_opportunity(db: Database, opportunity_id: int=None, opportunityObj: OpportunityUpdate=None, **filters: dict[str, Any]):
     if opportunity_id is not None:
@@ -81,3 +82,6 @@ async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadSta
         raise HTTPException(status_code=404, detail="Record(Opportunity) not found")
     
     return result
+
+async def get_total_opportunity_value(db: Database):
+    return await opportunity.get_total_opportunity_value(db)
