@@ -60,7 +60,6 @@ async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> lis
     else:
         rows = await db.fetch_all(query)
         returning = [dict(row) for row in rows]
-        print(returning)
         return returning
 
 

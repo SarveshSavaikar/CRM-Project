@@ -1,17 +1,17 @@
 import math
 from fastapi import HTTPException
-from app.crud import lead, opportunity
 # from app.schemas.analytics import 
 from datetime import date, datetime, time
 from databases import Database
 from datetime import date
+from . import lead_service, opportunity_service
 
 async def get_kpi_metrics(db: Database):
-    lead_count = await lead.get_leads(db, count=True)
-    opp_count = await opportunity.get_opportunities(db, count=True)
-    total_opp_value = await opportunity.get_total_opportunity_value(db)
+    lead_count = await lead_service.get_leads(db, count=True)
+    opp_count = await opportunity_service.get_opportunities(db, count=True)
+    total_opp_value = await opportunity_service.get_total_opportunity_value(db)
     total_opp_value = float(total_opp_value)
-    converted_lead_count = await lead.get_leads(db, count=True, status="Converted")
+    converted_lead_count = await lead_service.get_leads(db, count=True, status="Converted")
     print(f"Leads: {lead_count}, Converted leads: {converted_lead_count}")
     
     # For testing
@@ -30,11 +30,11 @@ async def get_kpi_metrics(db: Database):
     return kpi_metrics
     
 async def get_leads_by_source(db: Database):
-    result = await lead.get_leads_grouped(db, group_by="source")
+    result = await lead_service.get_leads_grouped(db, group_by="source")
     result["group_by"]="source"
     return result
 
 async def get_deals_by_stage(db: Database):
-    result = await opportunity.get_opportunities_grouped(db, group_by="stage")
+    result = await opportunity_service.get_opportunities_grouped(db, group_by="stage")
     result["group_by"]="stage"
     return result

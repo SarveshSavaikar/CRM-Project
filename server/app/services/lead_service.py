@@ -31,7 +31,8 @@ async def get_leads(
     user_name: Optional[str] = None,
     created: Optional[date] = None,
     last_updated: Optional[date] = None,
-    before: Optional[bool] = None
+    before: Optional[bool] = None,
+    count:bool = False
 ):
     filters = {}
 
@@ -57,8 +58,8 @@ async def get_leads(
         filters["last_updated__lt"] = last_updated
     elif before is False and last_updated is not None:
         filters["last_updated__gt"] = last_updated
-
-    return await lead.get_leads(db, **filters)
+    
+    return await lead.get_leads(db, count, **filters)
 
 async def create_lead(db: Database, leadObj: LeadCreate):
     leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
