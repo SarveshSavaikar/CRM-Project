@@ -13,7 +13,7 @@ async def get_customer_by_id(db: Database, customer_id: int):
 async def get_customers(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     query = select(Customer)
     conditions = []
-
+    print(query)
     for attr, value in filters.items():
         if value is None:
             continue
@@ -45,7 +45,7 @@ async def create_customer(db: Database, customer_data: CustomerCreate):
             name=customer_data.name,
             email=customer_data.email,
             phone=customer_data.phone,
-            company=customer_data.company,
+            description=customer_data.description,
             industry=customer_data.industry,
             created_at=customer_data.created_at,
             updated_at=customer_data.updated_at,

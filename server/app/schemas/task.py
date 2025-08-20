@@ -13,7 +13,7 @@ class TaskBase(BaseModel):
 
 class TaskCreate(TaskBase):
     status: str = Field(default="Pending", max_length=50)
-
+    
     
         
 

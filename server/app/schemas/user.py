@@ -16,7 +16,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
     role: Optional[str] = Field(None, max_length=20)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     team_id: Optional[int] = None
 
 class UserResponse(UserBase):

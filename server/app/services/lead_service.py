@@ -61,6 +61,23 @@ async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
         raise HTTPException(status_code=404, detail="Lead not found")
 
     update_data = leadObj.model_dump(exclude_unset=True)
+    # if(leadObj.name.replace(" ","") != ""):
+    #     update_data["name"] = leadObj.name
+    # if(leadObj.email.replace(" ","") != ""):
+    #     update_data["email"] = leadObj.email
+    # if(leadObj.status.replace(" ","") != ""):
+    #     update_data["status"] = leadObj.status
+    # if(leadObj.source.replace(" ","") != ""):
+    #     update_data["source"] = leadObj.source
+    # if(leadObj.phone.replace(" ","") != ""):
+    #     update_data["phone"] = leadObj.phone
+    # if(leadObj.score != -1):
+    #     update_data["score"] = leadObj.score
+    # if(leadObj.team_id != 0):
+    #     update_data["team_id"] = leadObj.team_id
+    # if(leadObj.user_id != 0):
+    #     update_data["user_id"] = leadObj.user_id
+
     
     return await lead.update_lead(db, lead_id, update_data)
     

@@ -100,7 +100,7 @@ Customer = Table(
     Column("name", String(100), nullable=False),
     Column("email", String(100), unique=True, nullable=True),
     Column("phone", Integer, unique=False, nullable=True),
-    Column("company", String(255), nullable=True, default="UNKNOWN"),
+    Column("description", String(255), nullable=True, default="UNKNOWN"),
     Column("industry", String(50), nullable=True, default="UNKNOWN"),
     Column("created_at", DateTime, nullable=False),
     Column("updated_at", DateTime, nullable=False),

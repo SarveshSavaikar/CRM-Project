@@ -17,7 +17,7 @@ async def get_customer(db: Database, customer_id: int):
 
 async def get_customers(
     db: Database,
-    company: str,
+    description: str,
     industry: str, 
     lead_id: int, 
     created: date, 
@@ -26,8 +26,8 @@ async def get_customers(
 ):
     filters = {}
 
-    if company is not None:
-        filters["company"] = company
+    if description is not None:
+        filters["description"] = description
     if industry is not None:
         filters["industry"] = industry
     if lead_id is not None:
