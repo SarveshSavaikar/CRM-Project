@@ -77,7 +77,8 @@ async def delete_customer(db: Database, customer_id: int):
         Customer
         .delete()
         .where(Customer.c.id == customer_id)
+        .returning(Customer)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

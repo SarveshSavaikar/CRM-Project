@@ -25,7 +25,7 @@ async def create_team(team: TeamCreate, db: Database = Depends(get_db)):
 async def update_team(team_id: int, team: TeamUpdate, db: Database = Depends(get_db)):    
     return await team_service.update_team(db, team_id, team)
 
-@router.delete("/{team_id}")
+@router.delete("/{team_id}", response_model=TeamResponse)
 async def delete_team(team_id: int, db: Database = Depends(get_db)):
     return await team_service.delete_team(db, team_id)
 

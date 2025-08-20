@@ -65,7 +65,10 @@ async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
     return await opportunity.create_opportunity(db, opportunityObj)
 
 async def delete_opportunity(db: Database, opportunity_id: int):
-    return await opportunity.delete_opportunity(db, opportunity_id)
+    result = await opportunity.delete_opportunity(db, opportunity_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Opportunity(id:{opportunity_id}) not found. Failed to delete.")
+    return result
 
 async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadStageUpdate):
     result = await opportunity.update_opportunity_by_lead_id(db, lead_id, update.pipeline_stage_id)

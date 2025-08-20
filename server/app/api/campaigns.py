@@ -31,6 +31,6 @@ async def create_campaign(campaign: CampaignCreate, db: Database = Depends(get_d
 async def update_campaign(campaign_id: int, campaign: CampaignUpdate, db: Database = Depends(get_db)):    
     return await campaign_service.update_campaign(db, campaign_id, campaign)
 
-@router.delete("/{campaign_id}")
+@router.delete("/{campaign_id}", response_model=CampaignResponse)
 async def delete_campaign(campaign_id: int, db: Database = Depends(get_db)):
     return await campaign_service.delete_campaign(db, campaign_id)

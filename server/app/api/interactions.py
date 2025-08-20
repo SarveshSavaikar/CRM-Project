@@ -37,7 +37,7 @@ async def update_interaction(interaction_id: int, interaction: InteractionUpdate
 async def update_interaction(interaction_id: int, interaction: InteractionUpdate, db: Database = Depends(get_db)):    
     return await interaction_service.update_interaction(db, interaction_id, interaction)  # service function to be implemented
 
-@router.delete("/{interaction_id}")
+@router.delete("/{interaction_id}", response_model=InteractionResponse)
 async def delete_interaction(interaction_id: int, db: Database = Depends(get_db)):
     return await interaction_service.delete_interaction(db, interaction_id)
 

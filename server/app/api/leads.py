@@ -41,7 +41,7 @@ async def create_lead(lead: LeadCreate, db: Database = Depends(get_db)):
 async def update_lead(lead_id: int, lead: LeadUpdate, db: Database = Depends(get_db)):    
     return await lead_service.update_lead(db, lead_id, lead)
 
-@router.delete("/{lead_id}")
+@router.delete("/{lead_id}", response_model=LeadResponse)
 async def delete_lead(lead_id: int, db: Database = Depends(get_db)):
     return await lead_service.delete_lead(db, lead_id)
 

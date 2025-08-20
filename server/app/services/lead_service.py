@@ -80,7 +80,10 @@ async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = N
     
 async def delete_lead(db: Database, lead_id: int):
     result = await opportunity_service.update_opportunity(db, opportunityObj=OpportunityUpdate(lead_id=None), lead_id=lead_id)
-    return await lead.delete_lead(db, lead_id)
+    result = await lead.delete_lead(db, lead_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Lead(id:{lead_id}) not found. Failes to delete.")
+    return result
     
 async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
     success_count = fail_count = 0

@@ -56,4 +56,7 @@ async def create_task(db: Database, taskObj: TaskCreate):
     return await task.create_task(db, taskObj)
 
 async def delete_task(db: Database, task_id: int):
-    return await task.delete_task(db, task_id)
+    result = await task.delete_task(db, task_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Task(id:{task_id}) not found. Failed to delete.")
+    return result   
