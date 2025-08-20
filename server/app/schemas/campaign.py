@@ -14,7 +14,7 @@ class CampaignCreate(CampaignBase):
         
 
 class CampaignUpdate(BaseModel):
-    name: str = Field(..., max_length=255)
+    name: Optional[str] = Field(default=None, max_length=255)
     description: Optional[str] = None
     channel: Optional[str] = None
     start_date: Optional[date] = None
