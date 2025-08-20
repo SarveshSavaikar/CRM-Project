@@ -122,10 +122,11 @@ async def delete_lead(db: Database, lead_id: int):
         Lead
         .delete()
         .where(Lead.c.id == lead_id)
+        .returning(Lead)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)
 
 async def get_lead_count(db: Database):
     query = select(func.count()).select_from(Lead)

@@ -49,5 +49,8 @@ async def update_user(db: Database, user_id: str, userObj: UserUpdate):
     return await user.update_user(db, user_id, update_data)
 
 async def delete_user(db: Database, user_id: int):
-    result = await lead_service.update_lead(db, leadObj=LeadUpdate(user_id=None, status="Unassigned"), user_id=user_id)
-    return await user.delete_user(db, user_id)
+    await lead_service.update_lead(db, leadObj=LeadUpdate(user_id=None, status="Unassigned"), user_id=user_id)
+    result = await user.delete_user(db, user_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"User(id:{user_id}) not found. Failed to delete.")
+    return result

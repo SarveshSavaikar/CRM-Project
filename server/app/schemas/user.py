@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, EmailStr
 class UserBase(BaseModel):
     name: str = Field(..., max_length=100)
     role: str = Field(default="Unassigned", max_length=20)
-    email: EmailStr
+    email: str
     team_id: Optional[int] = None
 
 class UserCreate(UserBase):
@@ -16,7 +16,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
     role: Optional[str] = Field(None, max_length=20)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     team_id: Optional[int] = None
 
 class UserResponse(UserBase):

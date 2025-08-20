@@ -71,7 +71,8 @@ async def delete_task(db: Database, task_id: int):
         Task
         .delete()
         .where(Task.c.id == task_id)
+        .returning(Task)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

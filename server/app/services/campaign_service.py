@@ -53,4 +53,7 @@ async def create_campaign(db: Database, campaignObj: CampaignCreate):
     return await campaign.create_campaign(db, campaignObj)
 
 async def delete_campaign(db: Database, campaign_id: int):
-    return await campaign.delete_campaign(db, campaign_id)
+    result = await campaign.delete_campaign(db, campaign_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Campaign(id:{campaign_id}) not found. Failed to delete.")
+    return result

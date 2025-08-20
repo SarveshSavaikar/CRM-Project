@@ -55,4 +55,7 @@ async def create_interaction(db: Database, interactionObj: InteractionCreate):
     return await interaction.create_interaction(db, interactionObj)
 
 async def delete_interaction(db: Database, interaction_id: int):
-    return await interaction.delete_interaction(db, interaction_id)
+    result = await interaction.delete_interaction(db, interaction_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Interaction(id:{interaction_id}) not found. Failed to delete.")
+    return result

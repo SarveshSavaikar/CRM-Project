@@ -80,7 +80,8 @@ async def delete_user(db: Database, user_id: int):
         User
         .delete()
         .where(User.c.id == user_id)
+        .returning(User)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

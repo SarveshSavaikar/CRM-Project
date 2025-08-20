@@ -75,7 +75,8 @@ async def delete_campaign(db: Database, campaign_id: int):
         Campaign
         .delete()
         .where(Campaign.c.id == campaign_id)
+        .returning(Campaign)
     )
     
     
-    return await db.execute(query)
+    return await db.fetch_one(query)

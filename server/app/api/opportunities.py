@@ -38,7 +38,7 @@ async def update_opportunity(opportunity_id: int, opportunity: OpportunityUpdate
 async def update_opportunity(opportunity_id: int, opportunity: OpportunityUpdate, db: Database = Depends(get_db)):    
     return await opportunity_service.update_opportunity(db, opportunity_id, opportunity)  # service function to be implemented
 
-@router.delete("/{opportunity_id}")
+@router.delete("/{opportunity_id}", response_model=OpportunityResponse)
 async def delete_opportunity(opportunity_id: int, db: Database = Depends(get_db)):
     return await opportunity_service.delete_opportunity(db, opportunity_id)
 
