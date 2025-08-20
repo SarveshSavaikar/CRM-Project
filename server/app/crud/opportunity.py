@@ -99,6 +99,26 @@ async def update_opportunity_by_lead_id(db: Database, lead_id: int, pipeline_sta
     )
     return await db.fetch_one(query)
 
+async def update_opportunity_by_filters(db: Database, update_data: dict, **filters: dict[str, Any]):
+    query = (
+        Opportunity
+        .update()
+        .values(**update_data)
+        .returning(Opportunity)
+    )
+    
+    conditions = []
+    for attr, val in filters.items():
+        if hasattr(Opportunity.c, attr):
+            conditions.append(getattr(Opportunity.c, attr) == val)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+        
+    updated_opps = await db.fetch_all(query)
+    
+    return updated_opps
+
 async def get_total_opportunity_value(db: Database):
     query = select(func.sum(Opportunity.c.value))
     return await db.execute(query)

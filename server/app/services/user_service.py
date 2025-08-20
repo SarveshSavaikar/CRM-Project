@@ -36,6 +36,7 @@ async def get_users(
     return await user.get_users(db, **filters)
     
 async def create_user(db: Database, userObj: UserCreate):
+    userObj.team_id = None if userObj.team_id==0 else userObj.team_id
     return await user.create_user(db, userObj)    
 
 async def update_user(db: Database, user_id: str, userObj: UserUpdate):

@@ -53,6 +53,7 @@ async def update_customer(db: Database, customer_id: str, customerObj: CustomerU
     return await customer.update_customer(db, customer_id, update_data)
     
 async def create_customer(db: Database, customerObj: CustomerCreate):
+    customerObj.lead_id = None if customerObj.lead_id==0 else customerObj.lead_id
     return await customer.create_customer(db, customerObj)
 
 async def delete_customer(db: Database, customer_id: int):

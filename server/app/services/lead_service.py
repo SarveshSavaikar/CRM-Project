@@ -5,6 +5,7 @@ from app.crud import lead
 from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate
 from datetime import date
 from databases import Database
+from app.schemas.opportunity import OpportunityUpdate
 from . import opportunity_service
 
 
@@ -61,7 +62,7 @@ async def get_leads(
 
 async def create_lead(db: Database, leadObj: LeadCreate):
     leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
-    leadObj.user_id = None if leadObj.team_id==0 else leadObj.team_id
+    leadObj.user_id = None if leadObj.user_id==0 else leadObj.user_id
     return await lead.create_lead(db, leadObj)   
 
 async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
@@ -78,6 +79,7 @@ async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = N
         return await lead.update_leads_by_filters(db, update_data, **filters)
     
 async def delete_lead(db: Database, lead_id: int):
+    result = await opportunity_service.update_opportunity(db, opportunityObj=OpportunityUpdate(lead_id=None), lead_id=lead_id)
     return await lead.delete_lead(db, lead_id)
     
 async def create_leads_from_list(db: Database, leads: list[LeadCreate]):

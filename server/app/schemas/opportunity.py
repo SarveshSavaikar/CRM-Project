@@ -18,6 +18,7 @@ class OpportunityCreate(OpportunityBase):
 class OpportunityUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
     value: Optional[float] = Field(None)
+    lead_id: Optional[int] = Field(None)
     pipeline_stage_id: Optional[int] = Field(None)
     close_date: Optional[datetime] = None
     
