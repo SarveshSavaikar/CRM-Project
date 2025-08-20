@@ -17,17 +17,18 @@ async def get_customer(db: Database, customer_id: int):
 
 async def get_customers(
     db: Database,
-    company: str,
-    industry: str, 
-    lead_id: int, 
-    created: date, 
-    last_updated: date, 
-    before: bool
+    description: str = None,
+    industry: str = None, 
+    lead_id: int = None, 
+    created: date = None, 
+    last_updated: date = None, 
+    before: bool = None,
+    count: bool = False
 ):
     filters = {}
 
-    if company is not None:
-        filters["company"] = company
+    if description is not None:
+        filters["description"] = description
     if industry is not None:
         filters["industry"] = industry
     if lead_id is not None:
@@ -40,8 +41,8 @@ async def get_customers(
         filters["updated__lt"] = datetime.combine(last_updated, time.max)
     elif before is False and created is not None:   
         filters["updated__gt"] = datetime.combine(last_updated, time.max)
-
-    return await customer.get_customers(db, **filters)
+        
+    return await customer.get_customers(db, count, **filters)
 
 async def update_customer(db: Database, customer_id: str, customerObj: CustomerUpdate):
     result = await customer.get_customer_by_id(db, customer_id)
