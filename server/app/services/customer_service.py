@@ -41,7 +41,7 @@ async def get_customers(
         filters["created__gt"] = datetime.combine(created, time.max)
     if before is True and last_updated is not None:
         filters["updated__lt"] = datetime.combine(last_updated, time.max)
-    elif before is False and created is not None:   
+    elif before is False and last_updated is not None:   
         filters["updated__gt"] = datetime.combine(last_updated, time.max)
         
     return await customer.get_customers(db, count, **filters)
