@@ -4,7 +4,7 @@ from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
 from app.schemas.lead import LeadStageUpdate
 from datetime import date, datetime, time
 from databases import Database
-from typing import Optional
+from typing import Any, Optional
 from datetime import date
 
 async def get_opportunity(db: Database, opportunity_id: int):
@@ -47,14 +47,19 @@ async def get_opportunities(
 
     return await opportunity.get_opportunities(db, **filters)
 
-async def update_opportunity(db: Database, opportunity_id: str, opportunityObj: OpportunityUpdate):
-    result = await opportunity.get_opportunity_by_id(db, opportunity_id)
-    if result is None:
-        raise HTTPException(status_code=404, detail="Opportunity not found")
+async def update_opportunity(db: Database, opportunity_id: int=None, opportunityObj: OpportunityUpdate=None, **filters: dict[str, Any]):
+    opportunityObj.lead_id = None if opportunityObj.lead_id==0 else opportunityObj.lead_id
+    if opportunity_id is not None:
+        result = await opportunity.get_opportunity_by_id(db, opportunity_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail="Opportunity not found")
 
     update_data = opportunityObj.model_dump(exclude_unset=True)
     
-    return await opportunity.update_opportunity(db, opportunity_id, update_data)
+    if opportunity_id is not None:
+        return await opportunity.update_opportunity(db, opportunity_id, update_data)
+    else:
+        return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
     
 async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
     return await opportunity.create_opportunity(db, opportunityObj)

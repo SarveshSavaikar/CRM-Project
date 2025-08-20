@@ -50,6 +50,8 @@ async def update_interaction(db: Database, interaction_id: str, interactionObj: 
     return await interaction.update_interaction(db, interaction_id, update_data)
     
 async def create_interaction(db: Database, interactionObj: InteractionCreate):
+    interactionObj.customer_id = None if interactionObj.customer_id==0 else interactionObj.customer_id
+    interactionObj.lead_id = None if interactionObj.lead_id==0 else interactionObj.lead_id
     return await interaction.create_interaction(db, interactionObj)
 
 async def delete_interaction(db: Database, interaction_id: int):

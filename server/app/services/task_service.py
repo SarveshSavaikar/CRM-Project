@@ -51,6 +51,8 @@ async def update_task(db: Database, task_id: str, taskObj: TaskUpdate):
     return await task.update_task(db, task_id, update_data)
     
 async def create_task(db: Database, taskObj: TaskCreate):
+    taskObj.user_id = None if taskObj.user_id==0 else taskObj.user_id
+    taskObj.opportunity_id = None if taskObj.opportunity_id==0 else taskObj.opportunity_id
     return await task.create_task(db, taskObj)
 
 async def delete_task(db: Database, task_id: int):
