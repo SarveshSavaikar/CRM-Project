@@ -4,7 +4,10 @@ from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import Lead, Team, User
 from typing import Any
+
+from datetime import datetime
 from . import crud_utils
+
 
 prefix_columns = crud_utils.prefix_columns
 # Get lead by ID
@@ -86,6 +89,7 @@ async def create_lead(db: Database, lead_data: LeadCreate):
 
 # Update lead
 async def update_lead(db: Database, lead_id: int, update_data: dict):
+    update_data["updated_at"] = datetime.utcnow()
     update_query = (
         Lead
         .update()

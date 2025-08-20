@@ -17,13 +17,15 @@ async def get_customer(db: Database, customer_id: int):
 
 async def get_customers(
     db: Database,
+
     description: str = None,
     industry: str = None, 
     lead_id: int = None, 
-    created: date = None, 
-    last_updated: date = None, 
+    created: datetime = None, 
+    last_updated: datetime = None, 
     before: bool = None,
     count: bool = False
+
 ):
     filters = {}
 

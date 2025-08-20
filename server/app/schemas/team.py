@@ -13,7 +13,6 @@ class TeamCreate(TeamBase):
 
 class TeamUpdate(BaseModel):
     name: Optional[str] = None
-    name: Optional[str] = None
     description: Optional[str] = None
 
 class TeamResponse(TeamBase):

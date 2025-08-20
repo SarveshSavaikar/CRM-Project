@@ -17,9 +17,10 @@ async def get_users(name: str = None, email: str=None, role: str = None, team_id
 async def get_user(user_id: int, db: Database = Depends(get_db)):
     return await user_service.get_user(db, user_id)
 
-@router.put("/user-{user_id}", response_model=UserResponse)
-async def update_user(user_id: str, user: UserUpdate, db: Database = Depends(get_db)):    
-    return await user_service.update_user(user_id, user)
+@router.put("/user-{user_id}", response_model=UserUpdate)
+async def update_user(user_id: int, user: UserUpdate, db: Database = Depends(get_db)):
+        
+    return await user_service.update_user( db , user_id, user)
 
 @router.delete("/{user_id}", response_model=UserResponse)
 async def delete_user(user_id: int, db: Database = Depends(get_db)):

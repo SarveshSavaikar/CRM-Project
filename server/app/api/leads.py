@@ -37,7 +37,7 @@ async def get_lead(lead_id: int, db: Database = Depends(get_db)):
 async def create_lead(lead: LeadCreate, db: Database = Depends(get_db)):
     return await lead_service.create_lead(db, lead)
 
-@router.put("/lead-{lead_id}", response_model=LeadResponse)
+@router.put("/lead-{lead_id}", response_model=LeadUpdate)
 async def update_lead(lead_id: int, lead: LeadUpdate, db: Database = Depends(get_db)):    
     return await lead_service.update_lead(db, lead_id, lead)
 

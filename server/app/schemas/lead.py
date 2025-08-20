@@ -19,13 +19,15 @@ class LeadCreate(LeadBase):
 
 class LeadUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
-    role: Optional[str] = Field(None, max_length=20)
-    department: Optional[int] = None  # Or str if needed
+    # role: Optional[str] = Field(None, max_length=20)
+    source: Optional[str] = None  # Or str if needed
     status: Optional[str] = Field(None, max_length=10)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     phone: Optional[str] = Field(None, max_length=20)
-    # user_id: Optional[int] = None
-    # team_id: Optional[int] = None
+    score: Optional[int]
+    team_id: Optional[int] = None
+    user_id: Optional[int] = None
+
 
 class LeadResponse(LeadBase):
     id: int

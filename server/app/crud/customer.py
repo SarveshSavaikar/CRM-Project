@@ -16,7 +16,7 @@ async def get_customers(db: Database, count=False, **filters: dict[str, Any]) ->
     else:
         query = select(Customer)
     conditions = []
-
+    print(query)
     for attr, value in filters.items():
         if value is None:
             continue

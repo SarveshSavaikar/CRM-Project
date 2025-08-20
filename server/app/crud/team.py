@@ -51,7 +51,9 @@ async def update_team(db: Database, team_id: int, update_data: dict):
         .returning(Team)
     )
     updated_team = await db.fetch_one(update_query)
-
+    print("ID = ",team_id)
+    print("Updates to be added :- ",update_data)
+    print("uppdated this to :-",updated_team)
     return updated_team
 
 async def delete_team(db: Database, team_id: int):

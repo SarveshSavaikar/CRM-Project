@@ -72,6 +72,23 @@ async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = N
         if leadObj.status not in status_values:
             raise HTTPException(status_code=400, detail="Invalid status field value")
     update_data = leadObj.model_dump(exclude_unset=True)
+    # if(leadObj.name.replace(" ","") != ""):
+    #     update_data["name"] = leadObj.name
+    # if(leadObj.email.replace(" ","") != ""):
+    #     update_data["email"] = leadObj.email
+    # if(leadObj.status.replace(" ","") != ""):
+    #     update_data["status"] = leadObj.status
+    # if(leadObj.source.replace(" ","") != ""):
+    #     update_data["source"] = leadObj.source
+    # if(leadObj.phone.replace(" ","") != ""):
+    #     update_data["phone"] = leadObj.phone
+    # if(leadObj.score != -1):
+    #     update_data["score"] = leadObj.score
+    # if(leadObj.team_id != 0):
+    #     update_data["team_id"] = leadObj.team_id
+    # if(leadObj.user_id != 0):
+    #     update_data["user_id"] = leadObj.user_id
+
     
     if lead_id is not None:
         return await lead.update_lead(db, lead_id, update_data)

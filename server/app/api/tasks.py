@@ -8,12 +8,13 @@ from datetime import date, datetime
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.post("/create-task", response_model=TaskResponse)
-async def create_task(task: TaskCreate, db: Database = Depends(get_db)):
+async def create_task( task: TaskCreate, db: Database = Depends(get_db)):
     return await task_service.create_task(db, task)
 
 @router.get("/", response_model=list[TaskResponse])
 async def get_task(
-    due_date: date = None,
+    title: str = None,
+    due_date: datetime = None,
     status: str = None,
     priority: str = None,
     user_id: int = None,
@@ -21,7 +22,7 @@ async def get_task(
     before: bool = True, 
     db: Database = Depends(get_db)
 ):
-    return await task_service.get_tasks(db, due_date, status, priority, user_id, opportunity_id, before)
+    return await task_service.get_tasks(db,title ,  due_date, status, priority, user_id, opportunity_id, before)
 
 
 @router.get("/task-{task_id}", response_model=TaskResponse)

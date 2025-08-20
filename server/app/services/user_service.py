@@ -43,8 +43,17 @@ async def update_user(db: Database, user_id: str, userObj: UserUpdate):
     result = await user.get_user_by_id(db, user_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Task not found")
-
+    
     update_data = userObj.model_dump(exclude_unset=True)
+    # update_data = {}
+    # if(userObj.email.replace(" ","") != ""):
+    #     update_data["email"] = userObj.email
+    # if(userObj.role.replace(" ","") != ""):
+    #     update_data["role"] = userObj.role
+    # if(userObj.name.replace(" ","") != ""):
+    #     update_data["name"] = userObj.name
+    # if(userObj.team_id != 0):
+    #     update_data["team_id"] = userObj.team_id
     
     return await user.update_user(db, user_id, update_data)
 

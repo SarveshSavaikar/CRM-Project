@@ -4,21 +4,22 @@ from databases import Database
 from app.database.connection import get_db
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse
 from app.services import customer_service
-from datetime import date
+from datetime import date , datetime
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
 @router.get("/", response_model=list[CustomerResponse])
-async def get_customers(
-    company: str = None,
+async def get_customer(
+    description: str = None,
     industry: str = None, 
     lead_id: int = None, 
-    created: date = None, 
-    last_updated: date = None, 
-    before: bool = True,
+    created: datetime = None, 
+    last_updated: datetime = None, 
+    before: bool = True, 
+
     db: Database = Depends(get_db)
 ):
-    return await customer_service.get_customers(db, company, industry, lead_id, created, last_updated, before)
+    return await customer_service.get_customers(db, description, industry, lead_id, created, last_updated, before)
 
 
 @router.get("/customer-{customer_id}", response_model=CustomerResponse)
