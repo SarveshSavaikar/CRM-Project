@@ -16,7 +16,7 @@ async def get_lead(db: Database, lead_id: int):
     
     return result
 
-from typing import Optional
+from typing import Any, Optional
 from datetime import date
 
 async def get_leads(
@@ -26,6 +26,8 @@ async def get_leads(
     min_score: Optional[float] = None,
     team_id: Optional[int] = None,
     user_id: Optional[int] = None,
+    team_name: Optional[str] = None,
+    user_name: Optional[str] = None,
     created: Optional[date] = None,
     last_updated: Optional[date] = None,
     before: Optional[bool] = None
@@ -42,6 +44,10 @@ async def get_leads(
         filters["team_id"] = team_id
     if user_id is not None:
         filters["user_id"] = user_id
+    if team_name is not None:
+        filters["team_name"] = team_name
+    if user_name is not None:
+        filters["user_name"] = user_name
     if created is not None:
         filters["created"] = created
     if last_updated is not None:
@@ -54,19 +60,22 @@ async def get_leads(
     return await lead.get_leads(db, **filters)
 
 async def create_lead(db: Database, leadObj: LeadCreate):
+    leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
+    leadObj.user_id = None if leadObj.team_id==0 else leadObj.team_id
     return await lead.create_lead(db, leadObj)   
 
-async def update_lead(db: Database, lead_id: str, leadObj: LeadUpdate):
-    status_values = ['active', 'inactive', 'converted', 'lost', 'archived']
-    result = await lead.get_lead_by_id(db, lead_id)
-    if result is None:
-        raise HTTPException(status_code=404, detail="Lead not found")
-    leadObj.status = leadObj.status.lower()
-    if leadObj.status not in status_values:
-        raise HTTPException(status_code=400, detail="Invalid status field value")
+async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
+    status_values = ['active', 'inactive', 'converted', 'lost', 'archived', 'unassigned']
+    if leadObj.status is not None:
+        leadObj.status = leadObj.status.lower()
+        if leadObj.status not in status_values:
+            raise HTTPException(status_code=400, detail="Invalid status field value")
     update_data = leadObj.model_dump(exclude_unset=True)
     
-    return await lead.update_lead(db, lead_id, update_data)
+    if lead_id is not None:
+        return await lead.update_lead(db, lead_id, update_data)
+    else:
+        return await lead.update_leads_by_filters(db, update_data, **filters)
     
 async def delete_lead(db: Database, lead_id: int):
     return await lead.delete_lead(db, lead_id)

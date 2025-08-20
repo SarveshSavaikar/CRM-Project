@@ -33,6 +33,8 @@ async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
     for attr, value in filters.items():
         if value is None:
             continue
+        elif attr == "name" or attr == "email":
+            conditions.append(getattr(User.c, attr).ilike(f"%{value}%"))
         elif hasattr(User.c, attr):
             conditions.append(getattr(User.c, attr) == value)
 

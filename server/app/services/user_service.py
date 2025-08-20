@@ -4,6 +4,9 @@ from app.crud import user
 from app.schemas.user import UserCreate, UserUpdate
 from databases import Database
 
+from app.schemas.lead import LeadUpdate
+from . import lead_service
+
 async def get_user(db: Database, user_id: int):
     result = await user.get_user_by_id(db, user_id)
     
@@ -14,11 +17,17 @@ async def get_user(db: Database, user_id: int):
 
 async def get_users(
     db: Database,
+    name: str,
+    email: str,
     role: Optional[str] = None,
     team_id: Optional[int] = None
 ):
     filters = {}
 
+    if name is not None:
+        filters["name"] = name
+    if email is not None:
+        filters["email"] = email
     if role is not None:
         filters["role"] = role
     if team_id is not None:
@@ -39,4 +48,5 @@ async def update_user(db: Database, user_id: str, userObj: UserUpdate):
     return await user.update_user(db, user_id, update_data)
 
 async def delete_user(db: Database, user_id: int):
+    result = await lead_service.update_lead(db, leadObj=LeadUpdate(user_id=None, status="Unassigned"), user_id=user_id)
     return await user.delete_user(db, user_id)
