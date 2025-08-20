@@ -124,3 +124,5 @@ async def create_leads_from_list(db: Database, leads: list[LeadCreate]):
 async def update_lead_stage(db: Database, lead_id: int, update: LeadStageUpdate):
     return await opportunity_service.update_opportunity_by_lead(db, lead_id, update)
     
+async def get_leads_grouped(db, group_by="id"):
+    return await lead.get_leads_grouped(db, group_by)

@@ -85,3 +85,6 @@ async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadSta
 
 async def get_total_opportunity_value(db: Database):
     return await opportunity.get_total_opportunity_value(db)
+
+async def get_opportunities_grouped(db, group_by="id"):
+    return await opportunity.get_opportunities_grouped(db, group_by)
