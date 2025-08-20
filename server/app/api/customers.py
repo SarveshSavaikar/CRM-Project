@@ -48,4 +48,4 @@ async def get_customer_count(
     before: bool = True,
     db: Database = Depends(get_db)
 ):
-    return await customer_service.get_customers(db, company, industry, lead_id, created, last_updated, before, count=True)
+    return await customer_service.get_customers(db, description, industry, lead_id, created, last_updated, before, count=True)
