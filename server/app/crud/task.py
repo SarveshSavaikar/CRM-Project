@@ -63,8 +63,25 @@ async def update_task(db: Database, task_id: int, update_data: dict):
         .returning(Task)
     )
     updated_task = await db.fetch_one(update_query)
-
+    
     return updated_task
+
+async def update_tasks_by_filters(db: Database, update_data: dict, **filters: dict[str, Any]):
+    query = (
+        Task
+        .update()
+        .values(**update_data)
+        .returning(Task)
+    )
+    conditions = []
+
+    for attr, value in filters.items():
+        if hasattr(Task.c, attr):
+            conditions.append(getattr(Task.c, attr) == value)
+
+    if conditions:
+        query = query.where(and_(*conditions))
+    return [dict(row) for row in await db.fetch_all(query)]
 
 async def delete_task(db: Database, task_id: int):
     query = (
