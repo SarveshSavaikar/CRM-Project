@@ -1,8 +1,8 @@
 {
   "hello": "Hello! How can I help you today?",
   "hi": "Hi there!",
-  "hey": "Hey! How’s your day going?",
-  "how are you": "I’m doing great, thanks for asking! How about you?",
+  "hey": "Hey! How is your day going?",
+  "how are you": "I am doing great, thanks for asking! How about you?",
   "good morning": "Good morning! How can I assist you today?",
   "good evening": "Good evening! How may I help you?",
 
@@ -86,20 +86,20 @@
   "logout": "To log out, click on your profile icon and select Logout.",
 
   "bye": "Goodbye! Have a nice day",
-  "thanks": "You’re welcome! Happy to help.",
+  "thanks": "You are welcome! Happy to help.",
   "thank you": "Glad I could help!",
   "goodbye": "Take care! See you soon.",
 
-  "idiot": "Please don’t use offensive language. Your response is being recorded, kindly behave.",
-  "stupid": "Please avoid inappropriate words. Let’s keep this conversation respectful.",
+  "idiot": "Please do not use offensive language. Your response is being recorded, kindly behave.",
+  "stupid": "Please avoid inappropriate words. Let us keep this conversation respectful.",
   "fuck": "Such language is not allowed. Please continue politely.",
   "shit": "We noticed inappropriate words. Kindly maintain professionalism.",
   "bitch": "Offensive language detected. Please be respectful.",
   "slut": "Offensive language detected. Please be respectful.",
   "cunt": "Offensive language detected. Please be respectful.",
-  "whore": "Please don’t use offensive language. Your response is being recorded, kindly behave.",
-  "pussy": "Please don’t use offensive language. Your response is being recorded, kindly behave.",
-  "nigger": "Please don’t use offensive language. Your response is being recorded, kindly behave.",
+  "whore": "Please do not use offensive language. Your response is being recorded, kindly behave.",
+  "pussy": "Please do not use offensive language. Your response is being recorded, kindly behave.",
+  "nigger": "Please do not use offensive language. Your response is being recorded, kindly behave.",
   "motherfucker": "We noticed inappropriate words. Kindly maintain professionalism.",
   "dick": "We noticed inappropriate words. Kindly maintain professionalism.",
   "shithead": "We noticed inappropriate words. Kindly maintain professionalism."
