@@ -11,6 +11,9 @@ async def get_kpi_metrics(db: Database):
     opp_count = await opportunity_service.get_opportunities(db, count=True)
     total_opp_value = await opportunity_service.get_total_opportunity_value(db)
     total_opp_value = float(total_opp_value)
+    opp_count_active = await opportunity_service.get_opportunities(db, count=True, active_only=True)
+    total_opp_value_active = await opportunity_service.get_total_opportunity_value(db, active_only=True)
+    total_opp_value_active = float(total_opp_value_active)
     converted_lead_count = await lead_service.get_leads(db, count=True, status="Converted")
     print(f"Leads: {lead_count}, Converted leads: {converted_lead_count}")
     
@@ -26,6 +29,8 @@ async def get_kpi_metrics(db: Database):
     kpi_metrics["conversion_rate"] = conversion_rate
     kpi_metrics["opportunity_count"] = opp_count
     kpi_metrics["total_opportunity_value"] = total_opp_value
+    kpi_metrics["opportunity_count_active"] = opp_count_active
+    kpi_metrics["total_opportunity_value_active"] = total_opp_value_active
     print(kpi_metrics)
     return kpi_metrics
     

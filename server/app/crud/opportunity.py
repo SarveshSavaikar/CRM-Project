@@ -4,6 +4,7 @@ from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import Opportunity, PipelineStage
 from typing import Any
+from . import crud_utils
 
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
@@ -21,6 +22,9 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             conditions.append(Opportunity.c.value >= value)
         if attr == "max_value":
             conditions.append(Opportunity.c.value <= value)
+        if attr == "not_pipeline_stage_id":
+            for pipeline_stage_id in value:
+                conditions.append(Opportunity.c.pipeline_stage_id != pipeline_stage_id)
         if attr == "close_date__lt":
             conditions.append(Opportunity.c.close_date <= value)
         elif attr == "close_date__gt":
@@ -120,19 +124,19 @@ async def update_opportunity_by_filters(db: Database, update_data: dict, **filte
     
     return updated_opps
 
-async def get_total_opportunity_value(db: Database):
+async def get_total_opportunity_value(db: Database, **filters):
     query = select(func.sum(Opportunity.c.value))
+    conditions = []
+    for attr, value in filters.items():
+        if attr == "not_pipeline_stage_id":
+            for id in value:
+                conditions.append(Opportunity.c.pipeline_stage_id != id)
+    if conditions:
+        query = query.where(and_(*conditions))
     return await db.execute(query)
 
 async def get_opportunities_grouped(db: Database, group_by: str):
-    if group_by == "stage":
-        query = (
-            select(PipelineStage.c.name, func.count().label("count"))
-            .select_from(
-                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
-            )
-            .group_by(PipelineStage.c.name)
-        )
+    query = crud_utils.build_group_by_query(Opportunity, group_by)
     
     rows = await db.fetch_all(query)
-    return {"group": [row[0] for row in rows], "count": [row[1] for row in rows]}
+    return {row[0]:row[1] for row in rows}

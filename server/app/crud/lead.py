@@ -137,11 +137,7 @@ async def get_lead_count(db: Database):
     return result.scalar_one()
 
 async def get_leads_grouped(db: Database, group_by: str):
-    if group_by == "source":
-        query = (
-            select(Lead.c.source, func.count().label("count"))
-            .group_by(Lead.c.source)
-        )
+    query = crud_utils.build_group_by_query(Lead, group_by)
     
     rows = await db.fetch_all(query)
-    return {"group": [row[0] for row in rows], "count": [row[1] for row in rows]}
+    return {row[0]:row[1] for row in rows}

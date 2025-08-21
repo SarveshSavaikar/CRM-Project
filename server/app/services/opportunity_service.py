@@ -27,7 +27,8 @@ async def get_opportunities(
     lead_id: int = None,
     pipeline_stage_id: int = None,
     before: bool = True,
-    count: bool = False
+    count: bool = False,
+    active_only: bool = False
 ):
     filters = {}
 
@@ -39,6 +40,8 @@ async def get_opportunities(
         filters["lead_id"] = lead_id
     if pipeline_stage_id is not None:
         filters["pipeline_stage_id"] = pipeline_stage_id
+    if active_only:
+        filters["not_pipeline_stage_id"] = [5, 6]
     if before is True and close_date is not None:
         filters["close_date__lt"] = datetime.combine(close_date, time.max)
     elif before is False and close_date is not None:
@@ -83,8 +86,11 @@ async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadSta
     
     return result
 
-async def get_total_opportunity_value(db: Database):
-    return await opportunity.get_total_opportunity_value(db)
+async def get_total_opportunity_value(db: Database, active_only:bool = False):
+    if active_only:
+        return await opportunity.get_total_opportunity_value(db, not_pipeline_stage_id=[5, 6])
+    else:
+        return await opportunity.get_total_opportunity_value(db)
 
 async def get_opportunities_grouped(db, group_by="id"):
     return await opportunity.get_opportunities_grouped(db, group_by)
