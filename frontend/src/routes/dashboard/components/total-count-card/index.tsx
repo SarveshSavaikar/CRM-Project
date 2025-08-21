@@ -162,7 +162,7 @@ const variants: {
         />
       </IconWrapper>
     ),
-    title: "Number of companies",
+    title: "Number of customers",
     data: [
       {
         index: "1",

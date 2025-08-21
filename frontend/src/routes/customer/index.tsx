@@ -28,6 +28,23 @@ const lifecycleData = [
   { name: "Closed Lost", value: 10 },
 ];
 
+// Customer Acquisition Channels data from the image
+const acquisitionData = [
+  { name: "Channel 5", value: 50 },
+  { name: "Channel 4", value: 120 },
+  { name: "Channel 3", value: 180 },
+  { name: "Channel 2", value: 350 },
+  { name: "Channel 1", value: 200 },
+];
+
+// New data for Customer Satisfaction by Segment
+const satisfactionData = [
+  { name: "SMB", satisfaction: 85 },
+  { name: "Enterprise", satisfaction: 78 },
+  { name: "Startup", satisfaction: 95 },
+  { name: "Freelancer", satisfaction: 90 },
+];
+
 // Retention vs churn data
 const retentionDataSample = {
   Q1: [
@@ -158,7 +175,45 @@ export const CustomersPage: React.FC = () => {
         </div>
       </Card>
 
-      <Row gutter={[24, 24]}>
+      <Row gutter={[16, 24]}>
+        {/* Customer Acquisition Channels */}
+        <Col xs={24} lg={12}>
+          <Card title="Customer Acquisition Channels" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart
+                width={400}
+                height={300}
+                data={acquisitionData}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#1467fa" />
+              </BarChart>
+            </div>
+          </Card>
+        </Col>
+
+        {/* Customer Satisfaction by Segment */}
+        <Col xs={24} lg={12}>
+          <Card title="Customer Satisfaction by Segment" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart width={400} height={300} data={satisfactionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="satisfaction" fill="#FFBB28" />
+              </BarChart>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 24]}>
         {/* Lifecycle Distribution */}
         <Col xs={24} lg={12}>
           <Card title="Lifecycle Distribution" style={{ height: '100%' }}>

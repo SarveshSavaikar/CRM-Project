@@ -7,7 +7,7 @@ export * from "./customer";
 export * from "./register"; 
 export * from "./leads/list";
 export * from "./geoinsights/list";
-export * from "./campagins";
+export * from "./campaigns";
 export * from "./inbox";
 
 

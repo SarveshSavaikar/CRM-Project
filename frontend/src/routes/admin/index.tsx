@@ -621,7 +621,7 @@ const CompanyCard: React.FC<{
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ margin: "0 0 16px 0", fontSize: "18px", fontWeight: "600" }}>
-              Add New Contact
+              Add New Record
             </h2>
             <form onSubmit={handleFormSubmit}>
               <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column" }}>
