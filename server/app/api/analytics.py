@@ -93,3 +93,7 @@ async def get_activity_stats(db: Database = Depends(get_db)):
         "in_progress":in_progress_tasks,
         "completed_tasks": completed_tasks
     }
+
+@router.get("/top-performers")
+async def get_top_performers(order_by_lead: bool = False, db: Database = Depends(get_db)):
+    return await analytics_service.get_top_performers(db, order_by_lead)
