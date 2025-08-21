@@ -128,9 +128,28 @@ async def get_total_opportunity_value(db: Database, **filters):
     query = select(func.sum(Opportunity.c.value))
     conditions = []
     for attr, value in filters.items():
+        if value is None:
+            continue
+        if attr == "min_value":
+            conditions.append(Opportunity.c.value >= value)
+        if attr == "max_value":
+            conditions.append(Opportunity.c.value <= value)
         if attr == "not_pipeline_stage_id":
-            for id in value:
-                conditions.append(Opportunity.c.pipeline_stage_id != id)
+            for pipeline_stage_id in value:
+                conditions.append(Opportunity.c.pipeline_stage_id != pipeline_stage_id)
+        if attr == "close_date__lt":
+            conditions.append(Opportunity.c.close_date <= value)
+        elif attr == "close_date__gt":
+            conditions.append(Opportunity.c.close_date >= value)
+        if attr == "created__lt":
+            print(value)
+            conditions.append(Opportunity.c.created_at <= value)
+        elif attr == "created__gt":
+            conditions.append(Opportunity.c.created_at >= value)
+            
+        elif hasattr(Opportunity.c, attr):
+            conditions.append(getattr(Opportunity.c, attr) == value)
+        
     if conditions:
         query = query.where(and_(*conditions))
     return await db.execute(query)

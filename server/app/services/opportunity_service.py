@@ -86,11 +86,36 @@ async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadSta
     
     return result
 
-async def get_total_opportunity_value(db: Database, active_only:bool = False):
+async def get_total_opportunity_value(db: Database, active_only:bool = False, won: bool = None, with_count: bool = False):
     if active_only:
-        return await opportunity.get_total_opportunity_value(db, not_pipeline_stage_id=[5, 6])
+        total = await opportunity.get_total_opportunity_value(db, not_pipeline_stage_id=[5, 6])
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count, not_pipeline_stage_id=[5, 6])
+            return {"total":total, "count":count}
+        else:
+            return total
+        
+    elif won == True:
+        total = await opportunity.get_total_opportunity_value(db, pipeline_stage_id=5)
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count, pipeline_stage_id=5)
+            return {"total":total, "count":count}
+        else:
+            return total
+    elif won == False:
+        total = await opportunity.get_total_opportunity_value(db, pipeline_stage_id=6)
+        if with_count:
+            count = await opportunity.get_opportunities(db, pipeline_stage_id=6)
+            return {"total":total, "count":count}
+        else:
+            return total
     else:
-        return await opportunity.get_total_opportunity_value(db)
+        total = await opportunity.get_total_opportunity_value(db)
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count=True)
+            return {"total":total, "count":count}
+        else:
+            return total
 
 async def get_opportunities_grouped(db, group_by="id"):
     return await opportunity.get_opportunities_grouped(db, group_by)

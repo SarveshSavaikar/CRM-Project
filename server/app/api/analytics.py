@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from databases import Database
 from app.database.connection import get_db
 from app.schemas.analytics import KPIMetricsResponse, EntityByAttributeResponse
-from app.services import analytics_service
+from app.services import analytics_service, lead_service, customer_service, opportunity_service
 from datetime import date, datetime
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
@@ -18,3 +18,48 @@ async def get_leads_by_source(db: Database = Depends(get_db)):
 @router.get("/deals-by-stage", response_model=EntityByAttributeResponse)
 async def get_leads_by_source(db: Database = Depends(get_db)):
     return await analytics_service.get_deals_by_stage(db)
+
+@router.get("/leads/count")
+async def get_leads_count(
+    source: str = None,
+    status: str = None, 
+    min_score: float = None, 
+    team_id: int = None, 
+    user_id: int = None,
+    team_name: str = None, 
+    user_name: str = None,
+    created: date = None, 
+    last_updated: date = None, 
+    before: bool = False, 
+    db: Database = Depends(get_db)
+):
+    return await lead_service.get_leads(db, source, status, min_score, team_id, user_id, team_name, user_name, created, last_updated, before, count=True)
+
+@router.get('/customers/count')
+async def get_customer_count(
+    description: str = None,
+    industry: str = None, 
+    lead_id: int = None, 
+    created: date = None, 
+    last_updated: date = None, 
+    before: bool = True,
+    db: Database = Depends(get_db)
+):
+    return await customer_service.get_customers(db, description, industry, lead_id, created, last_updated, before, count=True)
+
+@router.get('/opportunity/count')
+async def get_opportunity_count(
+    close_date: date = None,
+    created: date = None,
+    min_value: float = None,
+    max_value: float = None,
+    lead_id: int = None,
+    pipeline_stage_id: int = None,
+    before: bool = True,
+    db: Database = Depends(get_db)
+):
+    return await opportunity_service.get_opportunities(db, close_date, created, min_value, max_value, lead_id, pipeline_stage_id, before, count=True)
+
+@router.get("/revenue")
+async def get_revenue(with_count: bool = False, db: Database = Depends(get_db)):
+    return await opportunity_service.get_total_opportunity_value(db, won=True, with_count=with_count)
