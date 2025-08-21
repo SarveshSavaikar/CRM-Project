@@ -2,13 +2,16 @@
 # from crud import get_all_users, create_user
 # from server_utils import User, UserPydantic
 # import json
-from fastapi import FastAPI # type: ignore
+from fastapi import FastAPI , File, UploadFile# type: ignore
 
 from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics
 
 from app.api import test_db
 from app.database.connection import database
 from app.middlewares.jwt_middleware import JWTMiddleware
+import uuid
+import os
+from app.s3_bucket.s3_utlities import upload_file_to_s3
 
 app = FastAPI(
     title="CRM-API",
@@ -50,3 +53,15 @@ app.include_router(analytics.router)
 
 
 
+@app.post("/upload/")
+async def upload_file(file: UploadFile = File(...)):
+    temp_file = f"/tmp/{uuid.uuid4()}_{file.filename}"
+    with open(temp_file, "wb") as f:
+        f.write(await file.read())
+
+    # Upload to S3
+    s3_url = upload_file_to_s3(temp_file, f"uploads/{file.filename}")
+    
+    os.remove(temp_file)  # cleanup
+
+    return {"file_url": s3_url}
