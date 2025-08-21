@@ -23,7 +23,8 @@ async def get_tasks(
     priority: Optional[float] = None,
     user_id: Optional[int] = None,
     opportunity_id: Optional[int] = None,
-    before: Optional[bool] = True
+    before: Optional[bool] = True,
+    count:bool = False
 ):
     filters = {}
 
@@ -42,10 +43,11 @@ async def get_tasks(
     elif before is False and due_date is not None:
         filters["due_date__gt"] = datetime.combine(due_date, time.max)
 
-    result =  await task.get_tasks(db, **filters)
+    result =  await task.get_tasks(db, count, **filters)
     
     if(result == None):
         return { "detail" : "No Task Found"}
+    print(f"Result:", result)
     return result
 
 async def update_task(db: Database, task_id: int = None, taskObj: TaskUpdate = None, **filters: dict[str, Any]):
