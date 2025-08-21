@@ -42,11 +42,11 @@ def scrape_messages(driver):
     """Scrape message previews from LinkedIn Messaging"""
     driver.get(MESSAGING_URL)
     WebDriverWait(driver, 50).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, "msg-conversation-listitem"))
+        EC.presence_of_all_elements_located((By.CLASS_NAME, "list-style-none msg-conversations-container__conversations-list"))
     )
     
-    names = driver.find_elements(By.CLASS_NAME, "msg-conversation-listitem__participant-names")
-    snippets = driver.find_elements(By.CLASS_NAME, "msg-conversation-card__message-snippet-body")
+    names = driver.find_elements(By.CLASS_NAME, "msg-conversation-listitem_participant-names msg-conversation-card_participant-names truncate pr1 t-16 t-blackt-normal")
+    snippets = driver.find_elements(By.CLASS_NAME, "msg-conversation-card__message-snippet m0 t-14")
 
     messages = []
     for name, msg in zip(names, snippets):
