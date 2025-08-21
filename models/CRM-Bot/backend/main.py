@@ -1,11 +1,15 @@
+import re
+import json
+import random
+from collections import deque
+from rapidfuzz import fuzz, process
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-import json, re, random
-from rapidfuzz import process, fuzz
 
 app = FastAPI()
 
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -17,31 +21,18 @@ app.add_middleware(
 class Message(BaseModel):
     message: str
 
-with open('faq.json', 'r') as f:
+# Load FAQ
+with open("faq.json", "r") as f:
     faq = json.load(f)
 
-with open('badwords.json', 'r') as f:
-    BAD_WORDS = json.load(f)
+# Load bad words
+with open("badwords.json", "r") as f:
+    badwords = json.load(f)
 
-context_memory = {"last_topic": None}
+# Multi-turn context memory (last 5 turns)
+conversation_history = deque(maxlen=5)
 
-CHITCHAT_KEYS = {
-    "hi","hello","hey","good morning","good evening","how are you",
-    "thanks","thank you","bye","goodbye","who are you"
-}
-TASK_KEYWORDS = {
-    "reset","change","add","create","update","edit","delete",
-    "import","export","connect","integrate","sync","assign",
-    "cancel","upgrade","downgrade","pricing","price","cost",
-    "invoice","billing","payment","subscribe","trial","report",
-    "opportunity","lead","contact","task","pipeline","dashboard","plans","password"
-}
-STOPWORDS = {
-    "the","is","a","an","to","for","of","and","or","in","on","with",
-    "do","does","did","i","you","we","they","it","that","this","my",
-    "your","their","our","can","how","what","where","when","why","please"
-}
-
+# Response templates
 response_templates = [
     "Thank you for reaching out! Your request is being processed, and we truly appreciate your patience.",
     "We’re grateful for your query. Our team is already working on it for you!",
@@ -50,71 +41,87 @@ response_templates = [
     "We appreciate your message. Rest assured, your request is being taken care of."
 ]
 
+# Synonym dictionary
+synonyms = {
+    "subscription": ["plan", "plans", "package", "membership"],
+    "cost": ["price", "charges", "fees"],
+    "support": ["help", "assistance", "service"],
+    "cancel": ["terminate", "stop", "end"],
+    "billing": ["invoice", "payment"],
+}
+
+# Stopwords
+STOPWORDS = {
+    "the","is","a","an","to","for","of","and","or","in","on","with",
+    "do","does","did","i","you","we","they","it","that","this","my",
+    "your","their","our","can","how","what","where","when","why","please"
+}
+
+# Normalize text
+def normalize_text(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r"(.)\1+", r"\1", text)  # collapse repeated letters ("shitttt" -> "shit")
+    return text
+
+# Expand with synonyms
+def expand_with_synonyms(text: str) -> str:
+    for canonical, syn_list in synonyms.items():
+        for syn in syn_list:
+            if syn in text:
+                text = text.replace(syn, canonical)
+    return text
+
+# Tokenizer
 def tokens(text: str):
     return [w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in STOPWORDS]
 
+# Best FAQ Match
 def best_faq_match(query: str, candidate_keys):
-    results = process.extract(query, candidate_keys, scorer=fuzz.token_set_ratio, limit=5)
+    expanded_query = expand_with_synonyms(query)
+    results = process.extract(expanded_query, candidate_keys, scorer=fuzz.token_set_ratio, limit=5)
     return results[0] if results else (None, 0, None)
 
-def normalize_text(text: str) -> str:
-    text = text.lower()
-    text = re.sub(r'(.)\1+', r'\1', text)  # collapse consecutive repeated chars
-    return text
-
+# Bad word detection
 def contains_badword(message: str, badwords: list) -> bool:
-    words = re.findall(r"\w+", message.lower())  # split into words
+    words = re.findall(r"\w+", message.lower())
     for word in words:
         for bad in badwords:
-            # ✅ exact match
+            # exact match
             if word == bad:
                 return True
-            # ✅ fuzzy match (avoid false positives with a higher threshold)
-            if fuzz.ratio(word, bad) > 85:
+            # fuzzy match with higher threshold (to catch "BiTcH", "shitttt")
+            if fuzz.ratio(word, bad) > 80:
                 return True
     return False
-
-@app.get("/chat/{query}")
-def chat(query: str):
-    best_key, score, _ = best_faq_match(query, list(faq.keys()))
-    if best_key and score >= 70:
-        return {"response": faq[best_key]}
-    return {"response": "Sorry, I don't have an answer for that."}
 
 @app.post("/bot/respond")
 def respond(msg: Message):
     user_raw = msg.message
-    user_message = user_raw.lower()
     normalized_message = normalize_text(user_raw)
-    
-    if contains_badword(normalized_message, BAD_WORDS):
-        return {"reply": " Please avoid using offensive language. Your response is being recorded."}
-    
-    if context_memory["last_topic"] and any(p in normalized_message.split() for p in ["they","it","that","those","them","this"]):
-        topic = context_memory["last_topic"]
-        reply = f"You're asking about {topic}. {faq.get(topic, 'I don’t have more details on that.')}"
-        return {"reply": reply}
+    normalized_message = expand_with_synonyms(normalized_message)
 
-    tok = set(tokens(normalized_message))
-    looks_tasky = len(tok & TASK_KEYWORDS) > 0 or normalized_message.startswith(
-        ("how to", "how do i", "where do i", "can i", "how can i")
-    )   
+    # Check bad words
+    if contains_badword(normalized_message, badwords):
+        return {"reply": "Please avoid offensive language. Your response is being recorded."}
 
-    candidate_keys = [k for k in faq.keys() if not (looks_tasky and k in CHITCHAT_KEYS)]
-    if not candidate_keys:
-        candidate_keys = list(faq.keys())
-
-    best_key, score, _ = best_faq_match(normalized_message, candidate_keys)
+    # Match FAQ
+    best_key, score, _ = best_faq_match(normalized_message, list(faq.keys()))
+    reply = None
 
     if best_key and score >= 70:
+        # strong match → direct answer
         reply = faq[best_key]
-        context_memory["last_topic"] = best_key
-    # If weak FAQ match → use generic gratitude template
+        conversation_history.append(best_key)
     elif best_key and score >= 50:
-        reply = random.choice(response_templates)
-        context_memory["last_topic"] = best_key
+        # weak match → use partial FAQ or gratitude
+        reply = faq.get(best_key, random.choice(response_templates))
+        conversation_history.append(best_key)
     else:
-        reply = "Sorry, I don’t have an answer for that."
-        context_memory["last_topic"] = None
+        # No strong match → try to infer from past context
+        if conversation_history:
+            last_topic = conversation_history[-1]
+            reply = f"You're asking in relation to {last_topic}. {faq.get(last_topic, 'I don’t have more info on that.')}"
+        else:
+            reply = "Sorry, I don’t have an answer for that."
 
     return {"reply": reply}
