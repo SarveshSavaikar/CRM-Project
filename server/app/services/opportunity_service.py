@@ -117,5 +117,5 @@ async def get_total_opportunity_value(db: Database, active_only:bool = False, wo
         else:
             return total
 
-async def get_opportunities_grouped(db, group_by="id"):
-    return await opportunity.get_opportunities_grouped(db, group_by)
+async def get_opportunities_grouped(db, group_by="id", count: bool = False):
+    return await opportunity.get_opportunities_grouped(db, group_by, count)

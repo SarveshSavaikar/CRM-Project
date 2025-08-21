@@ -1,5 +1,5 @@
 from app.schemas.task import TaskCreate, TaskUpdate
-from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
+from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
 from app.database.models import Task
@@ -10,8 +10,8 @@ async def get_task_by_id(db: Database, task_id: int):
     query = select(Task).where(Task.c.id == task_id)
     return await db.fetch_one(query)
 
-async def get_tasks(db: Database, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(Task)
+async def get_tasks(db: Database, count:bool = False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    query = query = select(func.count()).select_from(Task) if count else select(Task)
     conditions = []
 
     for attr, value in filters.items():
@@ -27,8 +27,11 @@ async def get_tasks(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
 
     if conditions:
         query = query.where(and_(*conditions))
-    rows = await db.fetch_all(query)
-    return [dict(row) for row in rows]
+    if count:
+        return await db.execute(query)
+    else:
+        rows = await db.fetch_all(query)
+        return [dict(row) for row in rows]
     
 
 

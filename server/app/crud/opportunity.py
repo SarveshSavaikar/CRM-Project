@@ -1,3 +1,4 @@
+import json
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
@@ -154,8 +155,12 @@ async def get_total_opportunity_value(db: Database, **filters):
         query = query.where(and_(*conditions))
     return await db.execute(query)
 
-async def get_opportunities_grouped(db: Database, group_by: str):
-    query = crud_utils.build_group_by_query(Opportunity, group_by)
+async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
+    query = crud_utils.build_group_by_query(Opportunity, group_by, count)
     
     rows = await db.fetch_all(query)
-    return {row[0]:row[1] for row in rows}
+    print(count)
+    if count:
+        return {row[0]:row[1] for row in rows}
+    else:
+        return {row[0]:json.loads(row[1]) for row in rows}

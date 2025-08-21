@@ -39,7 +39,7 @@ async def get_leads_by_source(db: Database):
     result["group_by"]="source"
     return result
 
-async def get_deals_by_stage(db: Database):
-    result = await opportunity_service.get_opportunities_grouped(db, group_by="stage")
+async def get_deals_by_stage(db: Database, count: bool):
+    result = await opportunity_service.get_opportunities_grouped(db, group_by="stage", count=count)
     result["group_by"]="stage"
     return result
