@@ -3,7 +3,8 @@ from app.schemas.user import UserCreate  # Pydantic model
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import User
+from app.database.models import Opportunity, User, Lead
+from .crud_utils import prefix_columns
 
 # Get all users
 async def get_all_users(db: Database):
@@ -85,3 +86,25 @@ async def delete_user(db: Database, user_id: int):
     
     
     return await db.fetch_one(query)
+
+async def get_user_performance(db: Database, user_id: int):
+    query = (
+        select(
+            *prefix_columns(User, ""),
+            *prefix_columns(Lead, "lead"),
+            *prefix_columns(Opportunity, "opp")
+        )   
+        .select_from(
+            User
+            .join(
+                Lead.join(Opportunity, Lead.c.id == Opportunity.c.lead_id),
+                User.c.id == Lead.c.user_id
+            )
+        )
+    )
+    # conditions = []
+    # conditions.append(Opportunity.c.pipeline_stage_id == 5)
+    # if user_id:
+    #     conditions.append(User.c.id==user_id)
+    # query = query.where(and_(*conditions))
+    return await db.fetch_all(query)

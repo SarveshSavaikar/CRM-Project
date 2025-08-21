@@ -8,6 +8,7 @@ from typing import Any, Optional
 from datetime import date
 from app.schemas.task import TaskUpdate
 from . import task_service
+from asyncpg.exceptions import UniqueViolationError
 
 async def get_opportunity(db: Database, opportunity_id: int):
     result = await opportunity.get_opportunity_by_id(db, opportunity_id)
@@ -60,16 +61,21 @@ async def update_opportunity(db: Database, opportunity_id: int=None, opportunity
             raise HTTPException(status_code=404, detail="Opportunity not found")
 
     update_data = opportunityObj.model_dump(exclude_unset=True)
-    
-    if opportunity_id is not None:
-        return await opportunity.update_opportunity(db, opportunity_id, update_data)
-    else:
-        return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
+    try:
+        if opportunity_id is not None:
+            return await opportunity.update_opportunity(db, opportunity_id, update_data)
+        else:
+            return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
+    except UniqueViolationError as e:
+        raise HTTPException(status_code=409, detail="Opportunity linked to specified Lead ID already exists.")
     
 async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
     opportunityObj.lead_id = None if opportunityObj.lead_id == 0 else opportunityObj.lead_id
     opportunityObj.pipeline_stage_id = None if opportunityObj.pipeline_stage_id==0 else opportunityObj.pipeline_stage_id
-    return await opportunity.create_opportunity(db, opportunityObj)
+    try:
+        return await opportunity.create_opportunity(db, opportunityObj)
+    except UniqueViolationError as e:
+        raise HTTPException(status_code=409, detail="Opportunity linked to specified Lead ID already exists.")
 
 async def delete_opportunity(db: Database, opportunity_id: int):
     await task_service.update_task(db, taskObj=TaskUpdate(opportunity_id=None), opportunity_id=opportunity_id)
