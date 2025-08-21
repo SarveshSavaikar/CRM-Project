@@ -9,6 +9,7 @@ from app.api import users, leads, auth, teams, campaigns, tasks, admin, customer
 from app.api import test_db
 from app.database.connection import database
 from app.middlewares.jwt_middleware import JWTMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import os
 from app.s3_bucket.s3_utlities import upload_file_to_s3
@@ -30,6 +31,14 @@ async def shutdown():
     await database.disconnect()
 
 app.add_middleware(JWTMiddleware)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],  # allow POST, GET, OPTIONS, etc.
+    allow_headers=["*"],  # allow all headers (Authorization, Content-Type, etc.)
+)
 
 @app.get("/")
 async def root():
