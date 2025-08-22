@@ -68,7 +68,7 @@ async def create_lead(db: Database, leadObj: LeadCreate):
     return await lead.create_lead(db, leadObj)   
 
 async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
-    status_values = ['active', 'inactive', 'converted', 'lost', 'archived', 'unassigned']
+    status_values = ["Open", "Unassigned", "In Progress", "Converted", "Lost"]
     if leadObj.status is not None:
         leadObj.status = leadObj.status.lower()
         if leadObj.status not in status_values:
