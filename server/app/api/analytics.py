@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from databases import Database
 from app.database.connection import get_db
 from app.schemas.analytics import KPIMetricsResponse, EntityByAttributeResponse
-from app.services import analytics_service, lead_service, customer_service, opportunity_service, task_service
+from app.services import analytics_service, lead_service, customer_service, opportunity_service, task_service, campaign_service
 from datetime import date, datetime
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
@@ -97,3 +97,19 @@ async def get_activity_stats(db: Database = Depends(get_db)):
 @router.get("/top-performers")
 async def get_top_performers(order_by_lead: bool = False, db: Database = Depends(get_db)):
     return await analytics_service.get_top_performers(db, order_by_lead)
+
+@router.get("/campaigns/count")
+async def get_campaigns_count(
+    name: str = None,
+    channel: str = None,
+    start: date = None, 
+    end: date = None,
+    active_only: bool = False,
+    db: Database = Depends(get_db)
+):
+    return await campaign_service.get_campaigns(db, name, channel, start, end, active_only, count=True)
+
+@router.get("/campaigns/leads/count")
+async def get_lead_campaigns_count(db: Database = Depends(get_db)):
+    return await campaign_service.get_lead_campaigns_count(db)
+
