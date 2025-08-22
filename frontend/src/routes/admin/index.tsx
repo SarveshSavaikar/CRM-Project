@@ -840,7 +840,6 @@ export const AdminSettingsPage: React.FC = () => {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        background: "#f5f5f8",
         padding: "32px 12px",
         color: "#000",
       }}

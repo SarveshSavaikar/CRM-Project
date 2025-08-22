@@ -128,6 +128,105 @@ export const CustomersPage: React.FC = () => {
 
   return (
     <div style={{ padding: 24 }}>
+      {/* New Heading */}
+      <h1 style={{ marginBottom: 24, fontSize: 24, fontWeight: 700,}}>Customer Overview</h1>
+
+      {/* Customer Graphs */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 }}>
+        {/* Customer Acquisition Channels */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card title="Customer Acquisition Channels" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart
+                width={400}
+                height={300}
+                data={acquisitionData}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#1467fa" />
+              </BarChart>
+            </div>
+          </Card>
+        </div>
+
+        {/* Customer Satisfaction by Segment */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card title="Customer Satisfaction by Segment" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart width={400} height={300} data={satisfactionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="satisfaction" fill="#FFBB28" />
+              </BarChart>
+            </div>
+          </Card>
+        </div>
+
+        {/* Lifecycle Distribution */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card title="Lifecycle Distribution" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <PieChart width={400} height={300}>
+                <Pie
+                  data={lifecycleData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {lifecycleData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </div>
+          </Card>
+        </div>
+
+        {/* Retention vs Churn */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card
+            title="Retention vs Churn"
+            style={{ height: '100%' }}
+            extra={
+              <Select
+                value={selectedQuarter}
+                style={{ width: 120 }}
+                onChange={(value: QuarterKey) => setSelectedQuarter(value)}
+              >
+                <Option value="Q1">Q1</Option>
+                <Option value="Q2">Q2</Option>
+                <Option value="Q3">Q3</Option>
+                <Option value="Q4">Q4</Option>
+              </Select>
+            }
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart width={400} height={300} data={retentionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="retention" fill="#1467fa" />
+                <Bar dataKey="churn" fill="#FF8042" />
+              </BarChart>
+            </div>
+          </Card>
+        </div>
+      </div>
+
       {/* Customer List */}
       <Card
         title="Customer List"
@@ -174,102 +273,6 @@ export const CustomersPage: React.FC = () => {
           </div>
         </div>
       </Card>
-
-      <Row gutter={[16, 24]}>
-        {/* Customer Acquisition Channels */}
-        <Col xs={24} lg={12}>
-          <Card title="Customer Acquisition Channels" style={{ height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <BarChart
-                width={400}
-                height={300}
-                data={acquisitionData}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#1467fa" />
-              </BarChart>
-            </div>
-          </Card>
-        </Col>
-
-        {/* Customer Satisfaction by Segment */}
-        <Col xs={24} lg={12}>
-          <Card title="Customer Satisfaction by Segment" style={{ height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <BarChart width={400} height={300} data={satisfactionData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="satisfaction" fill="#FFBB28" />
-              </BarChart>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 24]}>
-        {/* Lifecycle Distribution */}
-        <Col xs={24} lg={12}>
-          <Card title="Lifecycle Distribution" style={{ height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <PieChart width={400} height={300}>
-                <Pie
-                  data={lifecycleData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-                  {lifecycleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </div>
-          </Card>
-        </Col>
-
-        {/* Retention vs Churn */}
-        <Col xs={24} lg={12}>
-          <Card
-            title="Retention vs Churn"
-            style={{ height: '100%' }}
-            extra={
-              <Select
-                value={selectedQuarter}
-                style={{ width: 120 }}
-                onChange={(value: QuarterKey) => setSelectedQuarter(value)}
-              >
-                <Option value="Q1">Q1</Option>
-                <Option value="Q2">Q2</Option>
-                <Option value="Q3">Q3</Option>
-                <Option value="Q4">Q4</Option>
-              </Select>
-            }
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <BarChart width={400} height={300} data={retentionData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="retention" fill="#1467fa" />
-                <Bar dataKey="churn" fill="#FF8042" />
-              </BarChart>
-            </div>
-          </Card>
-        </Col>
-      </Row>
     </div>
   );
 };

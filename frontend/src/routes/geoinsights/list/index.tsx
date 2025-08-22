@@ -40,7 +40,6 @@ export function GeoInsightsPage(): JSX.Element {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        background: "#f5f6fb",
         padding: "32px 36px",
       }}
     >
@@ -138,9 +137,9 @@ export function GeoInsightsPage(): JSX.Element {
       {/* NEW INDIA MAP CARD */}
       <Card
         title={
-          <span style={{ display: "flex", alignItems: "center" }}>
-            <GlobalOutlined style={{ marginRight: 8 }} />
-            <Typography.Text style={{ fontWeight: 500, fontSize: 16 }}>
+          <span style={{ display: "flex", alignItems: "center", }}>
+            <GlobalOutlined style={{ marginRight: 8,  }} />
+            <Typography.Text style={{ fontWeight: 500, fontSize: 16,  }}>
               Leads Distribution
             </Typography.Text>
           </span>
@@ -150,7 +149,7 @@ export function GeoInsightsPage(): JSX.Element {
             See all leads
           </Button>
         }
-        style={{ minHeight: 550, overflow: "hidden" }}
+        style={{ minHeight: 550, overflow: "hidden", border: "1px solid #9cbbe6ff" ,  }}
         bodyStyle={{ padding: 0, height: 400 }}
       >
         <div style={{ width: "100%", height: 560 }}>

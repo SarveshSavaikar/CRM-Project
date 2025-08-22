@@ -105,7 +105,7 @@ const DroppableStage = ({ stageId, children, title, dealCount }: { stageId: stri
         <div
             ref={setNodeRef}
             style={{
-                background: "#f8f9fa",
+                background: "#fff",
                 borderRadius: 8,
                 padding: "16px",
                 minWidth: 320,
@@ -127,14 +127,15 @@ const DroppableStage = ({ stageId, children, title, dealCount }: { stageId: stri
                     }}>{title}</h3>
                     <span
                         style={{
-                            backgroundColor: "#e0e7f7",
-                            color: "#386fe3",
-                            padding: "2px 8px",
-                            borderRadius: 12,
-                            fontSize: 14,
-                            fontWeight: 600,
-                            marginLeft: 10,
-                        }}
+                                    backgroundColor: "#b7daffff",
+                                    color: "#386fe3",
+                                    padding: "2px 8px",
+                                    border: "1px solid #abc1ff",
+                                    borderRadius: 12,
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    marginLeft: 10,
+                                }}
                     >
                         {dealCount}
                     </span>
@@ -301,7 +302,6 @@ export const DealsPage: React.FC = () => {
     return (
         <div style={{
             fontFamily: "Inter, sans-serif",
-            background: "#f0f2f5",
             padding: "24px 32px",
         }}>
             {/* --- Top Bar: Deals Overview --- */}

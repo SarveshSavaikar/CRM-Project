@@ -406,7 +406,6 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        background: "#f5f5f8",
         padding: "32px 36px",
       }}
     >
@@ -456,7 +455,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
               flex: 1,
               background: "#fff",
               borderRadius: 11,
-              boxShadow: "0 1px 8px #e7e9ee",
+              boxShadow: "0 1px 8px #eaeee7ff",
               padding: "22px 30px",
               display: "flex",
               flexDirection: "column",
@@ -464,7 +463,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
               minWidth: 180,
             }}
           >
-            <span style={{ color: "#8186a0", fontSize: 15, marginBottom: 5 }}>{stat.label}</span>
+            <span style={{ color: "#81a08aff", fontSize: 15, marginBottom: 5 }}>{stat.label}</span>
             <span style={{ fontSize: 25, fontWeight: 700, color: "#22274a" }}>{stat.value}</span>
             <span
               style={{
@@ -591,7 +590,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
                     x={x + 7}
                     y={210}
                     fontSize="10"
-                    fill="#7f8a9c"
+                    fill="#7f9c80ff"
                     textAnchor="middle"
                   >
                     {dat.month}
@@ -617,7 +616,7 @@ export function CampaignAnalyticsDashboard(): JSX.Element {
         style={{
           background: "#fff",
           borderRadius: 13,
-          boxShadow: "0 1px 8px #dde3f1",
+          boxShadow: "0 1px 8px #dff1ddff",
           padding: 22,
           marginTop: 24,
         }}

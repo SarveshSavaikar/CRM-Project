@@ -80,7 +80,6 @@ const initialMessages = [
 // --- Reusable Styles ---
 const pageContainerStyle = {
   fontFamily: "Inter, sans-serif",
-  background: "#f4f6fb",
   minHeight: "100vh",
   padding: "28px",
   display: "flex",
@@ -290,7 +289,7 @@ const messageDetailsTimestampStyle = {
 };
 const messageDetailsBodyStyle = {
   fontSize: "15px",
-  color: "#49527a",
+  color: "#517a49ff",
   lineHeight: "1.6",
   overflowY: "auto" as "auto",
 };

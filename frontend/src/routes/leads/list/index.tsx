@@ -247,7 +247,7 @@ const KanbanColumn = ({ stage, children }: { stage: string; children: React.Reac
       ref={setNodeRef}
       style={{
         ...kanbanColumnStyle,
-        background: isOver ? "#e0e7ff" : "#f8fafd",
+        background: isOver ? "#fff" : "#fff",
       }}
     >
       <div style={kanbanHeaderStyle}>
@@ -378,7 +378,7 @@ export function LeadsListIndex() {
   };
 
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", background: "#f4f6fb", minHeight: "100vh", padding: "28px" }}>
+    <div style={{ fontFamily: "Inter, sans-serif", minHeight: "100vh", padding: "28px" }}>
       {/* Header and Summary Boxes */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 0 }}>
         <h1 style={{ fontSize: 25, fontWeight: 700, margin: 0, letterSpacing: 0 }}>Leads Management</h1>
