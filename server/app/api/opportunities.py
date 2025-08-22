@@ -42,3 +42,10 @@ async def update_opportunity(opportunity_id: int, opportunity: OpportunityUpdate
 async def delete_opportunity(opportunity_id: int, db: Database = Depends(get_db)):
     return await opportunity_service.delete_opportunity(db, opportunity_id)
 
+@router.get("/by-month")
+async def get_deals_by_month_all(count: bool = False, db: Database = Depends(get_db)):
+    return await opportunity_service.get_deals_by_month(db, count)
+
+@router.get("/by-month/{month}")
+async def get_deals_by_month(month: int = datetime.now().month, count: bool = False, db: Database = Depends(get_db)):
+    return await opportunity_service.get_deals_by_month(db, month, count)
