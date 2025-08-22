@@ -8,6 +8,7 @@ from typing import Any, Optional
 from datetime import date
 from app.schemas.task import TaskUpdate
 from . import task_service
+from asyncpg.exceptions import UniqueViolationError
 
 async def get_opportunity(db: Database, opportunity_id: int):
     result = await opportunity.get_opportunity_by_id(db, opportunity_id)
@@ -60,16 +61,21 @@ async def update_opportunity(db: Database, opportunity_id: int=None, opportunity
             raise HTTPException(status_code=404, detail="Opportunity not found")
 
     update_data = opportunityObj.model_dump(exclude_unset=True)
-    
-    if opportunity_id is not None:
-        return await opportunity.update_opportunity(db, opportunity_id, update_data)
-    else:
-        return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
+    try:
+        if opportunity_id is not None:
+            return await opportunity.update_opportunity(db, opportunity_id, update_data)
+        else:
+            return await opportunity.update_opportunity_by_filters(db, update_data, **filters)
+    except UniqueViolationError as e:
+        raise HTTPException(status_code=409, detail="Opportunity linked to specified Lead ID already exists.")
     
 async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
     opportunityObj.lead_id = None if opportunityObj.lead_id == 0 else opportunityObj.lead_id
     opportunityObj.pipeline_stage_id = None if opportunityObj.pipeline_stage_id==0 else opportunityObj.pipeline_stage_id
-    return await opportunity.create_opportunity(db, opportunityObj)
+    try:
+        return await opportunity.create_opportunity(db, opportunityObj)
+    except UniqueViolationError as e:
+        raise HTTPException(status_code=409, detail="Opportunity linked to specified Lead ID already exists.")
 
 async def delete_opportunity(db: Database, opportunity_id: int):
     await task_service.update_task(db, taskObj=TaskUpdate(opportunity_id=None), opportunity_id=opportunity_id)
@@ -86,11 +92,36 @@ async def update_opportunity_by_lead(db: Database, lead_id: int, update: LeadSta
     
     return result
 
-async def get_total_opportunity_value(db: Database, active_only:bool = False):
+async def get_total_opportunity_value(db: Database, active_only:bool = False, won: bool = None, with_count: bool = False):
     if active_only:
-        return await opportunity.get_total_opportunity_value(db, not_pipeline_stage_id=[5, 6])
+        total = await opportunity.get_total_opportunity_value(db, not_pipeline_stage_id=[5, 6])
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count, not_pipeline_stage_id=[5, 6])
+            return {"total":total, "count":count}
+        else:
+            return total
+        
+    elif won == True:
+        total = await opportunity.get_total_opportunity_value(db, pipeline_stage_id=5)
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count, pipeline_stage_id=5)
+            return {"total":total, "count":count}
+        else:
+            return total
+    elif won == False:
+        total = await opportunity.get_total_opportunity_value(db, pipeline_stage_id=6)
+        if with_count:
+            count = await opportunity.get_opportunities(db, pipeline_stage_id=6)
+            return {"total":total, "count":count}
+        else:
+            return total
     else:
-        return await opportunity.get_total_opportunity_value(db)
+        total = await opportunity.get_total_opportunity_value(db)
+        if with_count:
+            count = await opportunity.get_opportunities(db, with_count=True)
+            return {"total":total, "count":count}
+        else:
+            return total
 
-async def get_opportunities_grouped(db, group_by="id"):
-    return await opportunity.get_opportunities_grouped(db, group_by)
+async def get_opportunities_grouped(db, group_by="id", count: bool = False):
+    return await opportunity.get_opportunities_grouped(db, group_by, count)

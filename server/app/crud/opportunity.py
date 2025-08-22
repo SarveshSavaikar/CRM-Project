@@ -1,3 +1,4 @@
+import json
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
@@ -128,15 +129,38 @@ async def get_total_opportunity_value(db: Database, **filters):
     query = select(func.sum(Opportunity.c.value))
     conditions = []
     for attr, value in filters.items():
+        if value is None:
+            continue
+        if attr == "min_value":
+            conditions.append(Opportunity.c.value >= value)
+        if attr == "max_value":
+            conditions.append(Opportunity.c.value <= value)
         if attr == "not_pipeline_stage_id":
-            for id in value:
-                conditions.append(Opportunity.c.pipeline_stage_id != id)
+            for pipeline_stage_id in value:
+                conditions.append(Opportunity.c.pipeline_stage_id != pipeline_stage_id)
+        if attr == "close_date__lt":
+            conditions.append(Opportunity.c.close_date <= value)
+        elif attr == "close_date__gt":
+            conditions.append(Opportunity.c.close_date >= value)
+        if attr == "created__lt":
+            print(value)
+            conditions.append(Opportunity.c.created_at <= value)
+        elif attr == "created__gt":
+            conditions.append(Opportunity.c.created_at >= value)
+            
+        elif hasattr(Opportunity.c, attr):
+            conditions.append(getattr(Opportunity.c, attr) == value)
+        
     if conditions:
         query = query.where(and_(*conditions))
     return await db.execute(query)
 
-async def get_opportunities_grouped(db: Database, group_by: str):
-    query = crud_utils.build_group_by_query(Opportunity, group_by)
+async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
+    query = crud_utils.build_group_by_query(Opportunity, group_by, count)
     
     rows = await db.fetch_all(query)
-    return {row[0]:row[1] for row in rows}
+    print(count)
+    if count:
+        return {row[0]:row[1] for row in rows}
+    else:
+        return {row[0]:json.loads(row[1]) for row in rows}

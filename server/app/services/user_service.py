@@ -1,7 +1,8 @@
+from collections import defaultdict
 from typing import Optional
 from fastapi import HTTPException
 from app.crud import user
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from databases import Database
 
 from app.schemas.lead import LeadUpdate
@@ -63,3 +64,29 @@ async def delete_user(db: Database, user_id: int):
     if not result:
         raise HTTPException(status_code=404, detail=f"User(id:{user_id}) not found. Failed to delete.")
     return result
+
+async def get_user_performance(db, order_by_lead: bool, id: int = None):
+    result = await user.get_user_performance(db, id)
+    result = [dict(row) for row in result]
+    users = defaultdict(lambda: {
+        "user": None,
+        "total_leads": 0,
+        "total_value": 0.0
+    })
+
+    for record in result:
+        if users[record["id"]]["user"] is None:
+            users[record["id"]]["user"] = UserResponse(**record)
+        
+        users[record["id"]]["total_leads"] += 1
+        users[record["id"]]["total_value"] += float(record["opp_value"])
+
+    users = dict(users)
+    users = list(users.values())
+
+    if order_by_lead:
+        users.sort(key=lambda u: u["total_leads"], reverse=True)
+    else:    
+        users.sort(key=lambda u: u["total_value"], reverse=True)
+    return users
+        

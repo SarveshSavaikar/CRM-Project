@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from datetime import date, datetime, time
 from databases import Database
 from datetime import date
-from . import lead_service, opportunity_service
+from . import lead_service, opportunity_service, user_service
 
 async def get_kpi_metrics(db: Database):
     lead_count = await lead_service.get_leads(db, count=True)
@@ -39,7 +39,11 @@ async def get_leads_by_source(db: Database):
     result["group_by"]="source"
     return result
 
-async def get_deals_by_stage(db: Database):
-    result = await opportunity_service.get_opportunities_grouped(db, group_by="stage")
+async def get_deals_by_stage(db: Database, count: bool):
+    result = await opportunity_service.get_opportunities_grouped(db, group_by="stage", count=count)
     result["group_by"]="stage"
     return result
+
+async def get_top_performers(db: Database, order_by_lead: bool):
+    user_performance = await user_service.get_user_performance(db, order_by_lead)
+    return user_performance

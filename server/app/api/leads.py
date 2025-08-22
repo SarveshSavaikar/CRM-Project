@@ -74,18 +74,3 @@ async def update_lead_stage(lead_id: int, update: LeadStageUpdate, db: Database 
     result = await lead_service.update_lead_stage(db, lead_id, update)
     return json.dumps({"lead_id": lead_id, "stage": result.pipeline_stage_id})
 
-@router.get("/count")
-async def get_leads(
-    source: str = None,
-    status: str = None, 
-    min_score: float = None, 
-    team_id: int = None, 
-    user_id: int = None,
-    team_name: str = None, 
-    user_name: str = None,
-    created: date = None, 
-    last_updated: date = None, 
-    before: bool = False, 
-    db: Database = Depends(get_db)
-):
-    return await lead_service.get_leads(db, source, status, min_score, team_id, user_id, team_name, user_name, created, last_updated, before, count=True)
