@@ -118,3 +118,14 @@ Interaction = Table(
     Column("lead_id", Integer, ForeignKey(Lead.c.id)),
     Column("customer_id", Integer, ForeignKey(Customer.c.id))
 )
+
+Conversation = Table(
+    "Conversation",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("channel", String(50), nullable=False),
+    Column("subject", String(255), nullable=True),
+    Column("created_at", DateTime, nullable=False),
+    Column("lead_id", Integer, ForeignKey(Lead.c.id)),
+    Column("customer_id", Integer, ForeignKey(Customer.c.id))
+)

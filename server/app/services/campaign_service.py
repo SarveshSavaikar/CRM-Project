@@ -21,7 +21,9 @@ async def get_campaigns(
     name: str,
     channel: str,
     start: date, 
-    end: date
+    end: date,
+    active_only: bool,
+    count: bool = False
 ):
     filters = {}
 
@@ -33,8 +35,9 @@ async def get_campaigns(
         filters["start"] = start
     if end is not None:
         filters["end"] = end
-
-    return await campaign.get_campaigns(db, **filters)
+    if active_only:
+        filters["active_only"] = active_only
+    return await campaign.get_campaigns(db, count, **filters)
 
 async def update_campaign(db: Database, campaign_id: str, campaignObj: CampaignUpdate):
     result = await campaign.get_campaign_by_id(db, campaign_id)
@@ -57,3 +60,9 @@ async def delete_campaign(db: Database, campaign_id: int):
     if not result:
         raise HTTPException(status_code=404, detail=f"Campaign(id:{campaign_id}) not found. Failed to delete.")
     return result
+
+async def get_lead_campaigns(db: Database):
+    return await campaign.get_lead_campaigns(db)
+
+async def get_lead_campaigns_count(db: Database):
+    return await campaign.get_lead_campaigns(db, count=True)
