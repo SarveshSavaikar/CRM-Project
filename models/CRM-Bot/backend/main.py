@@ -32,15 +32,6 @@ with open("badwords.json", "r") as f:
 # Multi-turn context memory (last 5 turns)
 conversation_history = deque(maxlen=5)
 
-# Response templates
-response_templates = [
-    "Thank you for reaching out! Your request is being processed, and we truly appreciate your patience.",
-    "We’re grateful for your query. Our team is already working on it for you!",
-    "Your request has been received successfully. We're thankful for your trust in us.",
-    "Thanks a lot! We’ve got your request, and it’s now in progress.",
-    "We appreciate your message. Rest assured, your request is being taken care of."
-]
-
 # Synonym dictionary
 synonyms = {
     "subscription": ["plan", "plans", "package", "membership"],
@@ -113,8 +104,8 @@ def respond(msg: Message):
         reply = faq[best_key]
         conversation_history.append(best_key)
     elif best_key and score >= 50:
-        # weak match → use partial FAQ or gratitude
-        reply = faq.get(best_key, random.choice(response_templates))
+        # weak match → return FAQ answer (no gratitude templates)
+        reply = faq.get(best_key, "Sorry, I don't have enough info on that.")
         conversation_history.append(best_key)
     else:
         # No strong match → try to infer from past context
