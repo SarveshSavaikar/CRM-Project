@@ -6,7 +6,7 @@ import { Card, Skeleton } from "antd";
 
 import { Text } from "@/components";
 
-type Type = "companies" | "contacts" | "deals";
+type Type = "lead" | "monthDeals" | "deals";
 
 type Props = {
   resource: Type;
@@ -57,6 +57,8 @@ export const DashboardTotalCountCard = ({
       color: primaryColor,
     },
   };
+
+  console.log("is leading? ->",isLoading)
 
   return (
     <Card
@@ -149,7 +151,7 @@ const variants: {
     data: { index: string; value: number }[];
   };
 } = {
-  companies: {
+  lead: {
     primaryColor: "#1677FF",
     secondaryColor: "#BAE0FF",
     icon: (
@@ -162,11 +164,11 @@ const variants: {
         />
       </IconWrapper>
     ),
-    title: "Number of companies",
+    title: "Number of Leads",
     data: [
       {
         index: "1",
-        value: 3500,
+        value: 100,
       },
       {
         index: "2",
@@ -186,7 +188,7 @@ const variants: {
       },
     ],
   },
-  contacts: {
+  monthDeals: {
     primaryColor: "#52C41A",
     secondaryColor: "#D9F7BE",
     icon: (

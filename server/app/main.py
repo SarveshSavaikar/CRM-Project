@@ -31,10 +31,15 @@ async def shutdown():
     await database.disconnect()
 
 app.add_middleware(JWTMiddleware)
-
+origins = [
+    "http://localhost:5173",   # Vite/React dev server
+    "http://localhost:3000",   # CRA/Next.js dev server (if used)
+    "http://127.0.0.1:5173",
+    # add your deployed frontend domain here later
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # frontend origin
+    allow_origins=origins,  # frontend origin
     allow_credentials=True,
     allow_methods=["*"],  # allow POST, GET, OPTIONS, etc.
     allow_headers=["*"],  # allow all headers (Authorization, Content-Type, etc.)

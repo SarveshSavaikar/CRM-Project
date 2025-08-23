@@ -42,3 +42,6 @@ async def update_opportunity(opportunity_id: int, opportunity: OpportunityUpdate
 async def delete_opportunity(opportunity_id: int, db: Database = Depends(get_db)):
     return await opportunity_service.delete_opportunity(db, opportunity_id)
 
+@router.get("/last-30-days")
+async def get_opportunities_last_30_days(db: Database = Depends(get_db)):
+    return await opportunity_service.fetch_opportunities_last_30_days(db)

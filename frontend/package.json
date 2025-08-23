@@ -52,6 +52,8 @@
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@refinedev/cli": "^2.16.47",
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^18.16.2",
     "@types/react": "^18.0.0",
     "@types/react-beautiful-dnd": "^13.1.8",

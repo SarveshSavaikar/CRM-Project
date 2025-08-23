@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app.database.models import Opportunity, PipelineStage
 from typing import Any
 from . import crud_utils
+from datetime import datetime, timedelta
 
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
@@ -164,3 +165,13 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
         return {row[0]:row[1] for row in rows}
     else:
         return {row[0]:json.loads(row[1]) for row in rows}
+    
+async def fetch_opportunities_last_30_days( db: Database):
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    query = select(Opportunity).where(Opportunity.c.created_at >= thirty_days_ago)
+    rows = await db.fetch_all(query)
+    # Convert Record -> dict
+    result = [dict(row._mapping) for row in rows]
+
+    return result 
+    

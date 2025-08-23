@@ -125,3 +125,6 @@ async def get_total_opportunity_value(db: Database, active_only:bool = False, wo
 
 async def get_opportunities_grouped(db, group_by="id", count: bool = False):
     return await opportunity.get_opportunities_grouped(db, group_by, count)
+
+async def fetch_opportunities_last_30_days( db: Database):
+    return await opportunity.fetch_opportunities_last_30_days(db)
