@@ -30,10 +30,11 @@ async def get_opportunities(
     pipeline_stage_id: int = None,
     before: bool = True,
     count: bool = False,
-    active_only: bool = False
+    active_only: bool = False,
+    is_closed: bool = False,
 ):
     filters = {}
-
+    print("Hello")
     if min_value is not None:
         filters["min_value"] = min_value
     if max_value is not None:
@@ -52,6 +53,8 @@ async def get_opportunities(
         filters["created__lt"] = datetime.combine(created, time.max)
     elif before is False and created is not None:
         filters["created__gt"] = datetime.combine(created, time.max)
+    elif is_closed:
+        filters["is_closed"] = True
 
     return await opportunity.get_opportunities(db, count, **filters)
 

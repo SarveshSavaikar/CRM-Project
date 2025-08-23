@@ -16,8 +16,23 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
+    if ( filters.get("is_closed")):
+        query = (
+            select(
+                Opportunity.c.id,
+                Opportunity.c.name,
+                Opportunity.c.value,
+                Opportunity.c.close_date,
+                Opportunity.c.created_at,
+                PipelineStage.c.id.label("stage_id"),
+                PipelineStage.c.stage.label("stage_name"),
+                PipelineStage.c.order.label("stage_order"),
+            )
+            .select_from(
+                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+            )
+        )
     conditions = []
-
     for attr, value in filters.items():
         if value is None:
             continue
@@ -37,17 +52,23 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
+        elif attr == "is_closed":
+            conditions.append(Opportunity.c.close_date.isnot(None))
+            # column = getattr(Opportunity.c,"")
             
         elif hasattr(Opportunity.c, attr):
             conditions.append(getattr(Opportunity.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
-        
+    
+    
+    
     if count:
         result = await db.execute(query)
         return result
     else:
+        
         rows = await db.fetch_all(query)
         return [dict(row) for row in rows]
     

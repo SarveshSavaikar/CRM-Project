@@ -29,7 +29,7 @@ PipelineStage = Table(
     "PipelineStage",
     metadata,
     Column("id", Integer, primary_key=True, index=True),
-    Column("name", String(50), nullable=False),
+    Column("stage", String(50), nullable=False),
     Column("order", Integer, nullable=False)
 )
 

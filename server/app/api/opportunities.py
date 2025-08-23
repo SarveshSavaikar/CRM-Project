@@ -20,9 +20,10 @@ async def get_opportunity(
     lead_id: int = None,
     pipeline_stage_id: int = None,
     before: bool = True,
+    all_closed: bool = False,
     db: Database = Depends(get_db)
 ):
-    return await opportunity_service.get_opportunities(db, close_date, created, min_value, max_value, lead_id, pipeline_stage_id, before)
+    return await opportunity_service.get_opportunities(db, close_date, created, min_value, max_value, lead_id, pipeline_stage_id, before , is_closed=all_closed)
 
 
 @router.get("/opportunity-{opportunity_id}", response_model=OpportunityResponse)

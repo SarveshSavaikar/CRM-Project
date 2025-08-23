@@ -24,12 +24,12 @@ export const DashboardPage = () => {
   //   meta: { gqlQuery: DASHBOARD_TOTAL_COUNTS_QUERY },
   // });
   const { data: leadsCount, isLoading: isLeadLoading } = useCustom<{ count: number}>({
-    url: "/leads/count",
+    url: "/leads/",
     method: "get",
     queryOptions: {
     select: (response) => ({
       ...response,
-      data: { count: response.data as unknown as number }, // wrap the number
+      data: { count: (response.data as unknown as any[]).length }, // wrap the number
     }),
   },
   });
