@@ -13,7 +13,23 @@ from datetime import datetime, timedelta
 prefix_columns = crud_utils.prefix_columns
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
-    query = select(Opportunity).where(Opportunity.c.id == opportunity_id)
+    query = select(
+        Opportunity.c.id,
+        Opportunity.c.name,
+        Opportunity.c.value,
+        Opportunity.c.close_date,
+        Opportunity.c.created_at,
+        Opportunity.c.lead_id,
+        Lead.c.name.label("lead_name"),
+        PipelineStage.c.id.label("stage_id"),
+        PipelineStage.c.stage.label("stage_name"),
+        PipelineStage.c.order.label("stage_order"),
+    ).select_from(
+        Opportunity
+        .join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+        .join(Lead, Opportunity.c.lead_id == Lead.c.id, isouter=True)
+    )
+    
     return await db.fetch_one(query)
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
