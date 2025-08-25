@@ -39,6 +39,11 @@ synonyms = {
     "support": ["help", "assistance", "service"],
     "cancel": ["terminate", "stop", "end"],
     "billing": ["invoice", "payment"],
+    "change": ["switch", "modify", "update"],
+    "language": ["lang", "locale", "idiom"],
+    "timezone": ["time zone", "tz", "clock settings"],
+    "deactivate": ["disable", "pause", "suspend"],
+    "invoice": ["bill", "receipt", "statement"]
 }
 
 # Stopwords
@@ -80,7 +85,7 @@ def contains_badword(message: str, badwords: list) -> bool:
             # exact match
             if word == bad:
                 return True
-            # fuzzy match with higher threshold (to catch "BiTcH", "shitttt")
+            # fuzzy match with higher threshold (to catch "shitttt")
             if fuzz.ratio(word, bad) > 80:
                 return True
     return False
