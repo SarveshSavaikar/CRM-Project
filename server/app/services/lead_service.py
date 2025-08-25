@@ -134,3 +134,9 @@ async def update_lead_stage(db: Database, lead_id: int, update: LeadStageUpdate)
     
 async def get_leads_grouped(db, group_by="id"):
     return await lead.get_leads_grouped(db, group_by)
+
+async def associate_lead_with_campaign(db: Database, lead_id: int, campaign_id: int):
+    return await lead.associate_lead_with_campaign(db, lead_id, campaign_id)
+
+async def get_lead_campaign(db: Database, lead_id: int):
+    return await lead.get_lead_campaign(db, lead_id)
