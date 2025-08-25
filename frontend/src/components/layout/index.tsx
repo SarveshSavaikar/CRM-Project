@@ -1,6 +1,6 @@
 import React from "react";
-
-import { ThemedLayoutV2 } from "@refinedev/antd";
+// Import ThemedSiderV2 directly from the library
+import { ThemedLayoutV2, ThemedSiderV2 } from "@refinedev/antd";
 
 import { Header } from "./header";
 
@@ -9,7 +9,8 @@ export const Layout = ({ children }: React.PropsWithChildren) => {
     <>
       <ThemedLayoutV2
         Header={Header}
-        // This change removes the logo and text from the sidebar.
+        // Use the imported ThemedSiderV2 component
+        Sider={() => <ThemedSiderV2 fixed />}
         Title={() => null}
       >
         {children}
