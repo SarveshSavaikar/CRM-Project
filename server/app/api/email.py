@@ -35,24 +35,23 @@ def get_new_emails():
 @router.post("/send")
 async def send_email(email: EmailRequest):
     try:
-        # Prepare email
-        msg = MIMEText( email.message)
-        msg["From"] = settings.email_user
-        msg["To"] = email.to
-        msg["Subject"] = email.subject
+        # Loop through recipients
+        for recipient in email.to:
+            msg = MIMEText(email.message)
+            msg["From"] = settings.email_user
+            msg["To"] = recipient
+            msg["Subject"] = email.subject
 
-        # Send email
-        await aiosmtplib.send(
-            msg,
-            # hostname=settings.email_host,
-            hostname=settings.email_smtp_host,
-            # port=int(os.getenv("SMTP_PORT", 587)),
-            port = 587,
-            start_tls=True,
-            username=settings.email_user,
-            password=settings.email_pass,
-        )
+            await aiosmtplib.send(
+                msg,
+                hostname=settings.email_smtp_host,
+                port=587,
+                start_tls=True,
+                username=settings.email_user,
+                password=settings.email_pass,
+            )
 
-        return {"status": "success", "message": f"Email sent to {email.to}"}
+        return {"status": "success", "message": f"Emails sent to {', '.join(email.to)}"}
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "error", "message": str(e)}

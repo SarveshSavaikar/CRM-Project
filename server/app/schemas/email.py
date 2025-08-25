@@ -12,6 +12,6 @@ class Email(BaseModel):
     date: str
 
 class EmailRequest(BaseModel):
-    to: EmailStr  # only one recipient per request
+    to: List[str]      # multiple recipients
     subject: str
     message: str
