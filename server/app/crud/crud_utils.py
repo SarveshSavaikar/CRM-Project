@@ -17,6 +17,14 @@ GROUP_BY_MAP_COUNT = {
         "lead": (
             Lead.c.name,
             Opportunity.join(Lead, Opportunity.c.lead_id == Lead.c.id)
+        ),
+        "month": (
+            [
+                (month_expr := func.date_trunc("month", Opportunity.c.created_at)).label("month"),
+                func.count(Opportunity.c.id).label("count")
+            ],
+            Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
+            month_expr
         )
     },
     Lead:{

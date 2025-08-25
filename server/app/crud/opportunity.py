@@ -33,7 +33,6 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
         elif attr == "close_date__gt":
             conditions.append(Opportunity.c.close_date >= value)
         if attr == "created__lt":
-            print(value)
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
@@ -145,7 +144,6 @@ async def get_total_opportunity_value(db: Database, **filters):
         elif attr == "close_date__gt":
             conditions.append(Opportunity.c.close_date >= value)
         if attr == "created__lt":
-            print(value)
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
@@ -161,7 +159,6 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
     query = crud_utils.build_group_by_query(Opportunity, group_by, count)
     
     rows = await db.fetch_all(query)
-    print(count)
     if count:
         return {row[0]:row[1] for row in rows}
     else:
@@ -170,13 +167,16 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
 async def get_opportunities_by_month_all(db: Database, count: bool):
     query = crud_utils.build_group_by_query(Opportunity, "month", count)
     query = query.where(func.extract("year", Opportunity.c.created_at) == datetime.now().year)
+    
     result = await db.fetch_all(query)
     
     result = [dict(row) for row in result]
+  
     for d in result:
         d["int_month"] = d["month"].month
         d["month"] = calendar.month_name[d["month"].month]
-        d["deals"] = json.loads(d["deals"])
+        if not count:
+            d["deals"] = json.loads(d["deals"])
     return result
     
 async def get_opportunities_by_month(db: Database, month: int, count: bool):
@@ -199,7 +199,6 @@ async def get_opportunities_by_stage_all(db: Database, count: bool):
     result = await db.fetch_all(query)
     
     result = [dict(row) for row in result]
-    print(result)
     for d in result:
         d["deals"] = json.loads(d["deals"])
         d["int_stage"] = d["deals"][0]["pipeline_stage_id"] if d["deals"] else None
