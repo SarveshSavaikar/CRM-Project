@@ -33,7 +33,6 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
         elif attr == "close_date__gt":
             conditions.append(Opportunity.c.close_date >= value)
         if attr == "created__lt":
-            print(value)
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
@@ -145,7 +144,6 @@ async def get_total_opportunity_value(db: Database, **filters):
         elif attr == "close_date__gt":
             conditions.append(Opportunity.c.close_date >= value)
         if attr == "created__lt":
-            print(value)
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
@@ -161,22 +159,16 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
     query = crud_utils.build_group_by_query(Opportunity, group_by, count)
     
     rows = await db.fetch_all(query)
-    print(count)
     if count:
-        return {row[0]:row[1] for row in rows}
+        rows = {f"{row[0]}":row[1] for row in rows}
     else:
-        return {row[0]:json.loads(row[1]) for row in rows}
-    
-async def get_opportunities_by_month_all(db: Database, count: bool):
-    query = crud_utils.build_group_by_query(Opportunity, "month", count)
-    query = query.where(func.extract("year", Opportunity.c.created_at) == datetime.now().year)
-    result = await db.fetch_all(query)
-    
-    result = [dict(row) for row in result]
-    for d in result:
-        d["int_month"] = d["month"].month
-        d["month"] = calendar.month_name[d["month"].month]
-        d["deals"] = json.loads(d["deals"])
+        rows = {f"{row[0]}":json.loads(row[1]) for row in rows}
+    print(rows)
+    if group_by == "month":
+        result = {}
+        for key, value in rows.items():
+            month = calendar.month_name[datetime.fromisoformat(key).month]
+            result[month] = value
     return result
     
 async def get_opportunities_by_month(db: Database, month: int, count: bool):
@@ -192,5 +184,3 @@ async def get_opportunities_by_month(db: Database, month: int, count: bool):
     
     rows = await db.fetch_all(query)
     return [dict(row) for row in rows]
-    
-    
