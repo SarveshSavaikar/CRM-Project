@@ -129,3 +129,13 @@ Conversation = Table(
     Column("lead_id", Integer, ForeignKey(Lead.c.id)),
     Column("customer_id", Integer, ForeignKey(Customer.c.id))
 )
+
+Product = Table(
+    "Product",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name", String(100), nullable=False),
+    Column("description", String, nullable=True),
+    Column("base_price", Float, nullable=False),
+    Column("currency", Integer, nullable=False, default="INR")
+)

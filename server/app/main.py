@@ -4,7 +4,7 @@
 # import json
 from fastapi import FastAPI , File, UploadFile# type: ignore
 
-from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics
+from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics, products
 
 from app.api import test_db
 from app.database.connection import database
@@ -59,6 +59,7 @@ app.include_router(tasks.router)
 app.include_router(customers.router)
 app.include_router(opportunities.router)
 app.include_router(interactions.router)
+app.include_router(products.router)
 
 app.include_router(email.router)
 app.include_router(linkedin.router)
