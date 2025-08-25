@@ -30,10 +30,11 @@ async def get_opportunities(
     pipeline_stage_id: int = None,
     before: bool = True,
     count: bool = False,
-    active_only: bool = False
+    active_only: bool = False,
+    is_closed: bool = False,
 ):
     filters = {}
-
+    print("Hello")
     if min_value is not None:
         filters["min_value"] = min_value
     if max_value is not None:
@@ -52,6 +53,8 @@ async def get_opportunities(
         filters["created__lt"] = datetime.combine(created, time.max)
     elif before is False and created is not None:
         filters["created__gt"] = datetime.combine(created, time.max)
+    elif is_closed:
+        filters["is_closed"] = True
 
     return await opportunity.get_opportunities(db, count, **filters)
 
@@ -124,6 +127,10 @@ async def get_total_opportunity_value(db: Database, active_only:bool = False, wo
         else:
             return total
 
+
+async def fetch_opportunities_last_30_days( db: Database):
+    return await opportunity.fetch_opportunities_last_30_days(db)
+
 async def get_opportunities_grouped(db: Database, group_by="id", count: bool = False):
     return await opportunity.get_opportunities_grouped(db, group_by, count)
 
@@ -139,8 +146,8 @@ async def get_deals_by_month(db: Database, month: int = None, count: bool = Fals
         result = await opportunity.get_opportunities_grouped(db, "month", count)
         return result
 
+
 async def get_deals_by_stage(db: Database, count: bool = False):
     result = await opportunity.get_opportunities_grouped(db, "stage", count)
     return result
 
-    

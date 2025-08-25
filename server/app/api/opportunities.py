@@ -20,9 +20,10 @@ async def get_opportunity(
     lead_id: int = None,
     pipeline_stage_id: int = None,
     before: bool = True,
+    all_closed: bool = False,
     db: Database = Depends(get_db)
 ):
-    return await opportunity_service.get_opportunities(db, close_date, created, min_value, max_value, lead_id, pipeline_stage_id, before)
+    return await opportunity_service.get_opportunities(db, close_date, created, min_value, max_value, lead_id, pipeline_stage_id, before , is_closed=all_closed)
 
 
 @router.get("/opportunity-{opportunity_id}", response_model=OpportunityResponse)
@@ -42,6 +43,11 @@ async def update_opportunity(opportunity_id: int, opportunity: OpportunityUpdate
 async def delete_opportunity(opportunity_id: int, db: Database = Depends(get_db)):
     return await opportunity_service.delete_opportunity(db, opportunity_id)
 
+
+@router.get("/last-30-days")
+async def get_opportunities_last_30_days(db: Database = Depends(get_db)):
+    return await opportunity_service.fetch_opportunities_last_30_days(db)
+
 @router.get("/by-month")
 async def get_deals_by_month_all(count: bool = False, db: Database = Depends(get_db)):
     return await opportunity_service.get_deals_by_month(db, count=count)
@@ -50,6 +56,8 @@ async def get_deals_by_month_all(count: bool = False, db: Database = Depends(get
 async def get_deals_by_month(month: int = datetime.now().month, count: bool = False, db: Database = Depends(get_db)):
     return await opportunity_service.get_deals_by_month(db, month, count)
 
+
 @router.get("/by-stage")
 async def get_deals_by_stage_all(count: bool = False, db: Database = Depends(get_db)):
     return await opportunity_service.get_deals_by_stage(db, count)
+

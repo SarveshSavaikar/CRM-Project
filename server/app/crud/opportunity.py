@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app.database.models import Opportunity, PipelineStage
 from typing import Any
 from . import crud_utils
+from datetime import datetime, timedelta
 
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
@@ -16,8 +17,23 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
+    if ( filters.get("is_closed")):
+        query = (
+            select(
+                Opportunity.c.id,
+                Opportunity.c.name,
+                Opportunity.c.value,
+                Opportunity.c.close_date,
+                Opportunity.c.created_at,
+                PipelineStage.c.id.label("stage_id"),
+                PipelineStage.c.stage.label("stage_name"),
+                PipelineStage.c.order.label("stage_order"),
+            )
+            .select_from(
+                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+            )
+        )
     conditions = []
-
     for attr, value in filters.items():
         if value is None:
             continue
@@ -36,17 +52,23 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             conditions.append(Opportunity.c.created_at <= value)
         elif attr == "created__gt":
             conditions.append(Opportunity.c.created_at >= value)
+        elif attr == "is_closed":
+            conditions.append(Opportunity.c.close_date.isnot(None))
+            # column = getattr(Opportunity.c,"")
             
         elif hasattr(Opportunity.c, attr):
             conditions.append(getattr(Opportunity.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
-        
+    
+    
+    
     if count:
         result = await db.execute(query)
         return result
     else:
+        
         rows = await db.fetch_all(query)
         return [dict(row) for row in rows]
     
@@ -162,13 +184,25 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
     if count:
         rows = {f"{row[0]}":row[1] for row in rows}
     else:
-        rows = {f"{row[0]}":json.loads(row[1]) for row in rows}
-    print(rows)
-    if group_by == "month":
-        result = {}
-        for key, value in rows.items():
-            month = calendar.month_name[datetime.fromisoformat(key).month]
-            result[month] = value
+        return {row[0]:json.loads(row[1]) for row in rows}
+    
+
+async def fetch_opportunities_last_30_days( db: Database):
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    query = select(Opportunity).where(Opportunity.c.created_at >= thirty_days_ago)
+    rows = await db.fetch_all(query)
+    # Convert Record -> dict
+    result = [dict(row._mapping) for row in rows]
+
+    return result 
+    
+async def get_opportunities_by_month_all(db: Database, count: bool):
+    query = crud_utils.build_group_by_query(Opportunity, "month", count)
+    query = query.where(func.extract("year", Opportunity.c.created_at) == datetime.now().year)
+    result = await db.fetch_all(query)
+    
+    result = [dict(row) for row in result]
+
     return result
     
 async def get_opportunities_by_month(db: Database, month: int, count: bool):
@@ -184,3 +218,7 @@ async def get_opportunities_by_month(db: Database, month: int, count: bool):
     
     rows = await db.fetch_all(query)
     return [dict(row) for row in rows]
+    
+    
+
+

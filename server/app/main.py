@@ -9,6 +9,7 @@ from app.api import users, leads, auth, teams, campaigns, tasks, admin, customer
 from app.api import test_db
 from app.database.connection import database
 from app.middlewares.jwt_middleware import JWTMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import os
 from app.s3_bucket.s3_utlities import upload_file_to_s3
@@ -30,6 +31,19 @@ async def shutdown():
     await database.disconnect()
 
 app.add_middleware(JWTMiddleware)
+origins = [
+    "http://localhost:5173",   # Vite/React dev server
+    "http://localhost:3000",   # CRA/Next.js dev server (if used)
+    "http://127.0.0.1:5173",
+    # add your deployed frontend domain here later
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],  # allow POST, GET, OPTIONS, etc.
+    allow_headers=["*"],  # allow all headers (Authorization, Content-Type, etc.)
+)
 
 @app.get("/")
 async def root():

@@ -11,7 +11,7 @@ import { App as AntdApp, ConfigProvider } from "antd";
 
 import { Layout } from "@/components";
 import { resources } from "@/config/resources";
-import { authProvider, dataProvider, liveProvider } from "@/providers";
+import { authProvider, mydataProvider } from "@/providers";
 
 import {
   CompanyCreatePage,
@@ -44,8 +44,8 @@ const App = () => {
 
           <Refine
             routerProvider={routerProvider}
-            dataProvider={dataProvider}
-            liveProvider={liveProvider}
+            dataProvider={mydataProvider}
+            // liveProvider={liveProvider}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
             resources={resources}
