@@ -1,3 +1,4 @@
+import calendar
 from datetime import datetime
 import json
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
@@ -172,6 +173,10 @@ async def get_opportunities_by_month_all(db: Database, count: bool):
     result = await db.fetch_all(query)
     
     result = [dict(row) for row in result]
+    for d in result:
+        d["int_month"] = d["month"].month
+        d["month"] = calendar.month_name[d["month"].month]
+        d["deals"] = json.loads(d["deals"])
     return result
     
 async def get_opportunities_by_month(db: Database, month: int, count: bool):
