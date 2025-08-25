@@ -1,5 +1,8 @@
+import csv
+import io
 from fastapi import APIRouter, Depends
 from databases import Database
+from fastapi.responses import StreamingResponse
 from app.database.connection import get_db
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate, OpportunityResponse
 from app.services import opportunity_service
@@ -60,4 +63,32 @@ async def get_deals_by_month(month: int = datetime.now().month, count: bool = Fa
 @router.get("/by-stage")
 async def get_deals_by_stage_all(count: bool = False, db: Database = Depends(get_db)):
     return await opportunity_service.get_deals_by_stage(db, count)
+
+
+@router.get("/export/csv")
+async def export_opportunities_to_csv(db: Database = Depends(get_db)):
+    opportunities = await opportunity_service.get_opportunities(db)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    headers = [
+        "id", "name", "value", "close_date", "created_at",
+        "lead_id", "pipeline_stage_id", "pipeline_stage"
+    ]
+    writer.writerow(headers)
+
+    for opportunity in opportunities:
+        writer.writerow([
+            opportunity["id"], opportunity["name"], float(opportunity["value"]), opportunity["close_date"],
+            opportunity["created_at"],
+            opportunity["lead_id"], opportunity["pipeline_stage_id"], opportunity["pipeline_stage"]
+        ])
+
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=opportunities_export.csv"}
+    )
 

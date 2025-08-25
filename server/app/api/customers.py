@@ -1,6 +1,9 @@
+import csv
+import io
 from fastapi import APIRouter, Depends
 # from sqlalchemy.orm import Session
 from databases import Database
+from fastapi.responses import StreamingResponse
 from app.database.connection import get_db
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse
 from app.services import customer_service
@@ -39,3 +42,29 @@ async def update_customer(customer_id: int, customer: CustomerUpdate, db: Databa
 async def delete_customer(customer_id: int, db: Database = Depends(get_db)):
     return await customer_service.delete_customer(db, customer_id)
 
+@router.get("/export/csv")
+async def export_customers_to_csv(db: Database = Depends(get_db)):
+    customers = await customer_service.get_customers(db)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    headers = [
+        "id", "name", "email", "phone", "industry", "description", "lead_id",
+        "created_at", "updated_at"
+    ]
+    writer.writerow(headers)
+
+    for customer in customers:
+        writer.writerow([
+            customer["id"], customer["name"], customer["email"], customer["phone"],
+            customer["industry"], customer["description"], customer["lead_id"],
+            customer["created_at"], customer["updated_at"]
+        ])
+
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=customers_export.csv"}
+    )

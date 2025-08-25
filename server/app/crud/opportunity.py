@@ -10,12 +10,14 @@ from typing import Any
 from . import crud_utils
 from datetime import datetime, timedelta
 
+prefix_columns = crud_utils.prefix_columns
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
     query = select(Opportunity).where(Opportunity.c.id == opportunity_id)
     return await db.fetch_one(query)
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+
     query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
     if ( filters.get("is_closed")):
         query = (
@@ -32,6 +34,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             .select_from(
                 Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
             )
+
         )
     conditions = []
     for attr, value in filters.items():

@@ -27,6 +27,7 @@ class OpportunityUpdate(BaseModel):
 class OpportunityResponse(OpportunityBase):
     id: int
     created_at: datetime
+    pipeline_stage: Optional[str] = None
     class Config:
         from_attributes = True
 
