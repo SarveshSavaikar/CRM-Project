@@ -6,7 +6,7 @@ class OpportunityBase(BaseModel):
     name: str = Field(..., max_length=255)
     value: float = Field(default=0.0)
     lead_id: Optional[int] = None
-    pipeline_stage_id: Optional[int] = None
+    stage_id: Optional[int] = None
     close_date: Optional[datetime] = None
 
 
@@ -26,8 +26,10 @@ class OpportunityUpdate(BaseModel):
 
 class OpportunityResponse(OpportunityBase):
     id: int
+    lead_name: Optional[str] = None
     created_at: datetime
-    pipeline_stage: Optional[str] = None
+    stage_name: Optional[str] = None
+    stage_order: Optional[int] = None
     class Config:
         from_attributes = True
 
