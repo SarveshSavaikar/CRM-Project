@@ -17,6 +17,14 @@ GROUP_BY_MAP_COUNT = {
         "lead": (
             Lead.c.name,
             Opportunity.join(Lead, Opportunity.c.lead_id == Lead.c.id)
+        ),
+        "month": (
+            [
+                (month_expr := func.date_trunc("month", Opportunity.c.created_at)).label("month"),
+                func.count(Opportunity.c.id).label("count")
+            ],
+            Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
+            month_expr
         )
     },
     Lead:{
@@ -42,7 +50,7 @@ GROUP_BY_MAP = {
                         literal_column("'lead_id'"), Opportunity.c.lead_id,
                         literal_column("'pipeline_stage_id'"), Opportunity.c.pipeline_stage_id,
                     )
-                ).label("records")],
+                ).label("deals")],
             Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
             PipelineStage.c.stage
         ),
@@ -52,7 +60,7 @@ GROUP_BY_MAP = {
         ),
         "month": (
             [
-                (month_expr := func.date_trunc("month", Opportunity.c.created_at)),
+                (month_expr := func.date_trunc("month", Opportunity.c.created_at)).label("month"),
                 func.jsonb_agg(
                     func.jsonb_build_object(
                         literal_column("'id'"), Opportunity.c.id,
@@ -63,7 +71,7 @@ GROUP_BY_MAP = {
                         literal_column("'lead_id'"), Opportunity.c.lead_id,
                         literal_column("'pipeline_stage'"), PipelineStage.c.stage,
                     )
-                ).label("records")
+                ).label("deals")
             ],
             Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
             month_expr
