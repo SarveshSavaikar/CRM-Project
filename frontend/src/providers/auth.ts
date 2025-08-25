@@ -29,13 +29,12 @@ export const authProvider: AuthBindings = {
   },
 
   // 🔹 SIGNUP (connects to your FastAPI /auth/signup endpoint)
-  register: async ({ email, password , role }) => {
+  register: async ({ email, password, role }) => {
     try {
       const res = await axios.post("http://localhost:8000/auth/signup", {
         email: email,
         password: password,
         role: role,
-
       });
 
       const { access_token } = res.data;
@@ -102,7 +101,7 @@ export const authProvider: AuthBindings = {
       return null;
     }
   },
-   onError: async (error) => {
+  onError: async (error) => {
     console.error("Auth error:", error);
 
     if (error?.status === 401) {

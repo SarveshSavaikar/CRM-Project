@@ -18,8 +18,11 @@ def get_new_emails():
     emails = []
 
     with MailBox(settings.email_imap_host).login(settings.email_user, settings.email_pass) as mailbox:
-        # Fetch *unread emails only*
-        for msg in mailbox.fetch('(UNSEEN)'):
+        # Fetch ALL mails and take only the latest 5
+        all_mails = list(mailbox.fetch('(ALL)', reverse=True))  # reverse=True = newest first
+        last_5 = all_mails[:5]  # pick top 5
+        
+        for msg in last_5:
             emails.append(Email(
                 sender=msg.from_,
                 subject=msg.subject,
@@ -27,6 +30,7 @@ def get_new_emails():
                 date=msg.date.strftime("%Y-%m-%d %H:%M:%S")
             ))
     return emails
+
 
 @router.post("/send")
 async def send_email(email: EmailRequest):

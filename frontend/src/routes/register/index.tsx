@@ -26,7 +26,7 @@ export const RegisterPage = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "110vh",
         backgroundColor: "#f0f2f5",
       }}
     >
@@ -40,6 +40,18 @@ export const RegisterPage = () => {
           onFinish={onFinish}
           initialValues={{ remember: true }}
         >
+          {/* Name field */}
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              { required: true, message: "Please input your Name!" },
+              { type: "email", message: "The input is not a valid Name!" },
+            ]}
+          >
+            <Input size="large" />
+          </Form.Item>
+
           {/* Email field */}
           <Form.Item
             label="Email"
@@ -84,16 +96,20 @@ export const RegisterPage = () => {
           <Form.Item
             label="Confirm Password"
             name="confirm-password"
-            dependencies={['password']}
+            dependencies={["password"]}
             hasFeedback
             rules={[
               { required: true, message: "Please confirm your Password!" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
+                  if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error("The two passwords that you entered do not match!"));
+                  return Promise.reject(
+                    new Error(
+                      "The two passwords that you entered do not match!",
+                    ),
+                  );
                 },
               }),
             ]}
