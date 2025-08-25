@@ -6,8 +6,9 @@ from databases import Database
 from fastapi.responses import StreamingResponse
 from app.database.connection import get_db
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse
-from app.services import customer_service
+from app.services import customer_service, lead_service
 from datetime import date , datetime
+from app.schemas.lead import LeadUpdate
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
@@ -68,3 +69,7 @@ async def export_customers_to_csv(db: Database = Depends(get_db)):
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=customers_export.csv"}
     )
+    
+@router.post("/create-customer-from-lead/{lead_id}")
+async def create_customer_from_lead(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.update_lead(db, lead_id, LeadUpdate(status="In Progress"), from_customer_endpoint=True)

@@ -20,7 +20,7 @@ class LeadCreate(LeadBase):
 class LeadUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = None  # Or str if needed
-    status: Optional[str] = Field(None, max_length=10)
+    status: Optional[str] = Field(None, max_length=20)
     email: Optional[str] = None
     phone: Optional[str] = Field(None, max_length=20)
     score: Optional[int] = None
