@@ -107,6 +107,6 @@ async def create_customer_from_lead(lead_id: int, db: Database = Depends(get_db)
 async def associate_lead_with_campaign(lead_id: int, campaign_id: int, db: Database = Depends(get_db)):
     return await lead_service.associate_lead_with_campaign(db, lead_id, campaign_id)
 
-@router.get("/{lead_id}/campaign", response_model=LeadCampaignResponse)
+@router.get("/{lead_id}/campaigns", response_model=LeadCampaignResponse)
 async def get_lead_campaign(lead_id: int, db: Database = Depends(get_db)):
     return await lead_service.get_lead_campaign(db, lead_id)
