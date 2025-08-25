@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 # from sqlalchemy.orm import Session
 from databases import Database
 from app.database.connection import get_db
-from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate, LeadResponse
+from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate, LeadResponse, LeadCampaignResponse
 from app.services import lead_service
 from datetime import date
 import csv
@@ -102,3 +102,11 @@ async def export_leads_to_csv(db: Database = Depends(get_db)):
 @router.post("/create-customer-from-lead/{lead_id}")
 async def create_customer_from_lead(lead_id: int, db: Database = Depends(get_db)):
     return await lead_service.update_lead(db, lead_id, LeadUpdate(status="In Progress"))
+
+@router.post("/{lead_id}/campaign/{campaign_id}", response_model=LeadCampaignResponse)
+async def associate_lead_with_campaign(lead_id: int, campaign_id: int, db: Database = Depends(get_db)):
+    return await lead_service.associate_lead_with_campaign(db, lead_id, campaign_id)
+
+@router.get("/{lead_id}/campaigns", response_model=LeadCampaignResponse)
+async def get_lead_campaign(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.get_lead_campaign(db, lead_id)

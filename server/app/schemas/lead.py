@@ -47,3 +47,12 @@ class LeadInDB(LeadBase):
 class LeadStageUpdate(BaseModel):
     pipeline_stage_id: int = Field(...)
         
+class LeadCampaignResponse(BaseModel):
+    lead_id: int
+    lead_name: str
+    campaign_id: int
+    campaign_name: str
+    campaign_start_date: Optional[datetime] = None
+    campaign_end_date: Optional[datetime] = None
+    class Config:
+        from_attributes = True
