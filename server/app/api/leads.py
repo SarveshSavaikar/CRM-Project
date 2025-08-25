@@ -98,3 +98,7 @@ async def export_leads_to_csv(db: Database = Depends(get_db)):
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=leads_export.csv"}
     )
+    
+@router.post("/create-customer-from-lead/{lead_id}")
+async def create_customer_from_lead(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.update_lead(db, lead_id, LeadUpdate(status="In Progress"))

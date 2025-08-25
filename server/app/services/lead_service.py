@@ -70,7 +70,6 @@ async def create_lead(db: Database, leadObj: LeadCreate):
 async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
     status_values = ["Open", "Unassigned", "In Progress", "Converted", "Lost"]
     if leadObj.status is not None:
-        leadObj.status = leadObj.status.lower()
         if leadObj.status not in status_values:
             raise HTTPException(status_code=400, detail="Invalid status field value")
         
@@ -96,12 +95,13 @@ async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = N
         result = await lead.update_lead(db, lead_id, update_data)
         if not result:
             raise HTTPException(status_code=404, detail=f"Lead(id:{lead_id}) not found. Failes to update.")
-    if leadObj.status == "active":
+    if leadObj.status == "In Progress":
         lead_in_db = await get_lead(db, lead_id)
         lead_in_db = dict(lead_in_db)
         lead_in_db["lead_id"] = lead_in_db["id"]
         customer = await customer_service.create_customer(db, CustomerCreate(**lead_in_db))
-        print(dict(customer))
+        if filters.get("from_customer_endpoint", False):
+            return dict(customer)
     return result
     
 async def delete_lead(db: Database, lead_id: int):
