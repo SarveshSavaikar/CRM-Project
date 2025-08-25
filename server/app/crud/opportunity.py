@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
@@ -164,3 +165,27 @@ async def get_opportunities_grouped(db: Database, group_by: str, count: bool):
         return {row[0]:row[1] for row in rows}
     else:
         return {row[0]:json.loads(row[1]) for row in rows}
+    
+async def get_opportunities_by_month_all(db: Database, count: bool):
+    query = crud_utils.build_group_by_query(Opportunity, "month", count)
+    query = query.where(func.extract("year", Opportunity.c.created_at) == datetime.now().year)
+    result = await db.fetch_all(query)
+    
+    result = [dict(row) for row in result]
+    return result
+    
+async def get_opportunities_by_month(db: Database, month: int, count: bool):
+    query = select(func.count(Opportunity.c.id)) if count else select(Opportunity)
+    
+    query = query.where(and_(
+        func.extract("month", Opportunity.c.created_at) == month,
+        func.extract("year", Opportunity.c.created_at) == datetime.now().year
+    ))
+    
+    if count:
+        return await db.execute(query)
+    
+    rows = await db.fetch_all(query)
+    return [dict(row) for row in rows]
+    
+    

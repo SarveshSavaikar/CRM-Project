@@ -9,6 +9,7 @@ from datetime import date
 from app.schemas.task import TaskUpdate
 from . import task_service
 from asyncpg.exceptions import UniqueViolationError
+from calendar import month_name
 
 async def get_opportunity(db: Database, opportunity_id: int):
     result = await opportunity.get_opportunity_by_id(db, opportunity_id)
@@ -123,5 +124,18 @@ async def get_total_opportunity_value(db: Database, active_only:bool = False, wo
         else:
             return total
 
-async def get_opportunities_grouped(db, group_by="id", count: bool = False):
+async def get_opportunities_grouped(db: Database, group_by="id", count: bool = False):
     return await opportunity.get_opportunities_grouped(db, group_by, count)
+
+async def get_deals_by_month(db: Database, month: int = None, count: bool = False):
+    if month:
+        result = await opportunity.get_opportunities_by_month(db, month, count)
+        mstr = month_name[month]
+        if count:
+            return result
+        else:
+            return {"month":mstr, "int_month":month, "deals": result}
+    else:
+        result = await opportunity.get_opportunities_by_month_all(db, count)
+        return result
+    
