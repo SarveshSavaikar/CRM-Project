@@ -95,7 +95,7 @@ export const DashboardPage = () => {
           <InboxPreview />
         </Col>
         <Col xs={24} sm={24} xl={16} style={{ height: "460px" }}>
-          {/* <DashboardDealsChart /> */}
+          <DashboardDealsChart />
         </Col>
       </Row>
 
