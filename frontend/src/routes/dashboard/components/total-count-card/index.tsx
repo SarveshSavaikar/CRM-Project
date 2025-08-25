@@ -4,7 +4,8 @@ import { Area, type AreaConfig } from "@ant-design/plots";
 import { Card, Skeleton } from "antd";
 import { Text } from "@/components";
 
-type Type = "companies" | "contacts" | "deals" | "conversionRate";
+
+type Type = "lead" | "monthDeals" | "deals"| "conversionRate";
 
 type Props = {
   resource: Type;
@@ -56,7 +57,11 @@ export const DashboardTotalCountCard = ({
     },
   };
 
+
   const displayValue = resource === "conversionRate" ? "95%" : totalCount;
+
+  console.log("is leading? ->",isLoading)
+
 
   return (
     <Card
@@ -150,7 +155,7 @@ const variants: {
     data: { index: string; value: number }[];
   };
 } = {
-  companies: {
+  lead: {
     primaryColor: "#1677FF",
     secondaryColor: "#BAE0FF",
     icon: (
@@ -163,16 +168,18 @@ const variants: {
         />
       </IconWrapper>
     ),
-    title: "Number of customers",
+
+    title: "Number of Leads",
     data: [
       { index: "1", value: 3500 },
       { index: "2", value: 2750 },
       { index: "3", value: 5000 },
       { index: "4", value: 4250 },
       { index: "5", value: 5000 },
+
     ],
   },
-  contacts: {
+  monthDeals: {
     primaryColor: "#52C41A",
     secondaryColor: "#D9F7BE",
     icon: (

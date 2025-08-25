@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { DndContext, useSensors, useSensor, MouseSensor, TouchSensor, useDroppable, useDraggable, DragEndEvent } from "@dnd-kit/core";
 
+
 // --- DUMMY LEADS DATA with updated 'status' values ---
+
 const initialLeads = [
   {
     id: "L001",
@@ -86,6 +88,7 @@ const initialLeads = [
   },
 ];
 
+
 // --- STYLING CONSTANTS & REUSABLE COMPONENTS ---
 const boxStyle = {
   borderRadius: 8,
@@ -95,6 +98,7 @@ const boxStyle = {
   minWidth: 185,
   flex: 1,
 };
+
 
 const kanbanColumnStyle = {
   minWidth: 300,
@@ -259,6 +263,7 @@ const KanbanColumn = ({ stage, children }: { stage: string; children: React.Reac
   );
 };
 
+
 // --- MAIN COMPONENT: LeadsListIndex ---
 export function LeadsListIndex() {
   // State Hooks
@@ -325,6 +330,7 @@ export function LeadsListIndex() {
   };
   let filteredLeads = leads.filter((lead) => filterLead(lead, filter.toLowerCase(), source, assigned, stageFilter, statusFilter));
   filteredLeads = sortLeads(filteredLeads, sortBy);
+
 
   // Dnd-kit sensors setup
   const sensors = useSensors(
@@ -575,5 +581,6 @@ export function LeadsListIndex() {
       )}
     </div>
   );
+
 }
 export default LeadsListIndex;

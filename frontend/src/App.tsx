@@ -11,7 +11,7 @@ import { App as AntdApp, ConfigProvider } from "antd";
 
 import { Layout } from "@/components";
 import { resources } from "@/config/resources";
-import { authProvider, dataProvider, liveProvider } from "@/providers";
+import { authProvider, mydataProvider } from "@/providers";
 
 import {
   CompanyCreatePage,
@@ -44,8 +44,8 @@ const App = () => {
 
           <Refine
             routerProvider={routerProvider}
-            dataProvider={dataProvider}
-            liveProvider={liveProvider}
+            dataProvider={mydataProvider}
+            // liveProvider={liveProvider}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
             resources={resources}
@@ -82,6 +82,7 @@ const App = () => {
                   <Route path="calendar" element={<TasksCalendarPage />} />
                 </Route>
 
+
                 {/* Companies */}
                 <Route path="/companies">
                   <Route index element={<CompanyListPage />} />
@@ -89,10 +90,12 @@ const App = () => {
                   <Route path="edit/:id" element={<CompanyEditPage />} />
                 </Route>
 
+
                 {/* Leads */}
                 <Route path="/leads">
                   <Route index element={<LeadsListIndex />} />
                 </Route>
+
 
                 {/* GeoInsights */}
                 <Route path="/geo-insights">
@@ -115,9 +118,11 @@ const App = () => {
                   <Route index element={<CustomersPage />} />
                 </Route>
 
+
                 {/* Deals */}
                 <Route path="/deals">
                   <Route index element={<DealsPage />} />
+
                 </Route>
 
                 {/* Admin Settings & Audit Log Custom Routes */}
