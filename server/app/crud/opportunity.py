@@ -1,11 +1,11 @@
 import calendar
 from datetime import datetime
 import json
-from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
+from app.schemas.opportunity import OpportunityCreate, OpportunityCreateWithProducts, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Lead, Opportunity, PipelineStage
+from app.database.models import Lead, Opportunity, PipelineStage, DealProduct
 from typing import Any
 from . import crud_utils
 from datetime import datetime, timedelta
@@ -96,8 +96,8 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
 
 
 # Create opportunity
-async def create_opportunity(db: Database, opportunity_data: OpportunityCreate):
-    query = (
+async def create_opportunity(db: Database, opportunity_data: OpportunityCreateWithProducts):
+    query_opp_create = (
         insert(Opportunity)
         .values(
             name=opportunity_data.name,
@@ -105,15 +105,43 @@ async def create_opportunity(db: Database, opportunity_data: OpportunityCreate):
             close_date=opportunity_data.close_date,
             created_at=opportunity_data.created_at,
             lead_id=opportunity_data.lead_id,
-            pipeline_stage_id=opportunity_data.pipeline_stage_id
+            pipeline_stage_id=opportunity_data.stage_id
         )
         .returning(Opportunity)
     )
-
+    
     try:
-        return await db.fetch_one(query)
+        opportunity = await db.fetch_one(query_opp_create)
+        opportunity = dict(opportunity)
     except IntegrityError as e:
+        print("IntegrityError(CREATE Opportunity):", e)
         raise e
+    
+    if opportunity_data.product_list_total:
+        products_data = []
+        for product_id, quantity, unit_price, _ in opportunity_data.product_list_total:
+            products_data.append({
+                "opportunity_id": opportunity["id"],
+                "product_id": product_id,
+                "quantity": quantity,
+                "unit_price": unit_price,
+            })
+        query_deal_product = (
+            insert(DealProduct)
+            .values(products_data)
+            .returning(DealProduct)
+        )
+        try:
+            deal_product = await db.fetch_all(query_deal_product)
+        except IntegrityError as e:
+            print("IntegrityError(CREATE DealProduct):", e)
+            raise e
+    
+    deal_product = [dict(row) for row in deal_product]
+    opportunity["products"] = deal_product
+    opportunity["total"] = sum([item[2] for item in opportunity_data.product_list_total])
+    return opportunity
+    
 
 # Update opportunity
 async def update_opportunity(db: Database, opportunity_id: int, update_data: dict):

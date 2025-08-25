@@ -139,3 +139,14 @@ Product = Table(
     Column("base_price", Float, nullable=False),
     Column("currency", Integer, nullable=False, default="INR")
 )
+
+DealProduct = Table(
+    "DealProduct",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("opportunity_id", Integer, ForeignKey(Opportunity.c.id), nullable=False),
+    Column("product_id", Integer, ForeignKey(Product.c.id), nullable=False),
+    Column("quantity", Integer, nullable=False, default=1),
+    Column("unit_price", Float, nullable=False),
+    Column("total_price", Float, nullable=False)
+)

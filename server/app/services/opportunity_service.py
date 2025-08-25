@@ -1,13 +1,14 @@
 from fastapi import HTTPException
 from app.crud import opportunity
-from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
+from app.schemas.opportunity import OpportunityCreate, OpportunityCreateWithProducts, OpportunityUpdate
 from app.schemas.lead import LeadStageUpdate
 from datetime import date, datetime, time
 from databases import Database
 from typing import Any, Optional
 from datetime import date
 from app.schemas.task import TaskUpdate
-from . import task_service
+from . import product_service
+from . import task_service, product_service
 from asyncpg.exceptions import UniqueViolationError
 from calendar import month_name
 
@@ -74,8 +75,22 @@ async def update_opportunity(db: Database, opportunity_id: int=None, opportunity
         raise HTTPException(status_code=409, detail="Opportunity linked to specified Lead ID already exists.")
     
 async def create_opportunity(db: Database, opportunityObj: OpportunityCreate):
+    opportunityObj = OpportunityCreateWithProducts(**opportunityObj.model_dump())
     opportunityObj.lead_id = None if opportunityObj.lead_id == 0 else opportunityObj.lead_id
-    opportunityObj.pipeline_stage_id = None if opportunityObj.pipeline_stage_id==0 else opportunityObj.pipeline_stage_id
+    opportunityObj.stage_id = None if opportunityObj.stage_id==0 else opportunityObj.stage_id
+    if opportunityObj.product_list:
+        for product_id, quantity in opportunityObj.product_list.items():
+            product_unit_price = await product_service.get_product_price(db, product_id)
+            if product_unit_price is None:
+                raise HTTPException(status_code=404, detail=f"Product with id:{product_id} not found.")
+            opportunityObj.product_list_total.append(
+                (
+                    product_id, 
+                    quantity,
+                    product_unit_price,
+                    product_unit_price * quantity
+                )
+            )
     try:
         return await opportunity.create_opportunity(db, opportunityObj)
     except UniqueViolationError as e:

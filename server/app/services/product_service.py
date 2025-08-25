@@ -17,3 +17,9 @@ async def update_product(db: Database, product_id: int, product_obj: ProductUpda
 
 async def delete_product(db: Database, product_id: int):
     return await product.delete_product(db, product_id)
+
+async def get_product_price(db: Database, product_id: int) -> float | None:
+    product_record = await product.get_product_by_id(db, product_id)
+    if product_record:
+        return product_record["base_price"]
+    return None
