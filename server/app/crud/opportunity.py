@@ -16,8 +16,10 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
     return await db.fetch_one(query)
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+    closed_flag = False
     query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
     if ( filters.get("is_closed")):
+        print("Query")
         query = (
             select(
                 Opportunity.c.id,
@@ -25,6 +27,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
                 Opportunity.c.value,
                 Opportunity.c.close_date,
                 Opportunity.c.created_at,
+                Opportunity.c.pipeline_stage_id,
                 PipelineStage.c.id.label("stage_id"),
                 PipelineStage.c.stage.label("stage_name"),
                 PipelineStage.c.order.label("stage_order"),
@@ -32,6 +35,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             .select_from(
                 Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
             )
+            
         )
     conditions = []
     for attr, value in filters.items():
@@ -54,15 +58,16 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             conditions.append(Opportunity.c.created_at >= value)
         elif attr == "is_closed":
             conditions.append(Opportunity.c.close_date.isnot(None))
-            # column = getattr(Opportunity.c,"")
+            closed_flag = True
             
         elif hasattr(Opportunity.c, attr):
             conditions.append(getattr(Opportunity.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
-    
-    
+
+    if closed_flag:
+        query = query.order_by(Opportunity.c.close_date)
     
     if count:
         result = await db.execute(query)
@@ -70,6 +75,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
     else:
         
         rows = await db.fetch_all(query)
+        # print([dict(row) for row in rows])
         return [dict(row) for row in rows]
     
 

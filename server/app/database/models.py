@@ -79,6 +79,12 @@ Opportunity = Table(
     Column("lead_id", Integer, ForeignKey(Lead.c.id)),
     Column("pipeline_stage_id", Integer, ForeignKey(PipelineStage.c.id))
 )
+TaskStage = Table(
+    "taskstage",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name", String(100), nullable=False),
+)
 
 Task = Table(
     "Task",
@@ -88,7 +94,7 @@ Task = Table(
     Column("description", String, nullable=False),
     Column("due_date", DateTime, nullable=False),
     Column("priority", String(50), nullable=False, default="Low"),
-    Column("status", String(50), nullable=False, default="Pending"),
+    Column("statusId", Integer, ForeignKey(TaskStage.c.id)),
     Column("user_id", Integer, ForeignKey(User.c.id)),
     Column("opportunity_id", Integer, ForeignKey(Opportunity.c.id))
 )
@@ -129,3 +135,4 @@ Conversation = Table(
     Column("lead_id", Integer, ForeignKey(Lead.c.id)),
     Column("customer_id", Integer, ForeignKey(Customer.c.id))
 )
+

@@ -27,6 +27,8 @@ class OpportunityUpdate(BaseModel):
 class OpportunityResponse(OpportunityBase):
     id: int
     created_at: datetime
+    stage_name: Optional[str] = None
+    stage_order: Optional[int] = None
     class Config:
         from_attributes = True
 
