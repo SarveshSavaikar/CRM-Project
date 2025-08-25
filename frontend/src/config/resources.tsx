@@ -12,137 +12,137 @@ import {
   MailOutlined, // new Inbox icon
 } from "@ant-design/icons";
 
-export const resources: IResourceItem[] = [
-  {
-    name: "users",
-    list: "/users",
-    create: "/users/new",
-    edit: "/users/edit/:id",
-    show: "/users/:id",
-    meta: { label: "Users", icon: <UsergroupAddOutlined /> },
-  },
-  {
-    name: "teams",
-    list: "/teams",
-    create: "/teams/new",
-    edit: "/teams/edit/:id",
-    show: "/teams/:id",
-    meta: { label: "Teams", icon: <ProjectOutlined /> },
-  },
-  {
-    name: "leads",
-    list: "/leads",
-    create: "/leads/new",
-    edit: "/leads/edit/:id",
-    show: "/leads/:id",
-    meta: { label: "Leads", icon: <UsergroupAddOutlined /> },
-  },
-  {
-    name: "analytics",
-    list: "/analytics",
-    meta: { label: "Analytics", icon: <DashboardOutlined /> },
-  },
-  {
-    name: "conversations",
-    list: "/conversations",
-    meta: { label: "Conversations", icon: <MailOutlined /> },
-  },
-  {
-    name: "messages",
-    list: "/messages",
-    meta: { label: "Messages", icon: <NotificationOutlined /> },
-  },
-];
-
 // export const resources: IResourceItem[] = [
-//   // Existing - Keep As Is
 //   {
-//     name: "dashboard",
-//     list: "/",
-//     meta: {
-//       label: "Dashboard",
-//       icon: <DashboardOutlined />,
-//     },
+//     name: "users",
+//     list: "/users",
+//     create: "/users/new",
+//     edit: "/users/edit/:id",
+//     show: "/users/:id",
+//     meta: { label: "Users", icon: <UsergroupAddOutlined /> },
 //   },
 //   {
-//     name: "tasks",
-//     list: "/tasks",
-//     create: "/tasks/new",
-//     edit: "/tasks/edit/:id",
-//     meta: {
-//       label: "Tasks",
-//       icon: <ProjectOutlined />,
-//     },
+//     name: "teams",
+//     list: "/teams",
+//     create: "/teams/new",
+//     edit: "/teams/edit/:id",
+//     show: "/teams/:id",
+//     meta: { label: "Teams", icon: <ProjectOutlined /> },
 //   },
-//   // New Additions
 //   {
 //     name: "leads",
 //     list: "/leads",
 //     create: "/leads/new",
 //     edit: "/leads/edit/:id",
 //     show: "/leads/:id",
-//     meta: {
-//       label: "Leads",
-//       icon: <UsergroupAddOutlined />,
-//     },
+//     meta: { label: "Leads", icon: <UsergroupAddOutlined /> },
 //   },
 //   {
-//     name: "deals",
-//     list: "/deals",
-//     create: "/deals/new",
-//     edit: "/deals/edit/:id",
-//     show: "/deals/:id",
-//     meta: {
-//       label: "Deals",
-//       icon: <DollarOutlined />,
-//     },
+//     name: "analytics",
+//     list: "/analytics",
+//     meta: { label: "Analytics", icon: <DashboardOutlined /> },
 //   },
 //   {
-//     name: "campaigns",
-//     list: "/campaigns",
-//     create: "/campaigns/new",
-//     edit: "/campaigns/edit/:id",
-//     show: "/campaigns/:id",
-//     meta: {
-//       label: "Campaigns",
-//       icon: <NotificationOutlined />,
-//     },
-//   },
-
-//   // New Inbox addition
-//   {
-//     name: "inbox",
-//     list: "/inbox",
-//     meta: {
-//       label: "Inbox",
-//       icon: <MailOutlined />,
-//     },
-//   },
-
-//   // ✅ Added Customers before Geo Insights
-//   {
-//     name: "customers",
-//     list: "/customers",
-//     meta: {
-//       label: "Customers",
-//       icon: <ShopOutlined />, // using existing ShopOutlined icon, you can change if needed
-//     },
-//   },
-
-//   {
-//     name: "geo-insights",
-//     list: "/geo-insights",
-//     meta: {
-//       label: "Geo Insights",
-//       icon: <GlobalOutlined />,
-//     },
+//     name: "conversations",
+//     list: "/conversations",
+//     meta: { label: "Conversations", icon: <MailOutlined /> },
 //   },
 //   {
-//     name: "admin",
-//     list: "/admin",
-//     meta: {
-//       label: "Admin / Settings",
-//       icon: <SettingOutlined />,
-//     },
+//     name: "messages",
+//     list: "/messages",
+//     meta: { label: "Messages", icon: <NotificationOutlined /> },
 //   },
 // ];
+
+export const resources: IResourceItem[] = [
+  // Existing - Keep As Is
+  {
+    name: "dashboard",
+    list: "/",
+    meta: {
+      label: "Dashboard",
+      icon: <DashboardOutlined />,
+    },
+  },
+  {
+    name: "tasks",
+    list: "/tasks",
+    create: "/tasks/new",
+    edit: "/tasks/edit/:id",
+    meta: {
+      label: "Tasks",
+      icon: <ProjectOutlined />,
+    },
+  },
+  // New Additions
+  {
+    name: "leads",
+    list: "/leads",
+    create: "/leads/new",
+    edit: "/leads/edit/:id",
+    show: "/leads/:id",
+    meta: {
+      label: "Leads",
+      icon: <UsergroupAddOutlined />,
+    },
+  },
+  {
+    name: "deals",
+    list: "/deals",
+    create: "/deals/new",
+    edit: "/deals/edit/:id",
+    show: "/deals/:id",
+    meta: {
+      label: "Deals",
+      icon: <DollarOutlined />,
+    },
+  },
+  {
+    name: "campaigns",
+    list: "/campaigns",
+    create: "/campaigns/new",
+    edit: "/campaigns/edit/:id",
+    show: "/campaigns/:id",
+    meta: {
+      label: "Campaigns",
+      icon: <NotificationOutlined />,
+    },
+  },
+
+  // New Inbox addition
+  {
+    name: "inbox",
+    list: "/inbox",
+    meta: {
+      label: "Inbox",
+      icon: <MailOutlined />,
+    },
+  },
+
+  // ✅ Added Customers before Geo Insights
+  {
+    name: "customers",
+    list: "/customers",
+    meta: {
+      label: "Customers",
+      icon: <ShopOutlined />, // using existing ShopOutlined icon, you can change if needed
+    },
+  },
+
+  {
+    name: "geo-insights",
+    list: "/geo-insights",
+    meta: {
+      label: "Geo Insights",
+      icon: <GlobalOutlined />,
+    },
+  },
+  {
+    name: "admin",
+    list: "/admin",
+    meta: {
+      label: "Admin / Settings",
+      icon: <SettingOutlined />,
+    },
+  },
+];

@@ -94,7 +94,7 @@ export const DashboardPage = () => {
         <Col xs={24} sm={24} xl={6}> {/* ✅ New column for conversion rate */}
           <DashboardTotalCountCard
             resource="conversionRate"
-            isLoading={isLoading}
+            isLoading={false}
           />
         </Col>
       </Row>

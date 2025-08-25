@@ -27,7 +27,7 @@ export const DashboardDealsChart = () => {
     method: "get",
   })
 
-  console.log(temp)
+  console.log("temp",temp)
   const dealData = React.useMemo(() => {
     return mapDealsData(data?.data);
   }, [data?.data]);
