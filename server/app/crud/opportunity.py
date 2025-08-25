@@ -194,3 +194,27 @@ async def get_opportunities_by_month(db: Database, month: int, count: bool):
     return [dict(row) for row in rows]
     
     
+async def get_opportunities_by_stage_all(db: Database, count: bool):
+    query = crud_utils.build_group_by_query(Opportunity, "stage", count)
+    result = await db.fetch_all(query)
+    
+    result = [dict(row) for row in result]
+    print(result)
+    for d in result:
+        d["deals"] = json.loads(d["deals"])
+        d["int_stage"] = d["deals"][0]["pipeline_stage_id"] if d["deals"] else None
+    return result
+    
+async def get_opportunities_by_stage(db: Database, stage: int, count: bool):
+    query = select(func.count(Opportunity.c.id)) if count else select(Opportunity)
+    
+    query = query.where(and_(
+        func.extract("stage", Opportunity.c.created_at) == stage,
+        func.extract("year", Opportunity.c.created_at) == datetime.now().year
+    ))
+    
+    if count:
+        return await db.execute(query)
+    
+    rows = await db.fetch_all(query)
+    return [dict(row) for row in rows]

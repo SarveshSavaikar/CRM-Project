@@ -49,3 +49,11 @@ async def get_deals_by_month_all(count: bool = False, db: Database = Depends(get
 @router.get("/by-month/{month}")
 async def get_deals_by_month(month: int = datetime.now().month, count: bool = False, db: Database = Depends(get_db)):
     return await opportunity_service.get_deals_by_month(db, month, count)
+
+@router.get("/by-stage")
+async def get_deals_by_stage_all(count: bool = False, db: Database = Depends(get_db)):
+    return await opportunity_service.get_deals_by_stage(db, count)
+
+@router.get("/by-stage/{stage}")
+async def get_deals_by_stage(stage: int, count: bool = False, db: Database = Depends(get_db)):
+    return await opportunity_service.get_deals_by_stage(db, stage, count)

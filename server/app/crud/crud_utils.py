@@ -42,7 +42,7 @@ GROUP_BY_MAP = {
                         literal_column("'lead_id'"), Opportunity.c.lead_id,
                         literal_column("'pipeline_stage_id'"), Opportunity.c.pipeline_stage_id,
                     )
-                ).label("records")],
+                ).label("deals")],
             Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
             PipelineStage.c.stage
         ),

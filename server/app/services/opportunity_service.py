@@ -138,4 +138,16 @@ async def get_deals_by_month(db: Database, month: int = None, count: bool = Fals
     else:
         result = await opportunity.get_opportunities_by_month_all(db, count)
         return result
+
+async def get_deals_by_stage(db: Database, stage: int = None, count: bool = False):
+    if stage:
+        result = await opportunity.get_opportunities_by_stage(db, stage, count)
+        if count:
+            return result
+        else:
+            return {"stage":mstr, "int_stage":stage, "deals": result}
+    else:
+        result = await opportunity.get_opportunities_by_stage_all(db, count)
+        return result
+
     
