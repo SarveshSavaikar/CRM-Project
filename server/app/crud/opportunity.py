@@ -5,7 +5,7 @@ from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Opportunity, PipelineStage
+from app.database.models import Lead, Opportunity, PipelineStage
 from typing import Any
 from . import crud_utils
 from datetime import datetime, timedelta
@@ -18,24 +18,23 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
 
-    query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
-    if ( filters.get("is_closed")):
-        query = (
-            select(
-                Opportunity.c.id,
-                Opportunity.c.name,
-                Opportunity.c.value,
-                Opportunity.c.close_date,
-                Opportunity.c.created_at,
-                PipelineStage.c.id.label("stage_id"),
-                PipelineStage.c.stage.label("stage_name"),
-                PipelineStage.c.order.label("stage_order"),
-            )
-            .select_from(
-                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
-            )
-
-        )
+    query = select(func.count()) if count else select(
+        Opportunity.c.id,
+        Opportunity.c.name,
+        Opportunity.c.value,
+        Opportunity.c.close_date,
+        Opportunity.c.created_at,
+        Opportunity.c.lead_id,
+        Lead.c.name.label("lead_name"),
+        PipelineStage.c.id.label("stage_id"),
+        PipelineStage.c.stage.label("stage_name"),
+        PipelineStage.c.order.label("stage_order"),
+    ).select_from(
+        Opportunity
+        .join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+        .join(Lead, Opportunity.c.lead_id == Lead.c.id, isouter=True)
+    )
+    
     conditions = []
     for attr, value in filters.items():
         if value is None:
@@ -73,7 +72,10 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
     else:
         
         rows = await db.fetch_all(query)
-        return [dict(row) for row in rows]
+        print("Number of rows:", len(rows))
+        result = [dict(row) for row in rows]
+        print(result)
+        return result
     
 
 
