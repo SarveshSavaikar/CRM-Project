@@ -10,9 +10,9 @@ def prefix_columns(table, prefix: str):
 GROUP_BY_MAP_COUNT = {
     Opportunity:{
         "stage": (
-            [PipelineStage.c.name, func.count().label("count")],
+            [PipelineStage.c.stage, func.count().label("count")],
             Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
-            PipelineStage.c.name
+            PipelineStage.c.stage
         ),
         "lead": (
             Lead.c.name,
@@ -31,7 +31,7 @@ GROUP_BY_MAP_COUNT = {
 GROUP_BY_MAP = {
     Opportunity:{
         "stage": (
-            [PipelineStage.c.name,
+            [PipelineStage.c.stage,
                 func.jsonb_agg(
                     func.jsonb_build_object(
                         literal_column("'id'"), Opportunity.c.id,
@@ -44,7 +44,7 @@ GROUP_BY_MAP = {
                     )
                 ).label("records")],
             Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id),
-            PipelineStage.c.name
+            PipelineStage.c.stage
         ),
         "lead": (
             [Lead.c.name],
@@ -61,7 +61,7 @@ GROUP_BY_MAP = {
                         literal_column("'close_date'"), Opportunity.c.close_date,
                         literal_column("'created_at'"), Opportunity.c.created_at,
                         literal_column("'lead_id'"), Opportunity.c.lead_id,
-                        literal_column("'pipeline_stage'"), PipelineStage.c.name,
+                        literal_column("'pipeline_stage'"), PipelineStage.c.stage,
                     )
                 ).label("records")
             ],
