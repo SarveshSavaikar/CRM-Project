@@ -140,7 +140,7 @@ const ContactsTable: React.FC<{ contacts: Contact[] }> = ({ contacts }) => (
               textAlign: "left",
               padding: 8,
               fontWeight: 600,
-              color: "#377afd",
+              color: "#1467fa",
               borderBottom: "1px solid #eef0f2",
             }}
           >
@@ -621,7 +621,7 @@ const CompanyCard: React.FC<{
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ margin: "0 0 16px 0", fontSize: "18px", fontWeight: "600" }}>
-              Add New Contact
+              Add New Record
             </h2>
             <form onSubmit={handleFormSubmit}>
               <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column" }}>
@@ -679,7 +679,7 @@ const CompanyCard: React.FC<{
                     padding: "8px 16px",
                     border: "none",
                     borderRadius: "6px",
-                    background: "#4e79ff",
+                    background: "#1467fa",
                     color: "#fff",
                     cursor: "pointer",
                   }}
@@ -840,7 +840,6 @@ export const AdminSettingsPage: React.FC = () => {
       style={{
         fontFamily: "Inter, sans-serif",
         minHeight: "100vh",
-        background: "#f5f5f8",
         padding: "32px 12px",
         color: "#000",
       }}
