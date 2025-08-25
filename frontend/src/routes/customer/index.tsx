@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Table, Card, Select, Row, Col, Input } from "antd";
+import { Table, Card, Select, Row, Col, Input, Pagination } from "antd";
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -28,6 +28,23 @@ const lifecycleData = [
   { name: "Closed Lost", value: 10 },
 ];
 
+// Customer Acquisition Channels data from the image
+const acquisitionData = [
+  { name: "Channel 5", value: 50 },
+  { name: "Channel 4", value: 120 },
+  { name: "Channel 3", value: 180 },
+  { name: "Channel 2", value: 350 },
+  { name: "Channel 1", value: 200 },
+];
+
+// New data for Customer Satisfaction by Segment
+const satisfactionData = [
+  { name: "SMB", satisfaction: 85 },
+  { name: "Enterprise", satisfaction: 78 },
+  { name: "Startup", satisfaction: 95 },
+  { name: "Freelancer", satisfaction: 90 },
+];
+
 // Retention vs churn data
 const retentionDataSample = {
   Q1: [
@@ -54,12 +71,14 @@ const retentionDataSample = {
 
 type QuarterKey = keyof typeof retentionDataSample;
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = ["#1467fa", "#00C49F", "#FFBB28", "#FF8042"];
 
 export const CustomersPage: React.FC = () => {
   const [selectedQuarter, setSelectedQuarter] = useState<QuarterKey>("Q1");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStage, setSelectedStage] = useState<string | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   const retentionData = useMemo(() => {
     return [...retentionDataSample[selectedQuarter]];
@@ -80,6 +99,12 @@ export const CustomersPage: React.FC = () => {
 
     return filtered;
   }, [searchQuery, selectedStage]);
+
+  const paginatedCustomers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredCustomers.slice(start, end);
+  }, [filteredCustomers, currentPage, pageSize]);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -103,45 +128,50 @@ export const CustomersPage: React.FC = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      {/* Customer List */}
-      <Card
-        title="Customer List"
-        style={{ marginBottom: 24 }}
-        extra={
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Select
-              style={{ width: 150 }}
-              placeholder="Filter by Stage"
-              onChange={(value) => setSelectedStage(value)}
-              value={selectedStage}
-              allowClear
-            >
-              {stageOptions.map(option => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
-            <Search
-              placeholder="Search customers"
-              onSearch={setSearchQuery}
-              style={{ width: 200 }}
-              enterButton
-            />
-          </div>
-        }
-      >
-        <Table
-          dataSource={filteredCustomers}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-        />
-      </Card>
+      {/* New Heading */}
+      <h1 style={{ marginBottom: 24, fontSize: 24, fontWeight: 700,}}>Customer Overview</h1>
 
-      <Row gutter={[24, 24]}>
+      {/* Customer Graphs */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 }}>
+        {/* Customer Acquisition Channels */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card title="Customer Acquisition Channels" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart
+                width={400}
+                height={300}
+                data={acquisitionData}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#1467fa" />
+              </BarChart>
+            </div>
+          </Card>
+        </div>
+
+        {/* Customer Satisfaction by Segment */}
+        <div style={{ width: '48%', marginBottom: 24 }}>
+          <Card title="Customer Satisfaction by Segment" style={{ height: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <BarChart width={400} height={300} data={satisfactionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="satisfaction" fill="#FFBB28" />
+              </BarChart>
+            </div>
+          </Card>
+        </div>
+
         {/* Lifecycle Distribution */}
-        <Col xs={24} lg={12}>
+        <div style={{ width: '48%', marginBottom: 24 }}>
           <Card title="Lifecycle Distribution" style={{ height: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <PieChart width={400} height={300}>
@@ -162,10 +192,10 @@ export const CustomersPage: React.FC = () => {
               </PieChart>
             </div>
           </Card>
-        </Col>
+        </div>
 
         {/* Retention vs Churn */}
-        <Col xs={24} lg={12}>
+        <div style={{ width: '48%', marginBottom: 24 }}>
           <Card
             title="Retention vs Churn"
             style={{ height: '100%' }}
@@ -189,13 +219,60 @@ export const CustomersPage: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="retention" fill="#0088FE" />
+                <Bar dataKey="retention" fill="#1467fa" />
                 <Bar dataKey="churn" fill="#FF8042" />
               </BarChart>
             </div>
           </Card>
-        </Col>
-      </Row>
+        </div>
+      </div>
+
+      {/* Customer List */}
+      <Card
+        title="Customer List"
+        style={{ marginBottom: 24, minHeight: 500 }}
+        extra={
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Select
+              style={{ width: 150 }}
+              placeholder="Filter by Stage"
+              onChange={(value) => setSelectedStage(value)}
+              value={selectedStage}
+              allowClear
+            >
+              {stageOptions.map(option => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
+                </Option>
+              ))}
+            </Select>
+            <Search
+              placeholder="Search customers"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 200 }}
+              enterButton // This prop adds the blue search button
+              value={searchQuery} // This ensures the input is controlled
+            />
+          </div>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', height: '400px', justifyContent: 'space-between' }}>
+          <Table
+            dataSource={paginatedCustomers}
+            columns={columns}
+            rowKey="id"
+            pagination={false}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredCustomers.length}
+              onChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

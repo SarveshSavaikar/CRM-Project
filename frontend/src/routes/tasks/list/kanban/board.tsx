@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   DndContext,
   type DragEndEvent,
@@ -39,11 +38,11 @@ export const KanbanBoard = ({
   };
 
   return (
-    <KanbanBoardContainer>
-      <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+    <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+      <KanbanBoardContainer>
         {children}
-      </DndContext>
-    </KanbanBoardContainer>
+      </KanbanBoardContainer>
+    </DndContext>
   );
 };
 
@@ -51,20 +50,23 @@ export const KanbanBoardContainer = ({ children }: React.PropsWithChildren) => {
   return (
     <div
       style={{
-        width: "calc(100% + 64px)",
-        height: "calc(100vh - 64px)",
+        width: "100%",
         display: "flex",
-        justifyContent: "column",
-        margin: "-32px",
+        flexDirection: "column",
+        // The following two lines enable the main page vertical scrollbar
+        // and allow content to be pushed down the page, while the inner div
+        // handles the horizontal scroll for the columns.
+        minHeight: "100vh", 
+        overflowY: "auto",
       }}
     >
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          flex: 1,
           display: "flex",
           padding: "32px",
-          overflow: "scroll",
+          overflowX: "auto", // This is the key change: only this div scrolls horizontally
+          overflowY: "hidden", // Prevents a double vertical scrollbar
         }}
       >
         {children}

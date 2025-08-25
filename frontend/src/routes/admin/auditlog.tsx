@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { CSSProperties } from "react";
+// Add the useNavigate hook to your imports.
+import { useNavigate } from "react-router-dom";
 
 // Define the interfaces for the updated data structure
 interface ChangesDetail {
@@ -158,6 +160,9 @@ export function AuditLog() {
   const [newRecord, setNewRecord] = useState<NewRecordFormState>(initialNewRecordState);
   const [auditLogs, setAuditLogs] = useState(initialAuditLogData);
 
+  // Initialize the useNavigate hook
+  const navigate = useNavigate();
+
   const getMostActiveUser = () => {
     const userCounts: { [key: string]: number } = {};
     let maxCount = 0;
@@ -218,6 +223,12 @@ export function AuditLog() {
     setNewRecord(initialNewRecordState);
   };
 
+  // Function to handle navigation
+  const handleGoBack = () => {
+    // Replace '/admin' with the actual path to your admin page
+    navigate('/admin');
+  };
+
   return (
     <div
       style={{
@@ -245,6 +256,21 @@ export function AuditLog() {
         >
           Audit Log
         </h1>
+        {/* Add the "Go Back" button here */}
+        <button
+          onClick={handleGoBack}
+          style={{
+            padding: "8px 12px",
+            background: "#1467fa",
+            color: "#fff",
+            border: "1px solid #dbe4f3",
+            borderRadius: "6px",
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+        >
+          Go Back
+        </button>
       </div>
 
       <div style={{ display: "flex", gap: 24, margin: "30px 0 23px 0" }}>
@@ -289,7 +315,7 @@ export function AuditLog() {
             onClick={() => setIsFormModalOpen(true)}
             style={{
               padding: "8px 12px",
-              background: "#4e79ff",
+              background: "#1467fa",
               color: "#fff",
               border: "none",
               borderRadius: "6px",

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends , HTTPException
 # from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
 from app.services import user_service
+from app.crud import user as user_c
 from databases import Database
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -16,6 +17,16 @@ async def get_users(name: str = None, email: str=None, role: str = None, team_id
 @router.get("/user-{user_id}", response_model=UserResponse)
 async def get_user(user_id: int, db: Database = Depends(get_db)):
     return await user_service.get_user(db, user_id)
+
+@router.get("/{email}", response_model=UserResponse)
+async def get_user_by_email(email: str,db: Database = Depends(get_db)):
+    print("I am herre ")
+    user = await user_c.get_user_by_email(db,email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
 
 @router.put("/user-{user_id}", response_model=UserUpdate)
 async def update_user(user_id: int, user: UserUpdate, db: Database = Depends(get_db)):
