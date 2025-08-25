@@ -16,7 +16,7 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
     return await db.fetch_one(query)
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
-    query = select(func.count()) if count else select(Opportunity, PipelineStage.c.stage)
+    query = select(func.count()) if count else select(Opportunity, PipelineStage.c.stage.label("pipeline_stage"))
     if not count:
         query = query.select_from(
             Opportunity

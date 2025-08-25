@@ -65,16 +65,16 @@ async def export_opportunities_to_csv(db: Database = Depends(get_db)):
     writer = csv.writer(output)
 
     headers = [
-        "id", "name", "value", "close_date", "created_at", "updated_at",
-        "lead_id", "pipeline_stage_id"
+        "id", "name", "value", "close_date", "created_at",
+        "lead_id", "pipeline_stage_id", "pipeline_stage"
     ]
     writer.writerow(headers)
 
     for opportunity in opportunities:
         writer.writerow([
-            opportunity["id"], opportunity["name"], opportunity["value"], opportunity["close_date"],
+            opportunity["id"], opportunity["name"], float(opportunity["value"]), opportunity["close_date"],
             opportunity["created_at"],
-            opportunity["lead_id"], opportunity["pipeline_stage_id"]
+            opportunity["lead_id"], opportunity["pipeline_stage_id"], opportunity["pipeline_stage"]
         ])
 
     output.seek(0)
