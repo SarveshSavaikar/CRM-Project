@@ -4,7 +4,9 @@
 # import json
 from fastapi import FastAPI , File, UploadFile# type: ignore
 
-from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics, products, upload
+
+from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics , taskStages ,products, upload
+
 
 from app.api import test_db
 from app.database.connection import database
@@ -65,8 +67,9 @@ app.include_router(email.router)
 app.include_router(linkedin.router)
 
 app.include_router(analytics.router)
-
+app.include_router(taskStages.router)
 app.include_router(upload.router)
+
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):

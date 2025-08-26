@@ -34,6 +34,7 @@ async def get_opportunity_by_id(db: Database, opportunity_id: int):
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
 
+    closed_flag = False
     query = select(func.count()) if count else select(
         Opportunity.c.id,
         Opportunity.c.name,
@@ -51,6 +52,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
         .join(Lead, Opportunity.c.lead_id == Lead.c.id, isouter=True)
     )
     
+
     conditions = []
     for attr, value in filters.items():
         if value is None:
@@ -72,15 +74,16 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
             conditions.append(Opportunity.c.created_at >= value)
         elif attr == "is_closed":
             conditions.append(Opportunity.c.close_date.isnot(None))
-            # column = getattr(Opportunity.c,"")
+            closed_flag = True
             
         elif hasattr(Opportunity.c, attr):
             conditions.append(getattr(Opportunity.c, attr) == value)
 
     if conditions:
         query = query.where(and_(*conditions))
-    
-    
+
+    if closed_flag:
+        query = query.order_by(Opportunity.c.close_date)
     
     if count:
         result = await db.execute(query)
@@ -88,6 +91,7 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
     else:
         
         rows = await db.fetch_all(query)
+
         print("Number of rows:", len(rows))
         result = [dict(row) for row in rows]
         print(result)

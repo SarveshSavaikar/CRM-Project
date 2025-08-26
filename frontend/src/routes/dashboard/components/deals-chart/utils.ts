@@ -3,6 +3,7 @@ import type { GetFieldsFromList } from "@refinedev/nestjs-query";
 import dayjs from "dayjs";
 
 import type { DashboardDealsChartQuery } from "@/graphql/types";
+import { Result } from "antd";
 
 type DealStage = GetFieldsFromList<DashboardDealsChartQuery>;
 
@@ -19,35 +20,46 @@ const filterDeal = (deal?: DealAggregate) =>
   deal?.groupBy?.closeDateMonth && deal.groupBy.closeDateYear;
 
 const mapDeals = (
-  deals: DealAggregate[] = [],
+  deals: any[] = [],
   state: string,
 ): MappedDealData[] => {
-  return deals.filter(filterDeal).map((deal) => {
-    const { closeDateMonth, closeDateYear } = deal.groupBy as NonNullable<
-      DealAggregate["groupBy"]
-    >;
+  return deals.map((deal) => {
 
-    const date = dayjs(`${closeDateYear}-${closeDateMonth}-01`);
+
+    // # Create a date for the 1st of that month
+    // dt = datetime.datetime(closeDateYear, closeDateMonth, 1)
+
+    const date: Date = new Date(deal.close_date);
+
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    const formatted = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      year: "numeric",
+    }).format(date);
 
     return {
-      timeUnix: date.unix(),
-      timeText: date.format("MMM YYYY"),
-      value: deal.sum?.value ?? 0,
+      timeUnix: dayjs(`${year}-${month}-01`).unix(),
+      timeText: formatted,
+      value: deal.value ?? 0,
       state,
     };
   });
 };
 
 export const mapDealsData = (
-  dealStages: DealStage[] = [],
+  dealStages: any[] = [],
 ): MappedDealData[] => {
-  const won = dealStages.find((stage) => stage.title === "WON");
+  console.log("dealStages", dealStages)
+  const won = dealStages.filter((stage) => stage.stage_name === "Closed Won");
+  console.log("WON :- ", won)
+  const wonDeals = mapDeals(won, "Won");
 
-  const wonDeals = mapDeals(won?.dealsAggregate, "Won");
-
-  const lost = dealStages.find((stage) => stage.title === "LOST");
-
-  const lostDeals = mapDeals(lost?.dealsAggregate, "Lost");
-
-  return [...wonDeals, ...lostDeals].sort((a, b) => a.timeUnix - b.timeUnix);
+  const lost = dealStages.filter((stage) => stage['stage_name'] === "Closed Lost");
+  console.log("LOST :- ", lost)
+  const lostDeals = mapDeals(lost, "Lost");
+  const result = [...wonDeals, ...lostDeals].sort((a, b) => a.timeUnix - b.timeUnix)
+  console.log("RESULT:- ",result)
+  return result;
 };

@@ -56,8 +56,10 @@ async def get_opportunities(
         filters["created__gt"] = datetime.combine(created, time.max)
     elif is_closed:
         filters["is_closed"] = True
-
-    return await opportunity.get_opportunities(db, count, **filters)
+        print("CLOSED")
+    result = await opportunity.get_opportunities(db, count, **filters)
+    # print(result)
+    return result
 
 async def update_opportunity(db: Database, opportunity_id: int=None, opportunityObj: OpportunityUpdate=None, **filters: dict[str, Any]):
     if opportunity_id is not None:

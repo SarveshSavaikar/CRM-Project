@@ -29,8 +29,9 @@ export const DashboardDealsChart = () => {
 
   console.log("temp",temp)
   const dealData = React.useMemo(() => {
-    return mapDealsData(data?.data);
-  }, [data?.data]);
+    console.log("SOmehting",temp)
+    return mapDealsData(temp?.data);
+  }, [temp?.data]);
 
   const config: AreaConfig = {
     isStack: false,

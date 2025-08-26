@@ -2,6 +2,7 @@ import React from "react";
 
 import {
   type HttpError,
+  useCustom,
   useList,
   useNavigation,
   useUpdate,
@@ -30,26 +31,31 @@ type TaskStage = GetFieldsFromList<TaskStagesQuery> & { tasks: Task[] };
 export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   const { replace } = useNavigation();
 
-  const { data: stages, isLoading: isLoadingStages } = useList<TaskStage>({
-    resource: "taskStages",
-    filters: [
-      {
-        field: "title",
-        operator: "in",
-        value: ["TODO", "IN PROGRESS", "IN REVIEW", "DONE"],
-      },
-    ],
-    sorters: [
-      {
-        field: "createdAt",
-        order: "asc",
-      },
-    ],
-    meta: {
-      gqlQuery: TASK_STAGES_QUERY,
-    },
-  });
+  // const { data: stages, isLoading: isLoadingStages } = useList<TaskStage>({
+  //   resource: "taskStages",
+  //   filters: [
+  //     {
+  //       field: "title",
+  //       operator: "in",
+  //       value: ["TODO", "IN PROGRESS", "IN REVIEW", "DONE"],
+  //     },
+  //   ],
+  //   sorters: [
+  //     {
+  //       field: "createdAt",
+  //       order: "asc",
+  //     },
+  //   ],
+  //   meta: {
+  //     gqlQuery: TASK_STAGES_QUERY,
+  //   },
+  // });
+  const { data: stages, isLoading: isLoadingStages } = useCustom<{data: any[]}>({
+    url:"/taskStages/",
+    method: "get",
+  })
 
+  
   const { data: tasks, isLoading: isLoadingTasks } = useList<
     GetFieldsFromList<TasksQuery>
   >({
@@ -84,7 +90,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
     const unassignedStage = tasks.data.filter((task) => task.stageId === null);
 
     // prepare unassigned stage
-    const grouped: TaskStage[] = stages.data.map((stage) => ({
+    const grouped: TaskStage[] = stages.data.data.map((stage) => ({
       ...stage,
       tasks: tasks.data.filter((task) => task.stageId?.toString() === stage.id),
     }));
@@ -147,7 +153,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
 
       <KanbanBoardContainer>
         <KanbanBoard onDragEnd={handleOnDragEnd}>
-          <KanbanColumn
+          {/* <KanbanColumn
             id={"unassigned"}
             title={"unassigned"}
             count={taskStages?.unassignedStage?.length || 0}
@@ -172,7 +178,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
                 onClick={() => handleAddCard({ stageId: "unassigned" })}
               />
             )}
-          </KanbanColumn>
+          </KanbanColumn> */}
           {taskStages.columns?.map((column) => {
             return (
               <KanbanColumn
