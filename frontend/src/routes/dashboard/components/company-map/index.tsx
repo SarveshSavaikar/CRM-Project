@@ -24,6 +24,7 @@ const companyMarkers: CompanyMarker[] = [
   { name: "New Delhi", coordinates: [77.209, 28.6139], count: 1 },
   { name: "Chennai", coordinates: [80.2707, 13.0827], count: 1 },
   { name: "Kolkata", coordinates: [88.3639, 22.5726], count: 1 },
+  { name: "Goa", coordinates: [15.2993, 74.124], count: 7 },
 ];
 
 export const CompaniesMapCard: React.FC = () => {
@@ -40,7 +41,9 @@ export const CompaniesMapCard: React.FC = () => {
         </span>
       }
       extra={
-        <Button size="small" type="default" onClick={() => navigate('/leads')}> {/* <-- Modified line */}
+        <Button size="small" type="default" onClick={() => navigate("/leads")}>
+          {" "}
+          {/* <-- Modified line */}
           See all leads
         </Button>
       }

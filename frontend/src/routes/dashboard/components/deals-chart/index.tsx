@@ -22,12 +22,12 @@ export const DashboardDealsChart = () => {
     },
   });
 
-  const { data: temp , isLoading: b} = useCustom<any []> ({
-    url:"/opportunities/?before=true&all_closed=true",
+  const { data: temp, isLoading: b } = useCustom<any[]>({
+    url: "/opportunities/?before=true&all_closed=true",
     method: "get",
-  })
+  });
 
-  console.log("temp",temp)
+  console.log("temp", temp);
   const dealData = React.useMemo(() => {
     return mapDealsData(data?.data);
   }, [data?.data]);
@@ -48,7 +48,7 @@ export const DashboardDealsChart = () => {
       tickCount: 4,
       label: {
         formatter: (v) => {
-          return `$${Number(v) / 1000}k`;
+          return `₹{Number(v) / 1000}k`;
         },
       },
     },
@@ -56,7 +56,7 @@ export const DashboardDealsChart = () => {
       formatter: (data) => {
         return {
           name: data.state,
-          value: `$${Number(data.value) / 1000}k`,
+          value: `₹₹{Number(data.value) / 1000}k`,
         };
       },
     },
