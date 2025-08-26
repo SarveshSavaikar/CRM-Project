@@ -1,12 +1,10 @@
 import React from "react";
-
-import { AuditOutlined, ShopOutlined, TeamOutlined } from "@ant-design/icons";
+import { AuditOutlined, ShopOutlined, TeamOutlined, RiseOutlined } from "@ant-design/icons";
 import { Area, type AreaConfig } from "@ant-design/plots";
 import { Card, Skeleton } from "antd";
-
 import { Text } from "@/components";
 
-type Type = "companies" | "contacts" | "deals";
+type Type = "companies" | "contacts" | "deals" | "conversionRate";
 
 type Props = {
   resource: Type;
@@ -19,13 +17,13 @@ export const DashboardTotalCountCard = ({
   isLoading,
   totalCount,
 }: Props) => {
-  const { primaryColor, secondaryColor, icon, title } = variants[resource];
-
+  const { primaryColor, secondaryColor, icon, title, data } = variants[resource];
+  
   const config: AreaConfig = {
     appendPadding: [1, 0, 0, 0],
     padding: 0,
     syncViewPadding: true,
-    data: variants[resource].data,
+    data, // ✅ Using the data from the variants object
     autoFit: true,
     tooltip: false,
     animation: false,
@@ -57,6 +55,8 @@ export const DashboardTotalCountCard = ({
       color: primaryColor,
     },
   };
+
+  const displayValue = resource === "conversionRate" ? "95%" : totalCount;
 
   return (
     <Card
@@ -105,7 +105,7 @@ export const DashboardTotalCountCard = ({
               }}
             />
           ) : (
-            totalCount
+            displayValue
           )}
         </Text>
         <Area
@@ -140,6 +140,7 @@ const IconWrapper = ({
   );
 };
 
+// All variants now have the `data` property to ensure the graph displays
 const variants: {
   [key in Type]: {
     primaryColor: string;
@@ -164,26 +165,11 @@ const variants: {
     ),
     title: "Number of customers",
     data: [
-      {
-        index: "1",
-        value: 3500,
-      },
-      {
-        index: "2",
-        value: 2750,
-      },
-      {
-        index: "3",
-        value: 5000,
-      },
-      {
-        index: "4",
-        value: 4250,
-      },
-      {
-        index: "5",
-        value: 5000,
-      },
+      { index: "1", value: 3500 },
+      { index: "2", value: 2750 },
+      { index: "3", value: 5000 },
+      { index: "4", value: 4250 },
+      { index: "5", value: 5000 },
     ],
   },
   contacts: {
@@ -201,30 +187,12 @@ const variants: {
     ),
     title: "Number of contacts",
     data: [
-      {
-        index: "1",
-        value: 10000,
-      },
-      {
-        index: "2",
-        value: 19500,
-      },
-      {
-        index: "3",
-        value: 13000,
-      },
-      {
-        index: "4",
-        value: 17000,
-      },
-      {
-        index: "5",
-        value: 13000,
-      },
-      {
-        index: "6",
-        value: 20000,
-      },
+      { index: "1", value: 10000 },
+      { index: "2", value: 19500 },
+      { index: "3", value: 13000 },
+      { index: "4", value: 17000 },
+      { index: "5", value: 13000 },
+      { index: "6", value: 20000 },
     ],
   },
   deals: {
@@ -242,38 +210,36 @@ const variants: {
     ),
     title: "Total deals in pipeline",
     data: [
-      {
-        index: "1",
-        value: 1000,
-      },
-      {
-        index: "2",
-        value: 1300,
-      },
-      {
-        index: "3",
-        value: 1200,
-      },
-      {
-        index: "4",
-        value: 2000,
-      },
-      {
-        index: "5",
-        value: 800,
-      },
-      {
-        index: "6",
-        value: 1700,
-      },
-      {
-        index: "7",
-        value: 1400,
-      },
-      {
-        index: "8",
-        value: 1800,
-      },
+      { index: "1", value: 1000 },
+      { index: "2", value: 1300 },
+      { index: "3", value: 1200 },
+      { index: "4", value: 2000 },
+      { index: "5", value: 800 },
+      { index: "6", value: 1700 },
+      { index: "7", value: 1400 },
+      { index: "8", value: 1800 },
+    ],
+  },
+  conversionRate: {
+    primaryColor: "#E0E0E0",
+    secondaryColor: "#F5F5F5",
+    icon: (
+      <IconWrapper color="#FAFAFA">
+        <RiseOutlined
+          className="md"
+          style={{
+            color: "#A0A0A0",
+          }}
+        />
+      </IconWrapper>
+    ),
+    title: "Conversion Rate",
+    data: [
+      { index: "1", value: 65 },
+      { index: "2", value: 75 },
+      { index: "3", value: 80 },
+      { index: "4", value: 90 },
+      { index: "5", value: 95 },
     ],
   },
 };
