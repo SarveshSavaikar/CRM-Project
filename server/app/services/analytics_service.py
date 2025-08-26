@@ -47,3 +47,15 @@ async def get_deals_by_stage(db: Database, count: bool):
 async def get_top_performers(db: Database, order_by_lead: bool):
     user_performance = await user_service.get_user_performance(db, order_by_lead)
     return user_performance
+
+async def get_campaigns_summary(db: Database):
+    from app.services import campaign_service
+    lead_campagins_count = await campaign_service.get_lead_campaigns_count(db)
+    campaign_count = await campaign_service.get_campaigns(db, name=None, channel=None, start=None, end=None, active_only=False, count=True)
+    active_campaigns_count = await campaign_service.get_campaigns(db, name=None, channel=None, start=None, end=None, active_only=True, count=True)
+    summary = {
+        "campaigns": campaign_count,
+        "lead_campaigns": lead_campagins_count,
+        "active_campaigns": active_campaigns_count
+    }
+    return summary

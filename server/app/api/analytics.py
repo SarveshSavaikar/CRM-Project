@@ -113,3 +113,6 @@ async def get_campaigns_count(
 async def get_lead_campaigns_count(db: Database = Depends(get_db)):
     return await campaign_service.get_lead_campaigns_count(db)
 
+@router.get("/campaigns/summary")
+async def get_campaigns_summary(db: Database = Depends(get_db)):
+    return await analytics_service.get_campaigns_summary(db)
