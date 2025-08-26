@@ -39,3 +39,7 @@ async def delete_campaign(campaign_id: int, db: Database = Depends(get_db)):
 @router.get("/lead-campaigns")
 async def get_lead_campaigns(db: Database = Depends(get_db)):
     return await campaign_service.get_lead_campaigns(db)
+
+@router.get("/{campaign_id}/metrics")
+async def get_campaign_metrics(campaign_id: int, db: Database = Depends(get_db)):
+    return await campaign_service.get_campaign_metrics(db, campaign_id)

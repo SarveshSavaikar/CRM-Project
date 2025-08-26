@@ -92,7 +92,7 @@ async def delete_campaign(db: Database, campaign_id: int):
     
     return await db.fetch_one(query)
 
-async def get_lead_campaigns(db: Database, count: bool = False):
+async def get_lead_campaigns(db: Database, lead_id: int = None, campaign_id: int = None, count: bool = False):
     query = select(func.count(LeadCampaign.c.lead_id)) if count else select(
         Lead.c.id.label("lead_id"),
         Lead.c.name.label("lead_name"),
@@ -103,6 +103,13 @@ async def get_lead_campaigns(db: Database, count: bool = False):
         Campaign.c.start_date.label("campaign_start_date"),
         Campaign.c.end_date.label("campaign_end_date")
     )
+    conditions = []
+    if lead_id is not None:
+        conditions.append(LeadCampaign.c.lead_id == lead_id)
+    if campaign_id is not None:
+        conditions.append(LeadCampaign.c.campaign_id == campaign_id)
+    if conditions:
+        query = query.where(and_(*conditions))
     if not count:
         query = query.select_from(
             LeadCampaign
