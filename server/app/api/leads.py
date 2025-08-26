@@ -3,11 +3,12 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 # from sqlalchemy.orm import Session
 from databases import Database
 from app.database.connection import get_db
-from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate, LeadResponse
+from app.schemas.lead import LeadCreate, LeadStageUpdate, LeadUpdate, LeadResponse, LeadCampaignResponse
 from app.services import lead_service
 from datetime import date
 import csv
 import io
+from fastapi.responses import StreamingResponse
 
 router = APIRouter(prefix="/leads", tags=["Leads"])
 
@@ -74,3 +75,38 @@ async def update_lead_stage(lead_id: int, update: LeadStageUpdate, db: Database 
     result = await lead_service.update_lead_stage(db, lead_id, update)
     return json.dumps({"lead_id": lead_id, "stage": result.pipeline_stage_id})
 
+@router.get("/export/csv")
+async def export_leads_to_csv(db: Database = Depends(get_db)):
+    leads = await lead_service.get_leads(db)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    headers = ["id", "name", "email", "phone", "source", "status", "score", "team_id", "user_id", "created_at", "updated_at"]
+    writer.writerow(headers)
+
+    for lead in leads:
+        writer.writerow([
+            lead["id"], lead["name"], lead["email"], lead["phone"], lead["source"],
+            lead["status"], lead["score"], lead["team_id"], lead["user_id"],
+            lead["created_at"], lead["updated_at"]
+        ])
+
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=leads_export.csv"}
+    )
+    
+@router.post("/create-customer-from-lead/{lead_id}")
+async def create_customer_from_lead(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.update_lead(db, lead_id, LeadUpdate(status="In Progress"))
+
+@router.post("/{lead_id}/campaign/{campaign_id}", response_model=LeadCampaignResponse)
+async def associate_lead_with_campaign(lead_id: int, campaign_id: int, db: Database = Depends(get_db)):
+    return await lead_service.associate_lead_with_campaign(db, lead_id, campaign_id)
+
+@router.get("/{lead_id}/campaigns", response_model=LeadCampaignResponse)
+async def get_lead_campaign(lead_id: int, db: Database = Depends(get_db)):
+    return await lead_service.get_lead_campaign(db, lead_id)

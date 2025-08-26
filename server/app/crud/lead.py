@@ -2,7 +2,7 @@ from app.schemas.lead import LeadCreate, LeadUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Lead, Team, User
+from app.database.models import Lead, Team, User, LeadCampaign, Campaign
 from typing import Any
 
 from datetime import datetime
@@ -141,3 +141,44 @@ async def get_leads_grouped(db: Database, group_by: str):
     
     rows = await db.fetch_all(query)
     return {row[0]:row[1] for row in rows}
+
+async def associate_lead_with_campaign(db: Database, lead_id: int, campaign_id: int):
+    query = (
+        LeadCampaign
+        .insert()
+        .values(campaign_id=campaign_id, lead_id=lead_id)
+        .returning(LeadCampaign)
+    )
+    try:
+        await db.fetch_one(query)
+    except IntegrityError as e:
+        raise e
+    
+    return await get_lead_campaign(db, lead_id, campaign_id)
+
+async def get_lead_campaign(db: Database, lead_id: int = None, campaign_id: int = None):
+
+    query = (
+        select(*prefix_columns(LeadCampaign, ""),
+                *prefix_columns(Lead, "lead"),
+                *prefix_columns(Campaign, "campaign")
+        ).select_from(
+            LeadCampaign
+            .join(Lead, LeadCampaign.c.lead_id == Lead.c.id)
+            .join(Campaign, LeadCampaign.c.campaign_id == Campaign.c.id)
+        )
+    )
+    conditions = []
+    if lead_id:
+        conditions.append(LeadCampaign.c.lead_id == lead_id)
+    if campaign_id:
+        conditions.append(LeadCampaign.c.campaign_id == campaign_id)
+    if conditions:    
+        query = query.where(and_(*conditions))
+    
+    lead_campaign = await db.fetch_all(query)
+        
+    if len(lead_campaign) == 1:
+        return dict(lead_campaign[0])
+    else:
+        return [dict(lc) for lc in lead_campaign]

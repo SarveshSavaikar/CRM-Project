@@ -66,3 +66,14 @@ async def get_lead_campaigns(db: Database):
 
 async def get_lead_campaigns_count(db: Database):
     return await campaign.get_lead_campaigns(db, count=True)
+
+async def get_campaign_metrics(db: Database, campaign_id: int):
+    leads = await campaign.get_lead_campaigns(db, campaign_id)
+    lead_count = await campaign.get_lead_campaigns(db, campaign_id, count=True)
+    if not leads:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return {
+        "campaign_id": campaign_id,
+        "leads": leads,
+        "lead_count": lead_count
+    }

@@ -20,7 +20,7 @@ class LeadCreate(LeadBase):
 class LeadUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = None  # Or str if needed
-    status: Optional[str] = Field(None, max_length=10)
+    status: Optional[str] = Field(None, max_length=20)
     email: Optional[str] = None
     phone: Optional[str] = Field(None, max_length=20)
     score: Optional[int] = None
@@ -47,3 +47,12 @@ class LeadInDB(LeadBase):
 class LeadStageUpdate(BaseModel):
     pipeline_stage_id: int = Field(...)
         
+class LeadCampaignResponse(BaseModel):
+    lead_id: int
+    lead_name: str
+    campaign_id: int
+    campaign_name: str
+    campaign_start_date: Optional[datetime] = None
+    campaign_end_date: Optional[datetime] = None
+    class Config:
+        from_attributes = True

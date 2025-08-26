@@ -1,42 +1,58 @@
 import calendar
 from datetime import datetime
 import json
-from app.schemas.opportunity import OpportunityCreate, OpportunityUpdate
+from app.schemas.opportunity import OpportunityCreate, OpportunityCreateWithProducts, OpportunityUpdate
 from sqlalchemy import Table, Column, Integer, String, MetaData, and_, func, select, insert, update
 from databases import Database
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Opportunity, PipelineStage
+from app.database.models import Lead, Opportunity, PipelineStage, DealProduct
 from typing import Any
 from . import crud_utils
 from datetime import datetime, timedelta
 
+prefix_columns = crud_utils.prefix_columns
 # Get opportunity by ID
 async def get_opportunity_by_id(db: Database, opportunity_id: int):
-    query = select(Opportunity).where(Opportunity.c.id == opportunity_id)
+    query = select(
+        Opportunity.c.id,
+        Opportunity.c.name,
+        Opportunity.c.value,
+        Opportunity.c.close_date,
+        Opportunity.c.created_at,
+        Opportunity.c.lead_id,
+        Lead.c.name.label("lead_name"),
+        PipelineStage.c.id.label("stage_id"),
+        PipelineStage.c.stage.label("stage_name"),
+        PipelineStage.c.order.label("stage_order"),
+    ).select_from(
+        Opportunity
+        .join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+        .join(Lead, Opportunity.c.lead_id == Lead.c.id, isouter=True)
+    )
+    
     return await db.fetch_one(query)
 
 async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
+
     closed_flag = False
-    query = select(func.count()).select_from(Opportunity) if count else select(Opportunity)
-    if ( filters.get("is_closed")):
-        print("Query")
-        query = (
-            select(
-                Opportunity.c.id,
-                Opportunity.c.name,
-                Opportunity.c.value,
-                Opportunity.c.close_date,
-                Opportunity.c.created_at,
-                Opportunity.c.pipeline_stage_id,
-                PipelineStage.c.id.label("stage_id"),
-                PipelineStage.c.stage.label("stage_name"),
-                PipelineStage.c.order.label("stage_order"),
-            )
-            .select_from(
-                Opportunity.join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
-            )
-            
-        )
+    query = select(func.count()) if count else select(
+        Opportunity.c.id,
+        Opportunity.c.name,
+        Opportunity.c.value,
+        Opportunity.c.close_date,
+        Opportunity.c.created_at,
+        Opportunity.c.lead_id,
+        Lead.c.name.label("lead_name"),
+        PipelineStage.c.id.label("stage_id"),
+        PipelineStage.c.stage.label("stage_name"),
+        PipelineStage.c.order.label("stage_order"),
+    ).select_from(
+        Opportunity
+        .join(PipelineStage, Opportunity.c.pipeline_stage_id == PipelineStage.c.id)
+        .join(Lead, Opportunity.c.lead_id == Lead.c.id, isouter=True)
+    )
+    
+
     conditions = []
     for attr, value in filters.items():
         if value is None:
@@ -75,14 +91,17 @@ async def get_opportunities(db: Database, count=False, **filters: dict[str, Any]
     else:
         
         rows = await db.fetch_all(query)
-        # print([dict(row) for row in rows])
-        return [dict(row) for row in rows]
+
+        print("Number of rows:", len(rows))
+        result = [dict(row) for row in rows]
+        print(result)
+        return result
     
 
 
 # Create opportunity
-async def create_opportunity(db: Database, opportunity_data: OpportunityCreate):
-    query = (
+async def create_opportunity(db: Database, opportunity_data: OpportunityCreateWithProducts):
+    query_opp_create = (
         insert(Opportunity)
         .values(
             name=opportunity_data.name,
@@ -90,15 +109,43 @@ async def create_opportunity(db: Database, opportunity_data: OpportunityCreate):
             close_date=opportunity_data.close_date,
             created_at=opportunity_data.created_at,
             lead_id=opportunity_data.lead_id,
-            pipeline_stage_id=opportunity_data.pipeline_stage_id
+            pipeline_stage_id=opportunity_data.stage_id
         )
         .returning(Opportunity)
     )
-
+    
     try:
-        return await db.fetch_one(query)
+        opportunity = await db.fetch_one(query_opp_create)
+        opportunity = dict(opportunity)
     except IntegrityError as e:
+        print("IntegrityError(CREATE Opportunity):", e)
         raise e
+    
+    if opportunity_data.product_list_total:
+        products_data = []
+        for product_id, quantity, unit_price, _ in opportunity_data.product_list_total:
+            products_data.append({
+                "opportunity_id": opportunity["id"],
+                "product_id": product_id,
+                "quantity": quantity,
+                "unit_price": unit_price,
+            })
+        query_deal_product = (
+            insert(DealProduct)
+            .values(products_data)
+            .returning(DealProduct)
+        )
+        try:
+            deal_product = await db.fetch_all(query_deal_product)
+        except IntegrityError as e:
+            print("IntegrityError(CREATE DealProduct):", e)
+            raise e
+    
+    deal_product = [dict(row) for row in deal_product]
+    opportunity["products"] = deal_product
+    opportunity["total"] = sum([item[2] for item in opportunity_data.product_list_total])
+    return opportunity
+    
 
 # Update opportunity
 async def update_opportunity(db: Database, opportunity_id: int, update_data: dict):
