@@ -1,12 +1,12 @@
 {
   "hello": "Hello! How can I help you today?",
   "hi": "Hi there! How are you doing?",
-  "hey": "Hey! How’s your day going?",
-  "how are you": "I’m doing great, thanks for asking! How about you?",
+  "hey": "Hey! How's your day going?",
+  "how are you": "I'm doing great, thanks for asking! How about you?",
   "good morning": "Good morning! Hope you have a productive day ahead.",
   "good afternoon": "Good afternoon! How can I assist you?",
   "good evening": "Good evening! How may I help you?",
-  "what’s up": "Not much, just here to help you with your CRM questions!",
+  "what's up": "Not much, just here to help you with your CRM questions!",
 
   "pricing": "Our pricing depends on your chosen plan. Please check the Pricing section in the CRM.",
   "plans": "We offer multiple plans depending on business size. Would you like to know about Basic, Pro, or Enterprise?",
@@ -114,15 +114,26 @@
   "switch timezone": "Yes, you can update your timezone from Account Settings -> Timezone. All timestamps will update automatically.",
   "deactivate account": "You can temporarily deactivate your account under Account Settings -> Security -> Deactivate Account. You can reactivate anytime by logging back in.",
   "cryptocurrency payments": "Currently, we do not support direct cryptocurrency payments. Please use supported methods like credit card, PayPal, or bank transfer.",
-  "invoice last month": "Yes, you can download invoices from Billing -> Invoices. Select the month you want and click ‘Download PDF’.",
+  "invoice last month": "Yes, you can download invoices from Billing -> Invoices. Select the month you want and click 'Download PDF'.",
   "merge duplicate contacts": "Go to Contacts -> Tools -> Merge Duplicates. The system will suggest possible duplicates, and you can confirm merges automatically.",
   "set recurring tasks": "When creating a new task, select the Recurrence option and choose how often you want it to repeat (daily, weekly, monthly, etc.).",
   "mark multiple opportunities won": "Go to Opportunities -> List View, select the opportunities you want, and use the bulk action menu to mark them as Won.",
   "setup webhook tasks": "Navigate to Settings -> Integrations -> Webhooks. Add a new webhook, select 'Tasks' as the event type, and provide your webhook URL.",
-  "enable two-factor authentication": "Enable 2FA from Account Settings -> Security -> Two-Factor Authentication. You’ll need an authenticator app (like Google Authenticator or Authy).",
+  "enable two-factor authentication": "Enable 2FA from Account Settings -> Security -> Two-Factor Authentication. You'll need an authenticator app (like Google Authenticator or Authy).",
   "download crm backup": "Admins can download a full backup by going to Settings -> Data Management -> Export Data. You can choose CSV, Excel, or JSON format.",
-  "offline mode mobile app": "Currently, offline mode is not supported. You’ll need an internet connection to use the mobile app.",
+  "offline mode mobile app": "Currently, offline mode is not supported. You'll need an internet connection to use the mobile app.",
   "dark mode dashboard": "Yes, dark mode can be enabled under User Settings -> Appearance -> Dark Mode.",
-  "reset dashboard settings": "Go to Dashboard Settings -> Reset to Default. This will remove all custom widgets and layouts."
+  "reset dashboard settings": "Go to Dashboard Settings -> Reset to Default. This will remove all custom widgets and layouts.",
+
+  "What does CRM mean?": "CRM stands for Customer Relationship Management. It is a system that helps businesses manage customer data, interactions, and relationships effectively.",
+  "What are the main features of a CRM?": "Common features include contact management, lead tracking, sales pipeline management, task automation, reporting, and integrations with other tools.",
+  "What are the benefits of using a CRM?": "A CRM improves customer relationships, boosts sales, saves time with automation, and centralizes all customer information in one place.",
+  "Is CRM useful for small businesses?": "Yes. Small businesses can use CRM to organize leads, track sales, and improve customer engagement without needing complex systems.",
+  "How is CRM better than Excel?": "Unlike Excel, a CRM offers automation, real-time collaboration, analytics, and integrations that make managing customers easier and more scalable.",
+  "Why is CRM important?": "CRM is important because it keeps all customer data organized, helps track sales opportunities, and provides insights for business growth.",
+  "Can you give examples of CRM software?": "Yes. Popular CRM software includes Salesforce, HubSpot, Zoho CRM, and Pipedrive.",
+  "What is CRM automation?": "CRM automation refers to automating tasks like sending follow-up emails, assigning leads, creating reminders, and updating records.",
+  "What is CRM analytics?": "CRM analytics provide insights into sales performance, customer behavior, and pipeline health using reports and dashboards.",
+  "What is CRM integration?": "CRM integration allows you to connect with tools like Gmail, Outlook, Slack, marketing platforms, and Zapier to streamline workflows."
 
 }

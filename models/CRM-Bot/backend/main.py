@@ -104,6 +104,7 @@ def respond(msg: Message):
     best_key, score, _ = best_faq_match(normalized_message, list(faq.keys()))
     reply = None
 
+
     if best_key and score >= 70:
         # strong match → direct answer
         reply = faq[best_key]
@@ -116,8 +117,8 @@ def respond(msg: Message):
         # No strong match → try to infer from past context
         if conversation_history:
             last_topic = conversation_history[-1]
-            reply = f"You're asking in relation to {last_topic}. {faq.get(last_topic, 'I don’t have more info on that.')}"
+            reply = f"You're asking in relation to {last_topic}. {faq.get(last_topic, "I don't have more info on that.")}"
         else:
-            reply = "Sorry, I don’t have an answer for that."
+            reply = "Sorry, I don't have an answer for that."
 
     return {"reply": reply}
