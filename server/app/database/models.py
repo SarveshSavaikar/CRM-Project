@@ -94,7 +94,7 @@ Task = Table(
     Column("description", String, nullable=False),
     Column("due_date", DateTime, nullable=False),
     Column("priority", String(50), nullable=False, default="Low"),
-    Column("statusId", Integer, ForeignKey(TaskStage.c.id)),
+    Column("stageid", Integer, ForeignKey(TaskStage.c.id)),
     Column("user_id", Integer, ForeignKey(User.c.id)),
     Column("opportunity_id", Integer, ForeignKey(Opportunity.c.id))
 )

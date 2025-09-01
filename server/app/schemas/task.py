@@ -10,6 +10,7 @@ class TaskBase(BaseModel):
     priority: str = Field(..., max_length=50)
     user_id: Optional[int] = None
     opportunity_id: Optional[int] = None
+    stageid: Optional[int] = None
 
 class TaskCreate(TaskBase):
     status: Optional[str] = Field(default="Pending", max_length=50)
@@ -26,6 +27,9 @@ class TaskUpdate(BaseModel):
     priority: Optional[str] = None
     user_id: Optional[int] = None
     opportunity_id: Optional[int] = None
+    stageid: Optional[int] = None
+    
+    
 
 class TaskResponse(TaskBase):
     id: Optional[int] = None
