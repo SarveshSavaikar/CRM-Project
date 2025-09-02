@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   SearchOutlined,
   MailOutlined,
@@ -10,20 +10,10 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 
-// Dummy data for the inbox messages.
-const initialMessages = [
-  {
-    id: "M001",
-    sender: "Marketing Team (marketing@example.com)", // Added email to sender
-    subject: "Your Weekly CRM Digest: New Feature Unveiled!",
-    body: "Discover new insights from your sales data and optimize your client outreach strategies with our latest update...",
-    timestamp: "2025-08-14 10:30 AM",
-    type: "Email",
-    read: false,
-  },
+const staticMessages = [
   {
     id: "M002",
-    sender: "Alex Johnson (+1-555-123-4567)", // Changed sender to include a phone number
+    sender: "Alex Johnson (+1-555-123-4567)",
     subject: "Regarding our meeting tomorrow",
     body: "Confirming our meeting for tomorrow at 2 PM. Please bring the client success report for review.",
     timestamp: "2025-08-14 09:45 AM",
@@ -32,80 +22,42 @@ const initialMessages = [
   },
   {
     id: "M003",
-    sender: "Sarah Connor (https://linkedin.com/in/sarahconnor)", // Added URL to sender
+    sender: "Sarah Connor (https://linkedin.com/in/sarahconnor)",
     subject: "Connection Request: John Doe - Sales Manager at Acme Corp",
     body: "John Doe sent you a connection request on LinkedIn. Accept or ignore?",
     timestamp: "2025-08-13 03:00 PM",
     type: "LinkedIn",
     read: false,
   },
-  {
-    id: "M004",
-    sender: "Support Desk (support@example.com)",
-    subject: "[Ticket #CRM-2024-005] Your CRM Login Issue Resolved",
-    body: "Good news! We have successfully resolved the login issue you reported. Please try logging in again.",
-    timestamp: "2025-08-12 11:00 AM",
-    type: "Email",
-    read: true,
-  },
-  {
-    id: "M005",
-    sender: "Project Alpha Team (alpha@example.com)",
-    subject: "Urgent: Feedback on Q3 Campaign Draft",
-    body: "Please review the attached Q3 campaign draft and provide your feedback by end of day today. Your input is crucial.",
-    timestamp: "2025-08-11 02:00 PM",
-    type: "Email",
-    read: false,
-  },
-  {
-    id: "M006",
-    sender: "Billing Department (billing@example.com)",
-    subject: "Your CRM Subscription Renewal Reminder",
-    body: "Your annual CRM subscription is set to renew on September 15th. Please ensure your payment details are up to date.",
-    timestamp: "2025-08-10 09:00 AM",
-    type: "Email",
-    read: true,
-  },
-  {
-    id: "M007",
-    sender: "Industry News Digest (news@example.com)",
-    subject: "Top 5 Trends Shaping the SaaS Landscape in 2024",
-    body: "Stay ahead of the curve with our latest report on the most impactful trends in the SaaS industry this year...",
-    timestamp: "2025-08-09 08:00 AM",
-    type: "Email",
-    read: true,
-  },
 ];
 
-// --- Reusable Styles ---
 const pageContainerStyle = {
   fontFamily: "Inter, sans-serif",
   minHeight: "100vh",
   padding: "28px",
   display: "flex",
   gap: "28px",
-  position: "relative" as "relative",
+  position: "relative",
   transition: "filter 0.3s ease-in-out",
-  // Add pointer events for the background content
-  // We'll set this dynamically
 };
 const inboxContainerStyle = {
-  flex: 2,
+  width: "800px",
   background: "#fff",
   borderRadius: "12px",
   boxShadow: "0 1px 6px 0 #f0f1f3",
   display: "flex",
-  flexDirection: "column" as "column",
+  flexDirection: "column",
+  overflowY: "auto",
 };
 const messageDetailsContainerStyle = {
-  flex: 1,
+  width: "400px",
   background: "#fff",
   borderRadius: "12px",
   boxShadow: "0 1px 6px 0 #f0f1f3",
   display: "flex",
-  flexDirection: "column" as "column",
+  flexDirection: "column",
   padding: "20px",
-  overflowY: "auto" as "auto",
+  overflowY: "auto",
 };
 const emptyMessageDetailsContainerStyle = {
   flex: 1,
@@ -113,13 +65,13 @@ const emptyMessageDetailsContainerStyle = {
   borderRadius: "12px",
   boxShadow: "0 1px 6px 0 #f0f1f3",
   display: "flex",
-  flexDirection: "column" as "column",
+  flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
   color: "#a8b0c8",
   fontSize: "14px",
   padding: "20px",
-  textAlign: "center" as "center",
+  textAlign: "center",
 };
 const inboxHeaderStyle = {
   display: "flex",
@@ -128,18 +80,15 @@ const inboxHeaderStyle = {
   padding: "16px 24px",
   borderBottom: "1px solid #f0f1f3",
 };
-
-// --- NEW SEARCH INPUT STYLES ---
 const searchInputContainerStyle = {
   flex: 1,
-  position: "relative" as "relative",
+  position: "relative",
   maxWidth: "300px",
   border: "1px solid #d9d9d9",
   borderRadius: "6px",
   display: "flex",
   overflow: "hidden",
 };
-
 const searchInputStyle = {
   border: "none",
   outline: "none",
@@ -147,7 +96,6 @@ const searchInputStyle = {
   fontSize: "15px",
   flex: 1,
 };
-
 const searchButtonStyle = {
   background: "#1467fa",
   border: "none",
@@ -157,8 +105,6 @@ const searchButtonStyle = {
   alignItems: "center",
   color: "#fff",
 };
-// ------------------------------------
-
 const newMessageButtonStyle = {
   padding: "8px 16px",
   borderRadius: "5px",
@@ -177,7 +123,7 @@ const tabContainerStyle = {
   padding: "16px 24px",
   borderBottom: "1px solid #f0f1f3",
 };
-const tabStyle = (active: boolean) => ({
+const tabStyle = (active) => ({
   padding: "8px 16px",
   borderRadius: "20px",
   fontWeight: 500,
@@ -187,8 +133,6 @@ const tabStyle = (active: boolean) => ({
   color: active ? "#1467fa" : "#636b91",
   marginRight: "8px",
 });
-
-// --- MODIFIED filterSortContainerStyle
 const filterSortContainerStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -198,21 +142,16 @@ const filterSortContainerStyle = {
   color: "#a8b0c8",
   fontSize: "14px",
 };
-// ------------------------------------
-
-const messageListStyle = {
-  overflowY: "auto" as "auto",
-  flex: 1,
-};
-const messageItemStyle = (read: boolean, selected: boolean) => ({
+const messageListStyle = { overflowY: "auto", flex: 1 };
+const messageItemStyle = (read, selected) => ({
   padding: "18px 24px",
   borderBottom: "1px solid #f0f1f3",
   cursor: "pointer",
   background: selected ? "#f0f2f7" : "#fff",
   transition: "background 0.2s",
-  position: "relative" as "relative",
+  position: "relative",
   display: "flex",
-  flexDirection: "column" as "column",
+  flexDirection: "column",
 });
 const messageHeaderStyle = {
   display: "flex",
@@ -220,12 +159,12 @@ const messageHeaderStyle = {
   alignItems: "flex-start",
   marginBottom: "4px",
 };
-const messageSenderStyle = (read: boolean) => ({
+const messageSenderStyle = (read) => ({
   fontWeight: read ? 400 : 600,
   fontSize: "15px",
   color: "#2d334a",
 });
-const messageSubjectStyle = (read: boolean) => ({
+const messageSubjectStyle = (read) => ({
   fontWeight: read ? 400 : 600,
   fontSize: "15px",
   color: "#2d334a",
@@ -235,28 +174,23 @@ const messageSubjectStyle = (read: boolean) => ({
 const messageBodyStyle = {
   fontSize: "14px",
   color: "#636b91",
-  whiteSpace: "nowrap" as "nowrap",
+  whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
   width: "100%",
 };
-const messageTimestampStyle = {
-  fontSize: "13px",
-  color: "#a8b0c8",
-};
+const messageTimestampStyle = { fontSize: "13px", color: "#a8b0c8" };
 const unreadDotStyle = {
   width: "8px",
   height: "8px",
   borderRadius: "50%",
   background: "#1467fa",
-  position: "absolute" as "absolute",
+  position: "absolute",
   left: "10px",
   top: "50%",
   transform: "translateY(-50%)",
 };
-const mailIconContainerStyle = {
-  marginBottom: "16px",
-};
+const mailIconContainerStyle = { marginBottom: "16px" };
 const mailIconStyle = {
   fontSize: "48px",
   border: "2px solid #e0e7ff",
@@ -283,20 +217,14 @@ const messageDetailsSenderStyle = {
   fontWeight: 500,
   color: "#2d334a",
 };
-const messageDetailsTimestampStyle = {
-  fontSize: "13px",
-  color: "#a8b0c8",
-};
+const messageDetailsTimestampStyle = { fontSize: "13px", color: "#a8b0c8" };
 const messageDetailsBodyStyle = {
   fontSize: "15px",
   color: "#517a49ff",
   lineHeight: "1.6",
-  overflowY: "auto" as "auto",
+  overflowY: "auto",
 };
-const actionButtonContainerStyle = {
-  display: "flex",
-  gap: "10px",
-};
+const actionButtonContainerStyle = { display: "flex", gap: "10px" };
 const actionButtonStyle = {
   padding: "6px 12px",
   borderRadius: "20px",
@@ -310,7 +238,7 @@ const actionButtonStyle = {
   alignItems: "center",
   gap: "6px",
 };
-const filterOptionStyle = (active: boolean) => ({
+const filterOptionStyle = (active) => ({
   cursor: "pointer",
   padding: "4px 10px",
   borderRadius: "16px",
@@ -319,10 +247,7 @@ const filterOptionStyle = (active: boolean) => ({
   color: active ? "#1467fa" : "#636b91",
   fontWeight: 500,
 });
-const sortDropdownStyle = {
-  position: "relative" as "relative",
-  display: "inline-block",
-};
+const sortDropdownStyle = { position: "relative", display: "inline-block" };
 const sortDropdownButtonStyle = {
   display: "flex",
   alignItems: "center",
@@ -332,7 +257,7 @@ const sortDropdownButtonStyle = {
   fontSize: "14px",
 };
 const sortDropdownMenuContainerStyle = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "100%",
   right: 0,
   background: "#fff",
@@ -343,17 +268,15 @@ const sortDropdownMenuContainerStyle = {
   minWidth: "120px",
   padding: "4px 0",
 };
-const sortDropdownMenuItemStyle = (active: boolean) => ({
+const sortDropdownMenuItemStyle = (active) => ({
   padding: "8px 12px",
   cursor: "pointer",
   fontWeight: active ? 600 : 400,
   color: active ? "#1467fa" : "#636b91",
   backgroundColor: active ? "#eef2ff" : "transparent",
 });
-
-// New and updated styles for the message prompt form (modal)
 const modalOverlayStyle = {
-  position: "fixed" as "fixed",
+  position: "fixed",
   top: 0,
   left: 0,
   right: 0,
@@ -363,21 +286,19 @@ const modalOverlayStyle = {
   justifyContent: "center",
   alignItems: "center",
   zIndex: 1000,
-  pointerEvents: "auto" as "auto",
+  pointerEvents: "auto",
 };
-
 const modalBoxStyle = {
   background: "#fff",
   borderRadius: "12px",
   padding: "24px",
   width: "400px",
   display: "flex",
-  flexDirection: "column" as "column",
+  flexDirection: "column",
   gap: "16px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-  pointerEvents: "auto" as "auto", // Ensure the modal box is clickable
+  pointerEvents: "auto",
 };
-
 const newMessageHeaderStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -386,11 +307,7 @@ const newMessageHeaderStyle = {
   paddingBottom: "16px",
   marginBottom: "20px",
 };
-
-const newMessageFormGroupStyle = {
-  marginBottom: "16px",
-};
-
+const newMessageFormGroupStyle = { marginBottom: "16px" };
 const newMessageInputStyle = {
   width: "100%",
   padding: "10px",
@@ -398,20 +315,17 @@ const newMessageInputStyle = {
   borderRadius: "8px",
   fontSize: "15px",
 };
-
 const newMessageTextareaStyle = {
   ...newMessageInputStyle,
   minHeight: "100px",
-  resize: "vertical" as "vertical",
+  resize: "vertical",
 };
-
 const newMessageLabelStyle = {
   display: "block",
   marginBottom: "8px",
   fontWeight: 500,
   color: "#2d334a",
 };
-
 const newMessageSendButtonStyle = {
   padding: "12px 24px",
   borderRadius: "8px",
@@ -422,23 +336,14 @@ const newMessageSendButtonStyle = {
   fontSize: "16px",
   cursor: "pointer",
 };
-
-const platformDropdownStyle = {
-  ...newMessageInputStyle,
-  cursor: "pointer",
-};
-
+const platformDropdownStyle = { ...newMessageInputStyle, cursor: "pointer" };
 const newMessageDropdownContainerStyle = {
-  position: "relative" as "relative",
+  position: "relative",
   display: "inline-block",
 };
-
-const newMessageDropdownButtonStyle = {
-  ...newMessageButtonStyle,
-};
-
+const newMessageDropdownButtonStyle = { ...newMessageButtonStyle };
 const newMessageDropdownMenuContainerStyle = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "100%",
   left: 0,
   background: "#fff",
@@ -449,38 +354,29 @@ const newMessageDropdownMenuContainerStyle = {
   minWidth: "160px",
   padding: "4px 0",
 };
-
 const newMessageDropdownMenuItemStyle = {
   padding: "8px 12px",
   cursor: "pointer",
   fontWeight: 400,
   color: "#636b91",
-  "&:hover": {
-    backgroundColor: "#eef2ff",
-    color: "#1467fa",
-  },
 };
 
-// A simple debounce function to prevent excessive re-renders on search input
-const debounce = (func: (...args: any[]) => void, delay: number) => {
-  let timeout: ReturnType<typeof setTimeout>;
-  return function (...args: any[]) {
+const debounce = (func, delay) => {
+  let timeout;
+  return function (...args) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), delay);
   };
 };
-
-// Function to extract contact information from the sender string
-const extractContact = (sender: string) => {
+const extractContact = (sender) => {
   const match = sender.match(/\(([^)]+)\)/);
   return match ? match[1] : "";
 };
 
 export const InboxIndex = () => {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState([...staticMessages]);
   const [activeTab, setActiveTab] = useState("All Messages");
-  const [selectedMessage, setSelectedMessage] =
-    useState<typeof initialMessages[number] | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
   const [readFilter, setReadFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -488,99 +384,189 @@ export const InboxIndex = () => {
   const [isNewMessageDropdownOpen, setIsNewMessageDropdownOpen] =
     useState(false);
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [isForwarding, setIsForwarding] = useState(false);
-  const [replyInfo, setReplyInfo] = useState({ to: "", subject: "", body: "" }); // New state for pre-filled reply info
+  const [replyInfo, setReplyInfo] = useState({ to: "", subject: "", body: "" });
+  const [loading, setLoading] = useState(false);
+  const [fetchController, setFetchController] = useState(null);
 
-  // Debounced search term update
+  // Fetch emails and update messages state
+  useEffect(() => {
+    // Abort previous fetch if ongoing
+    if (fetchController) fetchController.abort();
+
+    if (activeTab === "Email" || activeTab === "All Messages") {
+      const controller = new AbortController();
+      setFetchController(controller);
+      setLoading(true);
+
+      fetch("http://127.0.0.1:8000/Email/emails/new", {
+        signal: controller.signal,
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Network response was not ok");
+          return res.json();
+        })
+        .then((emails) => {
+          const fetchedEmails = (emails || []).map((msg, idx) => ({
+            id: `EMAIL${idx + 1}`,
+            sender: msg.sender,
+            subject: msg.subject,
+            body: msg.body,
+            timestamp: msg.date,
+            type: "Email",
+            read: false,
+          }));
+          if (activeTab === "All Messages") {
+            setMessages([...fetchedEmails, ...staticMessages]);
+          } else {
+            setMessages(fetchedEmails);
+          }
+        })
+        .catch((e) => {
+          if (e.name !== "AbortError") {
+            console.error("Failed to fetch emails:", e);
+          }
+        })
+        .finally(() => setLoading(false));
+
+      return () => controller.abort();
+    }
+
+    if (activeTab === "WhatsApp") {
+      setMessages(staticMessages.filter((msg) => msg.type === "WhatsApp"));
+    } else if (activeTab === "LinkedIn") {
+      setMessages(staticMessages.filter((msg) => msg.type === "LinkedIn"));
+    } else {
+      setMessages([...staticMessages]);
+    }
+  }, [activeTab]);
+
+  // Auto-refresh emails every 60 seconds when Email tab is active
+  useEffect(() => {
+    if (activeTab !== "Email") return;
+
+    const intervalId = setInterval(() => {
+      fetch("http://127.0.0.1:8000/Email/emails/new")
+        .then((res) => res.json())
+        .then((emails) => {
+          const mapped = (emails || []).map((msg, idx) => ({
+            id: `EMAIL${idx + 1}`,
+            sender: msg.sender,
+            subject: msg.subject,
+            body: msg.body,
+            timestamp: msg.date,
+            type: "Email",
+            read: false,
+          }));
+          setMessages(mapped);
+        })
+        .catch(console.error);
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, [activeTab]);
+
   const handleSearchChange = useCallback(
-    debounce((value: string) => {
-      setSearchTerm(value.toLowerCase());
-    }, 300),
-    []
+    debounce((value) => setSearchTerm(value.toLowerCase()), 300),
+    [],
   );
 
   const filteredAndSortedMessages = useMemo(() => {
-    // 1. Filter by search term
     const bySearch = messages.filter(
       (msg) =>
-        msg.sender.toLowerCase().includes(searchTerm) ||
-        msg.subject.toLowerCase().includes(searchTerm) ||
-        msg.body.toLowerCase().includes(searchTerm)
+        msg.sender?.toLowerCase().includes(searchTerm) ||
+        msg.subject?.toLowerCase().includes(searchTerm) ||
+        msg.body?.toLowerCase().includes(searchTerm),
     );
-
-    // 2. Filter by message type
-    const byType = bySearch.filter(
-      (msg) => activeTab === "All Messages" || msg.type.toLowerCase() === activeTab.toLowerCase()
-    );
-
-    // 3. Filter by read status
+    const byType = bySearch.filter((msg) => {
+      if (activeTab === "All Messages") return true;
+      return msg.type.toLowerCase() === activeTab.toLowerCase();
+    });
     const byReadStatus = byType.filter((msg) => {
       if (readFilter === "read") return msg.read;
       if (readFilter === "unread") return !msg.read;
       return true;
     });
-
-    // 4. Sort by time
     return byReadStatus.sort((a, b) => {
       const dateA = new Date(a.timestamp);
       const dateB = new Date(b.timestamp);
-      return sortOrder === "newest"
-        ? dateB.getTime() - dateA.getTime()
-        : dateA.getTime() - dateB.getTime();
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
   }, [messages, activeTab, readFilter, searchTerm, sortOrder]);
 
-  const handleMessageClick = (msgId: string) => {
+  const handleMessageClick = (msgId) => {
     const newMessages = messages.map((msg) =>
-      msg.id === msgId ? { ...msg, read: true } : msg
+      msg.id === msgId ? { ...msg, read: true } : msg,
     );
     setMessages(newMessages);
     setSelectedMessage(newMessages.find((msg) => msg.id === msgId) || null);
   };
 
-  const handleNewMessageClick = (platform: string) => {
+  const handleNewMessageClick = (platform) => {
     setSelectedPlatform(platform);
-    setReplyInfo({ to: "", subject: "", body: "" }); // Clear reply info for new message
+    setReplyInfo({ to: "", subject: "", body: "" });
     setIsNewMessageModalOpen(true);
-    setIsNewMessageDropdownOpen(false); // Close the platform dropdown
-    setIsForwarding(false); // Not a forward
+    setIsNewMessageDropdownOpen(false);
+    setIsForwarding(false);
   };
 
-  // --- NEW: handleForward function to set the state for the modal ---
   const handleReply = () => {
     if (!selectedMessage) return;
-
     const to = extractContact(selectedMessage.sender);
     const subject = `Re: ${selectedMessage.subject}`;
     const body = `\n\n--- Original Message ---\nFrom: ${selectedMessage.sender}\nSent: ${selectedMessage.timestamp}\nSubject: ${selectedMessage.subject}\n\n${selectedMessage.body}`;
-
     setSelectedPlatform(selectedMessage.type);
     setReplyInfo({ to, subject, body });
     setIsNewMessageModalOpen(true);
-    setIsForwarding(false); // It's a reply, not a forward
+    setIsForwarding(false);
   };
 
-  // --- NEW: handleForward function to set the state for the modal ---
   const handleForward = () => {
     if (!selectedMessage) return;
-
-    // Leave 'to' field empty for a new recipient
-    const to = "";
-    // Preserve the original subject and body for the forward
-    const subject = selectedMessage.subject;
-    const body = selectedMessage.body;
-
     setSelectedPlatform(selectedMessage.type);
-    setReplyInfo({ to, subject, body });
+    setReplyInfo({
+      to: "",
+      subject: selectedMessage.subject,
+      body: selectedMessage.body,
+    });
     setIsNewMessageModalOpen(true);
-    setIsForwarding(true); // Set state to true for forwarding
+    setIsForwarding(true);
   };
-  // -----------------------------------------------------------------
 
-  const tabs = ["All Messages", "WhatsApp", "Email", "LinkedIn"];
+  const handleSendEmail = async () => {
+    const emailData = {
+      to: [replyInfo.to],
+      subject: replyInfo.subject,
+      message: replyInfo.body,
+    };
+    const res = await fetch("http://127.0.0.1:8000/Email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(emailData),
+    });
+    const result = await res.json();
+    alert(result.message || "Message Sent ✅");
+    setIsNewMessageModalOpen(false);
+    if (selectedPlatform === "Email") {
+      fetch("http://127.0.0.1:8000/Email/emails/new")
+        .then((res) => res.json())
+        .then((emails) => {
+          const mapped = (emails || []).map((msg, idx) => ({
+            id: `EMAIL${idx + 1}`,
+            sender: msg.sender,
+            subject: msg.subject,
+            body: msg.body,
+            timestamp: msg.date,
+            type: "Email",
+            read: false,
+          }));
+          setMessages(mapped);
+        })
+        .catch(console.error);
+    }
+  };
 
-  // --- MODIFIED: renderFormFields to use replyInfo and readOnly for forward ---
   const renderFormFields = () => {
     switch (selectedPlatform) {
       case "Email":
@@ -608,7 +594,7 @@ export const InboxIndex = () => {
                 onChange={(e) =>
                   setReplyInfo({ ...replyInfo, subject: e.target.value })
                 }
-                readOnly={isForwarding} // Make subject non-editable for forward
+                readOnly={isForwarding}
               />
             </div>
             <div style={newMessageFormGroupStyle}>
@@ -616,14 +602,14 @@ export const InboxIndex = () => {
               <textarea
                 style={{
                   ...newMessageTextareaStyle,
-                  cursor: isForwarding ? "not-allowed" : "text", // Add a visual cue
+                  cursor: isForwarding ? "not-allowed" : "text",
                 }}
                 placeholder="Write your message here..."
                 value={replyInfo.body}
                 onChange={(e) =>
                   setReplyInfo({ ...replyInfo, body: e.target.value })
                 }
-                readOnly={isForwarding} // Make body non-editable for forward
+                readOnly={isForwarding}
               />
             </div>
           </>
@@ -655,7 +641,7 @@ export const InboxIndex = () => {
                 onChange={(e) =>
                   setReplyInfo({ ...replyInfo, body: e.target.value })
                 }
-                readOnly={isForwarding} // Make body non-editable for forward
+                readOnly={isForwarding}
               />
             </div>
           </>
@@ -685,7 +671,7 @@ export const InboxIndex = () => {
                 onChange={(e) =>
                   setReplyInfo({ ...replyInfo, subject: e.target.value })
                 }
-                readOnly={isForwarding} // Make subject non-editable for forward
+                readOnly={isForwarding}
               />
             </div>
             <div style={newMessageFormGroupStyle}>
@@ -700,7 +686,7 @@ export const InboxIndex = () => {
                 onChange={(e) =>
                   setReplyInfo({ ...replyInfo, body: e.target.value })
                 }
-                readOnly={isForwarding} // Make body non-editable for forward
+                readOnly={isForwarding}
               />
             </div>
           </>
@@ -709,24 +695,23 @@ export const InboxIndex = () => {
         return null;
     }
   };
-  // -----------------------------------------------------------------
 
   const mainContentStyle = {
     ...pageContainerStyle,
     filter: isNewMessageModalOpen ? " grayscale(50%)" : "none",
   };
 
+  const tabs = ["All Messages", "WhatsApp", "Email", "LinkedIn"];
+
   return (
     <>
       <div style={mainContentStyle}>
-        {/* Left Pane (Message List) */}
         <div style={inboxContainerStyle}>
-          {/* Inbox Header */}
           <div style={inboxHeaderStyle}>
             <h2
               style={{
                 margin: 0,
-                fontSize: "20px",
+                fontSize: 20,
                 fontWeight: 600,
                 color: "#2d334a",
               }}
@@ -736,7 +721,9 @@ export const InboxIndex = () => {
             <div style={newMessageDropdownContainerStyle}>
               <button
                 style={newMessageDropdownButtonStyle}
-                onClick={() => setIsNewMessageDropdownOpen(!isNewMessageDropdownOpen)}
+                onClick={() =>
+                  setIsNewMessageDropdownOpen(!isNewMessageDropdownOpen)
+                }
               >
                 <PlusOutlined /> New Message <DownOutlined />
               </button>
@@ -764,7 +751,6 @@ export const InboxIndex = () => {
               )}
             </div>
           </div>
-          {/* Tabs */}
           <div style={tabContainerStyle}>
             {tabs.map((tab) => (
               <div
@@ -776,19 +762,17 @@ export const InboxIndex = () => {
               </div>
             ))}
           </div>
-          {/* Filter and Sort */}
-          {/* UPDATED: Split the row into two sections */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f0f1f3', color: '#a8b0c8', fontSize: '14px' }}>
-            {/* Left Section: Sort & Filter */}
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+
+          <div style={filterSortContainerStyle}>
+            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
               <div style={sortDropdownStyle}>
                 <div
                   style={sortDropdownButtonStyle}
                   onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
                 >
-                  <SortAscendingOutlined />
-                  Sort by: {sortOrder === "newest" ? "Newest" : "Oldest"}
-                  <DownOutlined style={{ fontSize: "12px", marginLeft: "4px" }} />
+                  <SortAscendingOutlined /> Sort by:{" "}
+                  {sortOrder === "newest" ? "Newest" : "Oldest"}
+                  <DownOutlined style={{ fontSize: 12, marginLeft: 4 }} />
                 </div>
                 {isSortDropdownOpen && (
                   <div style={sortDropdownMenuContainerStyle}>
@@ -813,7 +797,7 @@ export const InboxIndex = () => {
                   </div>
                 )}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <FilterOutlined /> Filter by:
                 <span
                   style={filterOptionStyle(readFilter === "all")}
@@ -835,7 +819,6 @@ export const InboxIndex = () => {
                 </span>
               </div>
             </div>
-            {/* Right Section: Search */}
             <div style={searchInputContainerStyle}>
               <input
                 type="text"
@@ -851,33 +834,41 @@ export const InboxIndex = () => {
               </button>
             </div>
           </div>
-          {/* Message List */}
-          <div style={messageListStyle}>
-            {filteredAndSortedMessages.map((msg) => (
-              <div
-                key={msg.id}
-                style={messageItemStyle(msg.read, selectedMessage?.id === msg.id)}
-                onClick={() => handleMessageClick(msg.id)}
-              >
-                {!msg.read && <div style={unreadDotStyle} />}
-                <div style={{ paddingLeft: !msg.read ? "12px" : 0 }}>
-                  <div style={messageHeaderStyle}>
-                    <span style={messageSenderStyle(msg.read)}>
-                      {msg.sender}
-                    </span>
-                    <span style={messageTimestampStyle}>
-                      {msg.timestamp.split(" ")[1]} {msg.timestamp.split(" ")[2]}
-                    </span>
+
+          {loading ? (
+            <div style={{ padding: 20, textAlign: "center", color: "#636b91" }}>
+              Loading emails...
+            </div>
+          ) : (
+            <div style={messageListStyle}>
+              {filteredAndSortedMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  style={messageItemStyle(
+                    msg.read,
+                    selectedMessage?.id === msg.id,
+                  )}
+                  onClick={() => handleMessageClick(msg.id)}
+                >
+                  {!msg.read && <div style={unreadDotStyle} />}
+                  <div style={{ paddingLeft: !msg.read ? 12 : 0 }}>
+                    <div style={messageHeaderStyle}>
+                      <span style={messageSenderStyle(msg.read)}>
+                        {msg.sender}
+                      </span>
+                      <span style={messageTimestampStyle}>{msg.timestamp}</span>
+                    </div>
+                    <div style={messageSubjectStyle(msg.read)}>
+                      {msg.subject}
+                    </div>
+                    <div style={messageBodyStyle}>{msg.body}</div>
                   </div>
-                  <div style={messageSubjectStyle(msg.read)}>{msg.subject}</div>
-                  <div style={messageBodyStyle}>{msg.body}</div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Right Pane (Message Details) */}
         {selectedMessage ? (
           <div style={messageDetailsContainerStyle}>
             <div style={messageDetailsHeaderStyle}>
@@ -894,22 +885,14 @@ export const InboxIndex = () => {
               </div>
             </div>
             <div style={messageDetailsBodyStyle}>{selectedMessage.body}</div>
-            <div style={{ marginTop: "auto", paddingTop: "20px" }}>
+            <div style={{ marginTop: "auto", paddingTop: 20 }}>
               <div style={actionButtonContainerStyle}>
-                <button
-                  style={actionButtonStyle}
-                  onClick={handleReply}
-                >
+                <button style={actionButtonStyle} onClick={handleReply}>
                   <ArrowRightOutlined /> Reply
                 </button>
-                {/* --- MODIFIED: Added onClick to the Forward button --- */}
-                <button
-                  style={actionButtonStyle}
-                  onClick={handleForward}
-                >
+                <button style={actionButtonStyle} onClick={handleForward}>
                   <MailOutlined /> Forward
                 </button>
-                {/* --------------------------------------------------- */}
               </div>
             </div>
           </div>
@@ -924,32 +907,33 @@ export const InboxIndex = () => {
         )}
       </div>
 
-      {/* New Message Modal (Conditionally Rendered) */}
       {isNewMessageModalOpen && (
         <div style={modalOverlayStyle}>
           <div style={modalBoxStyle}>
             <div style={newMessageHeaderStyle}>
               <h3 style={{ margin: 0, fontWeight: 600 }}>
-                {isForwarding ? `Forward ${selectedPlatform} Message` : `New ${selectedPlatform} Message`}
+                {isForwarding
+                  ? `Forward ${selectedPlatform} Message`
+                  : `New ${selectedPlatform} Message`}
               </h3>
               <CloseOutlined
-                style={{
-                  fontSize: "18px",
-                  cursor: "pointer",
-                  color: "#636b91",
-                }}
+                style={{ fontSize: 18, cursor: "pointer", color: "#636b91" }}
                 onClick={() => setIsNewMessageModalOpen(false)}
               />
             </div>
-
             {renderFormFields()}
-
             <button
               style={newMessageSendButtonStyle}
-              onClick={() => {
-                alert("Message Sent ✅");
-                setIsNewMessageModalOpen(false);
-              }}
+              onClick={
+                selectedPlatform === "Email"
+                  ? handleSendEmail
+                  : () => {
+                      alert(
+                        "Message Sent ✅ (dummy, no API for this platform)",
+                      );
+                      setIsNewMessageModalOpen(false);
+                    }
+              }
             >
               Send Message
             </button>

@@ -117,7 +117,7 @@ def scrape_message_metadata(driver, max_conversations=10, max_messages=20):
 
 @router.get("/messages/details")
 def get_linkedin_message_details():
-    driver = init_driver()
+    driver = init_driver()   
     try:
         linkedin_login(driver)
         conversations = scrape_message_metadata(driver)
