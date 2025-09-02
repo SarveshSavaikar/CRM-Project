@@ -58,8 +58,9 @@ async def update_task(db: Database, task_id: int = None, taskObj: TaskUpdate = N
 
     update_data = taskObj.model_dump(exclude_unset=True)
     
-    
+    print("Update data:- ",taskObj)
     if task_id is not None:
+        print("Updating the task")
         return await task.update_task(db, task_id, update_data)
     else:
         return await task.update_tasks_by_filters(db, update_data, **filters)

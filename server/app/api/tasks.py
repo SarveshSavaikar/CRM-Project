@@ -22,7 +22,10 @@ async def get_task(
     before: bool = True, 
     db: Database = Depends(get_db)
 ):
-    return await task_service.get_tasks(db,title ,  due_date, status, priority, user_id, opportunity_id, before)
+    result = await task_service.get_tasks(db,title ,  due_date, status, priority, user_id, opportunity_id, before)
+    print(result)
+    print("final")
+    return result
 
 
 @router.get("/task-{task_id}", response_model=TaskResponse)

@@ -31,6 +31,8 @@ async def get_tasks(db: Database, count:bool = False, **filters: dict[str, Any])
         return await db.execute(query)
     else:
         rows = await db.fetch_all(query)
+        print("Rows :-",rows)
+        print()
         return [dict(row) for row in rows]
     
 
@@ -61,10 +63,11 @@ async def update_task(db: Database, task_id: int, update_data: dict):
     update_query = (
         Task
         .update()
-        .where(Task.c.id == task_id)
         .values(**update_data)
-        .returning(Task)
+        .where(Task.c.id == task_id)
+        .returning(*Task.c)
     )
+    print(str(update_query))
     updated_task = await db.fetch_one(update_query)
     
     return updated_task
