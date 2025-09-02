@@ -32,7 +32,6 @@ with open("badwords.json", "r") as f:
 # Multi-turn context memory (last 5 turns)
 conversation_history = deque(maxlen=5)
 
-# Synonym dictionary
 synonyms = {
     "subscription": ["plan", "plans", "package", "membership"],
     "cost": ["price", "charges", "fees"],
@@ -46,11 +45,10 @@ synonyms = {
     "invoice": ["bill", "receipt", "statement"]
 }
 
-# Stopwords
 STOPWORDS = {
-    "the","is","a","an","to","for","of","and","or","in","on","with",
-    "do","does","did","i","you","we","they","it","that","this","my",
-    "your","their","our","can","how","what","where","when","why","please"
+    "the", "is", "a", "an", "to", "for", "of", "and", "or", "in", "on", "with",
+    "do", "does", "did", "i", "you", "we", "they", "it", "that", "this", "my",
+    "your", "their", "our", "can", "how", "what", "where", "when", "why", "please"
 }
 
 # Normalize text
@@ -104,17 +102,13 @@ def respond(msg: Message):
     best_key, score, _ = best_faq_match(normalized_message, list(faq.keys()))
     reply = None
 
-
-    if best_key and score >= 70:
-        # strong match → direct answer
+    if best_key and score >= 70:  # strong match → direct answer
         reply = faq[best_key]
         conversation_history.append(best_key)
-    elif best_key and score >= 50:
-        # weak match → return FAQ answer (no gratitude templates)
+    elif best_key and score >= 50:  # weak match → return FAQ answer (no gratitude templates)
         reply = faq.get(best_key, "Sorry, I don't have enough info on that.")
         conversation_history.append(best_key)
-    else:
-        # No strong match → try to infer from past context
+    else:  # No strong match → try to infer from past context
         if conversation_history:
             last_topic = conversation_history[-1]
             reply = f"You're asking in relation to {last_topic}. {faq.get(last_topic, "I don't have more info on that.")}"
