@@ -28,7 +28,6 @@ import { useQueryClient } from "@tanstack/react-query";
 // import { queryClient } from "./refineClient";
 import { useInvalidate } from "@refinedev/core";
 
-const invalidate = useInvalidate();
 
 
 interface TaskUpdateInput {
@@ -47,6 +46,9 @@ type TaskStage = GetFieldsFromList<TaskStagesQuery> & { tasks: Task[] };
 
 export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   const { replace } = useNavigation();
+  const invalidate = useInvalidate();
+  const queryClient = useQueryClient();
+
 
   // const { data: stages, isLoading: isLoadingStages } = useList<TaskStage>({
   //   resource: "taskStages",
@@ -93,7 +95,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   //     gqlQuery: TASKS_QUERY,
   //   },
   // });
-  const { data: tasks, isLoading: isLoadingTasks } = useCustom<{
+  const { data: tasks, isLoading: isLoadingTasks  } = useCustom<{
     [x: string]: any;data: any[]
 }>({
     url:"/tasks/",
@@ -108,17 +110,17 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
     return { unassignedStage: [], columns: [] };
   }
 
-  const unassignedStage = tasks.data.data.filter(
+  const unassignedStage = tasks.data.data?.filter(
     (task) => task.stageid === null
   );
 
   const grouped: TaskStage[] = stages.data.data.map((stage) => ({
     ...stage,
-    tasks: tasks.data.data.filter(
+    tasks: tasks.data?.filter(
       (task: { stageid: number }) => task.stageid === stage.id
     ),
   }));
-
+  console.log("Grouped ",grouped)
   return {
     unassignedStage,
     columns: grouped,
@@ -146,6 +148,18 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   const taskStageId = event.active.data.current?.stageid;
 
   if (taskStageId === stageId) return;
+  console.log(queryClient.getQueryCache().getAll().map(q => q.queryKey));
+
+  queryClient.setQueryData(["data", "default", "custom", { url: "/tasks/", method: "get" }], (oldData: any) => {
+    if (!oldData) return oldData;
+    console.log("Oldata ",oldData)
+    return {
+      ...oldData,
+      data: oldData.data.map((task: any) =>
+        task.id === taskId ? { ...task, stageid: stageId } : task
+      ),
+    };
+  });
 
   updateTask(
     {
@@ -210,7 +224,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
             )}
           </KanbanColumn>   */}
           {taskStages.columns?.map((column) => {
-            console.log("Showing columns")
+            console.log("Showing columns" , column.tasks?.length)
             return (
               <KanbanColumn
                 key={column.id}
@@ -219,9 +233,12 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
                 count={column.tasks?.length}
                 onAddClick={() => handleAddCard({ stageId: column.id })}
               >
-                {isLoading && <ProjectCardSkeleton />}
+                {isLoading && <ProjectCardSkeleton /> }
+                {isLoading && console.log("Emo")}
+                
                 {!isLoading &&
                   column.tasks?.map((task) => {
+                    console.log("Task.id = ",task)
                     return (
                       <KanbanItem key={task.id} id={task.id} data={task}>
                         <ProjectCardMemo
