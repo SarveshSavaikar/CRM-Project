@@ -43,7 +43,6 @@ async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
         query = query.where(and_(*conditions))
 
     rows = await db.fetch_all(query)
-    print([dict(row) for row in rows])
     return [dict(row) for row in rows]
 
 
