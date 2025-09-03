@@ -56,7 +56,9 @@ Lead = Table(
     Column("created_at", DateTime, nullable=False),
     Column("updated_at", DateTime, nullable=False),
     Column("team_id", Integer, ForeignKey(Team.c.id)),
-    Column("user_id", Integer, ForeignKey(User.c.id))
+    Column("user_id", Integer, ForeignKey(User.c.id)),
+    Column("city", String(100), nullable=True),
+    Column("region", String(100), nullable=True)
 )
 
 

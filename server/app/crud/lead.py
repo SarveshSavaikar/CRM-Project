@@ -12,8 +12,23 @@ from . import crud_utils
 prefix_columns = crud_utils.prefix_columns
 # Get lead by ID
 async def get_lead_by_id(db: Database, lead_id: int):
-    query = select(Lead).where(Lead.c.id == lead_id)
-    return await db.fetch_one(query)
+    query = (
+        select(
+            *prefix_columns(User, "user"),
+            *prefix_columns(Team, "team"),
+            *prefix_columns(Lead, "")
+        )
+        .select_from(
+            Lead
+            .outerjoin(User, Lead.c.user_id == User.c.id)
+            .outerjoin(Team, Lead.c.team_id == Team.c.id)
+        )
+        .where(Lead.c.id == lead_id)
+    )
+
+    row = await db.fetch_one(query)
+    return dict(row) if row else None
+
 
 async def get_leads(db: Database, count=False, **filters: dict[str, Any]) -> list[dict[str, Any]]:
     if count:
@@ -75,7 +90,10 @@ async def create_lead(db: Database, lead_data: LeadCreate):
             status = lead_data.status,
             score = lead_data.score,
             team_id = lead_data.team_id,
-            user_id = lead_data.user_id
+            user_id = lead_data.user_id,
+            city = lead_data.city,
+            region = lead_data.region
+            
         )
         .returning(Lead)
 
