@@ -9,6 +9,7 @@ import {
   useDraggable,
   DragEndEvent,
 } from "@dnd-kit/core";
+import { HttpError, useCreate, useList } from "@refinedev/core";
 
 // --- DUMMY LEADS DATA with updated 'status' values ---
 
@@ -324,6 +325,21 @@ const KanbanColumn = ({
   );
 };
 
+interface LeadFormData {
+  name: string;
+  email: string;
+  phone: string;
+  source: string;
+  status: string;
+  score: number;
+  team_id?: number;
+  user_id?: number;
+  user_name: string;
+  team_name: string;
+  city: string;
+  region: string;
+}
+
 // --- MAIN COMPONENT: LeadsListIndex ---
 export function LeadsListIndex() {
   // State Hooks
@@ -336,8 +352,7 @@ export function LeadsListIndex() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [showAddLeadForm, setShowAddLeadForm] = useState(false);
-  const [newLeadData, setNewLeadData] = useState<Lead>({
-    id: 0,
+  const [newLeadData, setNewLeadData] = useState<LeadFormData>({
     name: "",
     email: "",
     phone: "",
@@ -348,20 +363,31 @@ export function LeadsListIndex() {
     user_id: undefined,
     user_name: "",
     team_name: "",
+    city: "",
+    region: "",
+  });
+
+  const { data, isLoading, isError } = useList<Lead>({
+    resource: "leads",
   });
 
   useEffect(() => {
-    fetch("http://localhost:8000/leads/")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setLeads(data);
-      })
-      .catch((err) => {
-        // handle error, e.g. show notification
-        setLeads([]);
-      });
-  }, []);
+    if (data?.data) {
+      setLeads(data.data);
+    }
+  }, [data]);
+  // useEffect(() => {
+  //   fetch("http://localhost:8000/leads/")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log(data);
+  //       setLeads(data);
+  //     })
+  //     .catch((err) => {
+  //       // handle error, e.g. show notification
+  //       setLeads([]);
+  //     });
+  // }, []);
 
   // Data for Select Inputs
   const stages = [
@@ -383,11 +409,18 @@ export function LeadsListIndex() {
     "Social Media",
     "Other",
   ];
-  const assignees = ["Sarah J.", "Michael B.", "Peter G.", "Lisa R."];
-  const sources = [
-    "All",
-    ...leadSources,
-  ];
+  // const assignees = ["Sarah J.", "Michael B.", "Peter G.", "Lisa R."];
+  const { data: assigneesData, isLoading: isLoadingAssignees } = useList({
+    resource: "users?role=Sales%20Rep",
+  });
+
+  const assignees = assigneesData?.data?.map((user) => user) || [];
+  const { data: teamsData, isLoading: isLoadingTeams } = useList({
+    resource: "teams",
+  });
+
+  const teams = teamsData?.data?.map((team) => team) || [];
+  const sources = ["All", ...leadSources];
   const assigneesFilter = [
     "All",
     ...Array.from(new Set(initialLeads.map((l) => l.user_name))),
@@ -469,21 +502,49 @@ export function LeadsListIndex() {
   };
 
   const handleFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setNewLeadData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+    if (name === "user_id") {
+      // Find the selected user object
+      const selectedUser = assignees.find((a) => a.id === Number(value));
+      setNewLeadData((prevData) => ({
+        ...prevData,
+        user_id: Number(value), 
+        user_name: selectedUser ? selectedUser.name : "",
+      }));
+    } else if (name === "team_id") {
+      // Find the selected user object
+      const selectedTeam = teams.find((t) => t.id === Number(value));
+      console.log("User\n", selectedTeam);
+      setNewLeadData((prevData) => ({
+        ...prevData,
+        team_id: Number(value), 
+        team_name: selectedTeam ? selectedTeam.name : "",
+      }));
+    } else {
+      setNewLeadData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+    console.log(newLeadData);
   };
 
+  const { 
+    mutate: createLead, 
+    isLoading: isLoadingCreate, 
+    isError: isCreateError, 
+    error 
+  } = useCreate<Lead, HttpError>();
+
+  
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newId =
-      leads.length > 0 ? Math.max(...leads.map((l) => l.id)) + 1 : 1;
+
+    const newId = leads.length > 0 ? Math.max(...leads.map((l) => l.id)) + 1 : 1;
+
     const newLead: Lead = {
       ...newLeadData,
       id: newId,
@@ -491,21 +552,39 @@ export function LeadsListIndex() {
       team_id: newLeadData.team_id ? Number(newLeadData.team_id) : undefined,
       user_id: newLeadData.user_id ? Number(newLeadData.user_id) : undefined,
     };
-    setLeads((prevLeads) => [...prevLeads, newLead]);
-    setShowAddLeadForm(false);
-    setNewLeadData({
-      id: 0,
-      name: "",
-      email: "",
-      phone: "",
-      source: "",
-      status: "Open",
-      score: 0,
-      team_id: undefined,
-      user_id: undefined,
-      user_name: "",
-      team_name: "",
-    });
+
+    createLead(
+      {
+        resource: "leads/create-lead",
+        values: newLead,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Created Lead:", data?.data);
+          setLeads((prevLeads) => [...prevLeads, data.data]);
+          setShowAddLeadForm(false);
+
+          // reset form
+          setNewLeadData({
+            name: "",
+            email: "",
+            phone: "",
+            source: "",
+            status: "Open",
+            score: 0,
+            team_id: undefined,
+            user_id: undefined,
+            user_name: "",
+            team_name: "",
+            city: "",
+            region: "",
+          });
+        },
+        onError: (err) => {
+          console.error("Error creating lead:", err);
+        },
+      }
+    );
   };
 
   return (
@@ -781,7 +860,7 @@ export function LeadsListIndex() {
                        {" "}
                     <input
                       type="text"
-                      name="fullName"
+                      name="name"
                       value={newLeadData.name}
                       onChange={handleFormChange}
                       required
@@ -790,7 +869,7 @@ export function LeadsListIndex() {
                                      {" "}
                   </div>
                                    {" "}
-                  <div
+                  {/* <div
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
                   >
                                         <label style={labelStyle}>*Title</label>
@@ -804,7 +883,7 @@ export function LeadsListIndex() {
                       style={inputStyle}
                     />
                                      {" "}
-                  </div>
+                  </div> */}
                                    {" "}
                   <div
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
@@ -857,7 +936,7 @@ export function LeadsListIndex() {
                                      {" "}
                   </div>
                                    {" "}
-                  <div
+                  {/* <div
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
                   >
                                        {" "}
@@ -872,7 +951,7 @@ export function LeadsListIndex() {
                       style={inputStyle}
                     />
                                      {" "}
-                  </div>
+                  </div> */}
                                  {" "}
                 </div>
                              {" "}
@@ -900,7 +979,7 @@ export function LeadsListIndex() {
                     <label style={labelStyle}>*Lead Source</label>             
                          {" "}
                     <select
-                      name="leadSource"
+                      name="source"
                       value={newLeadData.source}
                       onChange={handleFormChange}
                       required
@@ -926,7 +1005,7 @@ export function LeadsListIndex() {
                     <label style={labelStyle}>*Lead Status</label>             
                          {" "}
                     <select
-                      name="leadStatus"
+                      name="status"
                       value={newLeadData.status}
                       onChange={handleFormChange}
                       required
@@ -950,8 +1029,8 @@ export function LeadsListIndex() {
                     <label style={labelStyle}>*Assigned To</label>             
                          {" "}
                     <select
-                      name="assignedTo"
-                      value={newLeadData.user_name}
+                      name="user_id"
+                      value={newLeadData.user_id}
                       onChange={handleFormChange}
                       required
                       style={inputStyle}
@@ -960,8 +1039,8 @@ export function LeadsListIndex() {
                       <option value="">Select an agent</option>                 
                          {" "}
                       {assignees.map((a) => (
-                        <option key={a} value={a}>
-                          {a}
+                        <option key={"user-"+a.id} value={a.id}>
+                          {a.name}
                         </option>
                       ))}
                                          {" "}
@@ -970,6 +1049,32 @@ export function LeadsListIndex() {
                   </div>
                                    {" "}
                   <div
+                    style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
+                  >
+                                       {" "}
+                    <label style={labelStyle}>*Team</label>             
+                         {" "}
+                    <select
+                      name="team_id"
+                      value={newLeadData.team_id}
+                      onChange={handleFormChange}
+                      required
+                      style={inputStyle}
+                    >
+                                           {" "}
+                      <option value="">Select a team</option>                 
+                         {" "}
+                      {teams.map((t) => (
+                        <option key={"team-"+t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                                         {" "}
+                    </select>
+                                     {" "}
+                  </div>
+                                   {" "}
+                  {/* <div
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
                   >
                                        {" "}
@@ -984,18 +1089,17 @@ export function LeadsListIndex() {
                       style={inputStyle}
                     />
                                      {" "}
-                  </div>
+                  </div> */}
                                    {" "}
                   <div
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
                   >
-                                       {" "}
-                    <label style={labelStyle}>*Budget Range</label>             
-                         {" "}
+                                        <label style={labelStyle}>*City</label> 
+                                     {" "}
                     <input
                       type="text"
-                      name="budgetRange"
-                      // value={newLeadData.budgetRange}
+                      name="city"
+                      value={newLeadData.city}
                       onChange={handleFormChange}
                       required
                       style={inputStyle}
@@ -1007,12 +1111,11 @@ export function LeadsListIndex() {
                     style={{ ...formGroupStyle, flexBasis: "calc(33% - 5px)" }}
                   >
                                        {" "}
-                    <label style={labelStyle}>*Location</label>                 
-                     {" "}
+                    <label style={labelStyle}>*Region</label>
                     <input
                       type="text"
-                      name="location"
-                      // value={newLeadData.location}
+                      name="region"
+                      value={newLeadData.region}
                       onChange={handleFormChange}
                       required
                       style={inputStyle}
@@ -1020,7 +1123,7 @@ export function LeadsListIndex() {
                                      {" "}
                   </div>
                                    {" "}
-                  <div style={{ ...formGroupStyle, flexBasis: "100%" }}>
+                  {/* <div style={{ ...formGroupStyle, flexBasis: "100%" }}>
                                        {" "}
                     <label style={labelStyle}>*Description</label>             
                          {" "}
@@ -1036,7 +1139,7 @@ export function LeadsListIndex() {
                       }}
                     />
                                      {" "}
-                  </div>
+                  </div> */}
                                  {" "}
                 </div>
                              {" "}
@@ -1337,9 +1440,7 @@ export function LeadsListIndex() {
                   ASSIGNED TO
                 </th>
                                {" "}
-                <th style={{ textAlign: "left", padding: "13px 8px" }}>
-                  TEAM
-                </th>
+                <th style={{ textAlign: "left", padding: "13px 8px" }}>TEAM</th>
                                {" "}
                 <th style={{ textAlign: "left", padding: "13px 8px" }}>
                   STAGE

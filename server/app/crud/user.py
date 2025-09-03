@@ -38,7 +38,7 @@ async def get_users(db: Database, **filters: dict[str, Any]) -> list[dict[str, A
             conditions.append(getattr(User.c, attr).ilike(f"%{value}%"))
         elif hasattr(User.c, attr):
             conditions.append(getattr(User.c, attr) == value)
-
+    conditions.append(User.c.name != None)
     if conditions:
         query = query.where(and_(*conditions))
 

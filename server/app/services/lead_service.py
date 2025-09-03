@@ -65,7 +65,12 @@ async def get_leads(
 async def create_lead(db: Database, leadObj: LeadCreate):
     leadObj.team_id = None if leadObj.team_id==0 else leadObj.team_id
     leadObj.user_id = None if leadObj.user_id==0 else leadObj.user_id
-    return await lead.create_lead(db, leadObj)   
+    print("Creating lead")
+    createdLead = await lead.create_lead(db, leadObj)
+    createdLead = dict(createdLead)
+    lead_id = createdLead["id"]
+    return await get_lead(db, lead_id)
+    
 
 async def update_lead(db: Database, lead_id: int = None, leadObj: LeadUpdate = None, **filters: dict[str, Any]):
     status_values = ["Open", "Unassigned", "In Progress", "Converted", "Lost"]
