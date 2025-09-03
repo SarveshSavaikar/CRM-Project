@@ -177,6 +177,10 @@
   "How do I create a shared team inbox?": "Navigate to Settings -> Communication -> Team Inbox and connect your shared email address.",
   "Can I set priority levels for tasks or tickets?": "Yes. While creating or editing a task/ticket, choose a priority level such as Low, Medium, or High.",
   "How do I get notified when a new lead is added?": "Enable lead notifications under Settings -> Notifications or create an automation rule for alerts.",
-  "Can I schedule reports to be sent by email?": "Yes. Go to Reports -> Schedule Report, choose the frequency, and add recipients."
+  "Can I schedule reports to be sent by email?": "Yes. Go to Reports -> Schedule Report, choose the frequency, and add recipients.",
+  "how do I cancel my subscription?": "To cancel your subscription, go to Settings -> Billing -> Subscription Plan, and click 'Cancel Subscription'. Follow the prompts to confirm the cancellation.",
+  "How can I terminate my subscription?": "You can cancel your subscription from Settings -> Billing -> Cancel Subscription.",
+  "I want to quit my plan": "You can cancel your subscription from Settings -> Billing -> Cancel Subscription.",
+  "How do I delete my account permanently?": "Go to Settings -> Account -> Delete Account and follow the instructions."
 
 }
