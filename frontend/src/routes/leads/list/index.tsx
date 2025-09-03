@@ -9,7 +9,7 @@ import {
   useDraggable,
   DragEndEvent,
 } from "@dnd-kit/core";
-import { useList } from "@refinedev/core";
+import { HttpError, useCreate, useList } from "@refinedev/core";
 
 // --- DUMMY LEADS DATA with updated 'status' values ---
 
@@ -509,7 +509,6 @@ export function LeadsListIndex() {
     if (name === "user_id") {
       // Find the selected user object
       const selectedUser = assignees.find((a) => a.id === Number(value));
-      console.log("User\n", selectedUser);
       setNewLeadData((prevData) => ({
         ...prevData,
         user_id: Number(value), 
@@ -533,10 +532,19 @@ export function LeadsListIndex() {
     console.log(newLeadData);
   };
 
+  const { 
+    mutate: createLead, 
+    isLoading: isLoadingCreate, 
+    isError: isCreateError, 
+    error 
+  } = useCreate<Lead, HttpError>();
+
+  
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newId =
-      leads.length > 0 ? Math.max(...leads.map((l) => l.id)) + 1 : 1;
+
+    const newId = leads.length > 0 ? Math.max(...leads.map((l) => l.id)) + 1 : 1;
+
     const newLead: Lead = {
       ...newLeadData,
       id: newId,
@@ -544,35 +552,39 @@ export function LeadsListIndex() {
       team_id: newLeadData.team_id ? Number(newLeadData.team_id) : undefined,
       user_id: newLeadData.user_id ? Number(newLeadData.user_id) : undefined,
     };
-    fetch("http://localhost:8000/leads/create-lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newLead),
-    })
-      .then((res) => res.json())
-      .then((createdLead) => {
-        console.log("Created Lead:", createdLead);
-        setLeads((prevLeads) => [...prevLeads, createdLead]);
-        setShowAddLeadForm(false);
-        // reset form...
-      })
-      .catch((err) => {
-        console.error("Error creating lead:", err);
-      });
-    setNewLeadData({
-      name: "",
-      email: "",
-      phone: "",
-      source: "",
-      status: "Open",
-      score: 0,
-      team_id: undefined,
-      user_id: undefined,
-      user_name: "",
-      team_name: "",
-      city: "",
-      region: "",
-    });
+
+    createLead(
+      {
+        resource: "leads/create-lead",
+        values: newLead,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Created Lead:", data?.data);
+          setLeads((prevLeads) => [...prevLeads, data.data]);
+          setShowAddLeadForm(false);
+
+          // reset form
+          setNewLeadData({
+            name: "",
+            email: "",
+            phone: "",
+            source: "",
+            status: "Open",
+            score: 0,
+            team_id: undefined,
+            user_id: undefined,
+            user_name: "",
+            team_name: "",
+            city: "",
+            region: "",
+          });
+        },
+        onError: (err) => {
+          console.error("Error creating lead:", err);
+        },
+      }
+    );
   };
 
   return (
