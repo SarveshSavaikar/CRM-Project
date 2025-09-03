@@ -69,12 +69,12 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   //     gqlQuery: TASK_STAGES_QUERY,
   //   },
   // });
-  const { data: stages, isLoading: isLoadingStages } = useCustom<{data: any[]}>({
-    url:"/taskStages/",
+  const { data: stages, isLoading: isLoadingStages } = useCustom<{ data: any[] }>({
+    url: "/taskStages/",
     method: "get",
   })
 
-  console.log("stages: ",stages)
+  console.log("stages: ", stages)
   // const { data: tasks, isLoading: isLoadingTasks } = useList<
   //   GetFieldsFromList<TasksQuery>
   // >({
@@ -95,37 +95,37 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
   //     gqlQuery: TASKS_QUERY,
   //   },
   // });
-  const { data: tasks, isLoading: isLoadingTasks  } = useCustom<{
-    [x: string]: any;data: any[]
-}>({
-    url:"/tasks/",
+  const { data: tasks, isLoading: isLoadingTasks } = useCustom<{
+    [x: string]: any; data: any[]
+  }>({
+    url: "/tasks/",
     method: "get",
   })
-  console.log("task : ",tasks)
+  console.log("task : ", tasks)
   // group tasks by stage
   // it's convert Task[] to TaskStage[] (group by stage) for kanban
   // uses `stages` and `tasks` from useList hooks
   const taskStages = React.useMemo(() => {
-  if (!tasks?.data || !stages?.data) {
-    return { unassignedStage: [], columns: [] };
-  }
+    if (!tasks?.data || !stages?.data) {
+      return { unassignedStage: [], columns: [] };
+    }
 
-  const unassignedStage = tasks.data.data?.filter(
-    (task) => task.stageid === null
-  );
+    const unassignedStage = tasks.data.data?.filter(
+      (task) => task.stageid === null
+    );
 
-  const grouped: TaskStage[] = stages.data.data.map((stage) => ({
-    ...stage,
-    tasks: tasks.data?.filter(
-      (task: { stageid: number }) => task.stageid === stage.id
-    ),
-  }));
-  console.log("Grouped ",grouped)
-  return {
-    unassignedStage,
-    columns: grouped,
-  };
-}, [tasks, stages]);
+    const grouped: TaskStage[] = stages.data.data.map((stage) => ({
+      ...stage,
+      tasks: tasks.data?.filter(
+        (task: { stageid: number }) => task.stageid === stage.id
+      ),
+    }));
+    console.log("Grouped ", grouped)
+    return {
+      unassignedStage,
+      columns: grouped,
+    };
+  }, [tasks, stages]);
 
   const { mutate: updateTask } = useUpdate<
     any,              // response type
@@ -139,41 +139,41 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
       // Override the method to use PATCH instead of default PUT
       method: "patch",
     },
-    
+
   });
 
   const handleOnDragEnd = (event: DragEndEvent) => {
-  const stageId = Number(event.over?.id); // convert to number
-  const taskId = Number(event.active.id);
-  const taskStageId = event.active.data.current?.stageid;
+    const stageId = Number(event.over?.id); // convert to number
+    const taskId = Number(event.active.id);
+    const taskStageId = event.active.data.current?.stageid;
 
-  if (taskStageId === stageId) return;
-  console.log(queryClient.getQueryCache().getAll().map(q => q.queryKey));
+    if (taskStageId === stageId) return;
+    console.log(queryClient.getQueryCache().getAll().map(q => q.queryKey));
 
-  queryClient.setQueryData(["data", "default", "custom", { url: "/tasks/", method: "get" }], (oldData: any) => {
-    if (!oldData) return oldData;
-    console.log("Oldata ",oldData)
-    return {
-      ...oldData,
-      data: oldData.data.map((task: any) =>
-        task.id === taskId ? { ...task, stageid: stageId } : task
-      ),
-    };
-  });
+    queryClient.setQueryData(["data", "default", "custom", { url: "/tasks/", method: "get" }], (oldData: any) => {
+      if (!oldData) return oldData;
+      console.log("Oldata ", oldData)
+      return {
+        ...oldData,
+        data: oldData.data.map((task: any) =>
+          task.id === taskId ? { ...task, stageid: stageId } : task
+        ),
+      };
+    });
 
-  updateTask(
-    {
-      id: taskId,
-      values: { stageid: stageId },
-    },
-    {
-      onSuccess: () => {
-        // Refetch tasks after update
-        invalidate({ resource: "tasks", invalidates: ["list"] });
+    updateTask(
+      {
+        id: taskId,
+        values: { stageid: stageId },
       },
-    }
-  );
-};
+      {
+        onSuccess: () => {
+          // Refetch tasks after update
+          invalidate({ resource: "tasks", invalidates: ["list"] });
+        },
+      }
+    );
+  };
 
   const handleAddCard = (args: { stageId: string }) => {
     const path =
@@ -197,7 +197,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
 
       <KanbanBoardContainer>
         <KanbanBoard onDragEnd={handleOnDragEnd}>
-           {/* <KanbanColumn
+          {/* <KanbanColumn
             id={"1"}
             title={"unassigned"}
             count={taskStages?.unassignedStage?.length || 0}
@@ -224,7 +224,7 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
             )}
           </KanbanColumn>   */}
           {taskStages.columns?.map((column) => {
-            console.log("Showing columns" , column.tasks?.length)
+            console.log("Showing columns", column.tasks?.length)
             return (
               <KanbanColumn
                 key={column.id}
@@ -233,17 +233,24 @@ export const TasksListPage = ({ children }: React.PropsWithChildren) => {
                 count={column.tasks?.length}
                 onAddClick={() => handleAddCard({ stageId: column.id })}
               >
-                {isLoading && <ProjectCardSkeleton /> }
+                {isLoading && <ProjectCardSkeleton />}
                 {isLoading && console.log("Emo")}
-                
+
                 {!isLoading &&
                   column.tasks?.map((task) => {
-                    console.log("Task.id = ",task)
+                    console.log("Task.id = ", task)
                     return (
                       <KanbanItem key={task.id} id={task.id} data={task}>
                         <ProjectCardMemo
                           {...task}
-                          dueDate={task.dueDate || undefined}
+                          dueDate={task['due_date'] || "02-Sep"}
+                          users={[
+                            {
+                              id: task["user_id"]?.toString() || "0",
+                              name: task["user_name"] || "Unknown User",
+                              avatarUrl: task["user_avatar"] || undefined,
+                            },
+                          ]}
                         />
                       </KanbanItem>
                     );

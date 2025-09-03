@@ -5,7 +5,7 @@
 from fastapi import FastAPI , File, UploadFile# type: ignore
 
 
-from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics , taskStages ,products, upload
+from app.api import users, leads, auth, teams, campaigns, tasks, admin, customers, opportunities, interactions , email , linkedin, analytics , taskStages ,products, upload ,whatsapp
 
 
 from app.api import test_db
@@ -65,6 +65,7 @@ app.include_router(products.router)
 
 app.include_router(email.router)
 app.include_router(linkedin.router)
+app.include_router(whatsapp.router)
 
 app.include_router(analytics.router)
 app.include_router(taskStages.router)
