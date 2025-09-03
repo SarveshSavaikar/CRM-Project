@@ -11,6 +11,8 @@ class LeadBase(BaseModel):
     score: int = Field(default=0)
     team_id: Optional[int] = None
     user_id: Optional[int] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
 
 class LeadCreate(LeadBase):
     pass
