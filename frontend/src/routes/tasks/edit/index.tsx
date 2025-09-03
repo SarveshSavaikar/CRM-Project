@@ -30,11 +30,13 @@ export const TasksEditPage = () => {
   const { modalProps, close, queryResult } = useModalForm<Task>({
     action: "edit",
     defaultVisible: true,
-    meta: {
-      gqlMutation: UPDATE_TASK_MUTATION,
-    },
+    // meta: {
+    //   gqlMutation: UPDATE_TASK_MUTATION,
+    // },
+    resource: "tasks"
   });
-
+  console.log("ModalProps", modalProps)
+  console.log("queryResult", queryResult?.data?.data)
   const { description, dueDate, users, title } = queryResult?.data?.data ?? {};
   const isLoading = queryResult?.isLoading ?? true;
 

@@ -13,6 +13,7 @@ async def create_task( task: TaskCreate, db: Database = Depends(get_db)):
 
 @router.get("/", response_model=list[TaskResponse])
 async def get_task(
+    id: int = None,
     title: str = None,
     due_date: datetime = None,
     status: str = None,
@@ -28,7 +29,7 @@ async def get_task(
     return result
 
 
-@router.get("/task-{task_id}", response_model=TaskResponse)
+@router.get("/{task_id}", response_model=TaskResponse)
 async def get_task(task_id: int, db: Database = Depends(get_db)):
     return await task_service.get_task(db, task_id)
 
