@@ -1,19 +1,17 @@
 import React from "react";
+// Import ThemedSiderV2 directly from the library
+import { ThemedLayoutV2, ThemedSiderV2 } from "@refinedev/antd";
 
-import { ThemedLayoutV2, ThemedTitleV2 } from "@refinedev/antd";
-
-import { GitHubBanner } from "./gh-banner";
 import { Header } from "./header";
 
 export const Layout = ({ children }: React.PropsWithChildren) => {
   return (
     <>
-      <GitHubBanner />
       <ThemedLayoutV2
         Header={Header}
-        Title={(titleProps) => {
-          return <ThemedTitleV2 {...titleProps} text="Refine" />;
-        }}
+        // Use the imported ThemedSiderV2 component
+        Sider={() => <ThemedSiderV2 fixed />}
+        Title={() => null}
       >
         {children}
       </ThemedLayoutV2>

@@ -26,9 +26,5 @@ load_dotenv()  # loads .env variables
 
 database = Database("postgresql://postgres:kerzWqBTnPLjqJqPAgJrBglHzCBKjpwp@switchyard.proxy.rlwy.net:21007/railway")
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    return database

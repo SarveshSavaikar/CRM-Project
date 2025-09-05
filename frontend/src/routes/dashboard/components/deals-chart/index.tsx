@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useList } from "@refinedev/core";
+import { useCustom, useList } from "@refinedev/core";
 import type { GetFieldsFromList } from "@refinedev/nestjs-query";
 
 import { DollarOutlined } from "@ant-design/icons";
@@ -22,9 +22,16 @@ export const DashboardDealsChart = () => {
     },
   });
 
+  const { data: temp , isLoading: b} = useCustom<any []> ({
+    url:"/opportunities/?before=true&all_closed=true",
+    method: "get",
+  })
+
+  console.log("temp",temp)
   const dealData = React.useMemo(() => {
-    return mapDealsData(data?.data);
-  }, [data?.data]);
+    console.log("SOmehting",temp)
+    return mapDealsData(temp?.data);
+  }, [temp?.data]);
 
   const config: AreaConfig = {
     isStack: false,

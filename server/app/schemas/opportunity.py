@@ -1,0 +1,49 @@
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel, Field, EmailStr
+
+class OpportunityBase(BaseModel):
+    name: str = Field(..., max_length=255)
+    value: float = Field(default=0.0)
+    lead_id: Optional[int] = None
+    stage_id: Optional[int] = None
+    close_date: Optional[datetime] = None
+
+
+class OpportunityCreate(OpportunityBase):
+    created_at: datetime = Field(default_factory=datetime.now)
+    product_list: Optional[dict[int, int]] = None # {product_id: quantity}
+
+class OpportunityCreateWithProducts(OpportunityBase):
+    created_at: datetime = Field(default_factory=datetime.now)
+    product_list: Optional[dict[int, int]] = None # {product_id: quantity}
+    product_list_total: Optional[list[tuple[int, int, float, float]]] = [] # [{"product_id": int, "quantity": int, "unit_price": float, "total_price": float}]    
+        
+
+class OpportunityUpdate(BaseModel):
+    name: Optional[str] = Field(None, max_length=100)
+    value: Optional[float] = Field(None)
+    lead_id: Optional[int] = Field(None)
+    pipeline_stage_id: Optional[int] = Field(None)
+    close_date: Optional[datetime] = None
+    
+
+
+class OpportunityResponse(OpportunityBase):
+    id: int
+    lead_name: Optional[str] = None
+    created_at: datetime
+    stage_name: Optional[str] = None
+    stage_order: Optional[int] = None
+    products: Optional[list[dict]] = None
+    class Config:
+        from_attributes = True
+
+
+class OpportunityInDB(OpportunityBase):
+    id: int
+    created_at: datetime
+    close_date: datetime
+
+    class Config:
+        from_attributes = True
