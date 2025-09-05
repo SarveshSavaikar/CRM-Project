@@ -1,0 +1,13 @@
+jwt_secret_key=awkef20392@
+access_token_expire_minutes=60
+algorithm="HS256"
+EMAIL_IMAP_HOST = "imap.gmail.com"  # IMAP server
+EMAIL_SMTP_HOST = "smtp.gmail.com"
+EMAIL_USER = "johnsmith.example.project@gmail.com"  # Your email
+EMAIL_PASS = "botx xjkf lfed kjko"  # App password (Gmail/Outlook)
+LINKEDIN_EMAIL=johnsmith.example.project@gmail.com
+LINKEDIN_PASSWORD=john1234
+AWS_ACCESS_KEY_ID=AKIAUVY7UP5FAHXZWIGA
+AWS_SECRET_ACCESS_KEY=6F++DH4e/uvaw6eLqYea6Hh3KjK4yzxeqwMILU8O
+AWS_REGION=ap-south-1
+AWS_BUCKET_NAME=crm-leads-storage123
